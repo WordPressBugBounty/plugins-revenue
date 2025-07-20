@@ -1800,11 +1800,11 @@ class Revenue_Functions {
 	 *                     an array containing offer details (type, value, message, price) is returned.
 	 *                     Otherwise, the final offered price is returned as a float.
 	 */
-	public function calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price, $with_save_data = false, $offer_qty = 1 , $campaign_type='') {
+	public function calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price, $with_save_data = false, $offer_qty = 1, $campaign_type = '' ) {
 		$offered_price        = 0.0;
 		$regular_price        = floatval( $regular_price );
 		$offer_value          = floatval( $offer_value );
-		$offer_qty 			  = floatval($offer_qty);
+		$offer_qty            = floatval( $offer_qty );
 		$save_data            = array();
 		$save_data['message'] = '';
 
@@ -1823,7 +1823,6 @@ class Revenue_Functions {
 				}
 				break;
 
-			
 			case 'fixed_discount':
 			case 'amount':
 				$offered_price     = max( floatval( 0 ), ( $regular_price - $offer_value ) );
@@ -1842,24 +1841,23 @@ class Revenue_Functions {
 				if($campaign_type==='volume_discount') {
 					$total_save = $total_save * $offer_qty;
 				}
-				
+
 				$save_data['message'] = sprintf( __( 'Save %s', 'revenue' ), wc_price( $total_save ) );
 				break;
 			case 'fixed_total_price':
-				$offered_price        = $offer_value;
-				$temp_price 		  =  $offer_value * $offer_qty;
+				$offered_price = $offer_value;
+				$temp_price    = $offer_value * $offer_qty;
 
-				if($campaign_type==='volume_discount') {
-					$regular_price = $regular_price*$offer_qty;
-					$offer_value = $offer_value;
+				if ( $campaign_type === 'volume_discount' ) {
+					$regular_price = $regular_price * $offer_qty;
+					$offer_value   = $offer_value;
 				}
 
-
-				$save_data['type']    = 'fixed_total_price';
-				$save_data['value']   = $offer_value;
+				$save_data['type']  = 'fixed_total_price';
+				$save_data['value'] = $offer_value;
 				/* translators: %s: Discount percentage value */
-				$save_data['message'] = sprintf( __( 'Save %s', 'revenue' ), wc_price(  $regular_price -  $offer_value ) );	
-								
+				$save_data['message'] = sprintf( __( 'Save %s', 'revenue' ), wc_price( $regular_price - $offer_value ) );
+
 				break;
 
 			case 'no_discount':
@@ -2894,29 +2892,39 @@ class Revenue_Functions {
 		$data_attribute = '';
 		if ( ! empty( $customData ) ) {
 			foreach ( $customData as $key => $value ) {
-				$data_attribute .= "data-$key = '$value' ";
+				$safe_value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+				$data_attribute .= "data-$key='" . $safe_value . "' ";
 			}
 		}
 
+		// Special case for product title link
 		if ( 'double_order' !== $current_campaign['campaign_type'] ) {
-			$offered_product_title_click_action = revenue()->get_campaign_meta( $current_campaign['id'], 'offered_product_click_action', true ) ?? 'go_to_product';
+			$click_action = revenue()->get_campaign_meta( $current_campaign['id'], 'offered_product_click_action', true ) ?? 'go_to_product';
 
-			if ( $name == 'productTitle' && isset( $customData['product_url'] ) && 'go_to_product' == $offered_product_title_click_action ) {
+			if ( $name == 'productTitle' && isset( $customData['product_url'] ) && 'go_to_product' == $click_action ) {
 				ob_start();
 				?>
-					<a target="_blank" href="<?php echo esc_url( $customData['product_url'] ); ?>"> <?php echo wp_kses( "<$wrapperTag title='$p_name' style='$css' class='$class $classes'  $data_attribute>" . $wrappedContent . "</$wrapperTag>", revenue()->get_allowed_tag() ); ?> </a>
+			<a target="_blank" href="<?php echo esc_url( $customData['product_url'] ); ?>">
 				<?php
-
+				echo wp_kses(
+					"<$wrapperTag title='$p_name' style='$css' class='$class $classes' $data_attribute>$wrappedContent</$wrapperTag>",
+					revenue()->get_allowed_tag()
+				);
+				?>
+			</a>
+				<?php
 				return ob_get_clean();
 			}
 		}
 
+		// Add spinner for addToCartButton
 		if ( 'addToCartButton' === $name ) {
 			$wrappedContent = '<span class="spinner" style="display: none;"></span>' . $wrappedContent;
 		}
 
-		return "<$wrapperTag title='$p_name' style='$css' class='$class $classes'  $data_attribute>" . $wrappedContent . "</$wrapperTag>";
+		return "<$wrapperTag title='$p_name' style='$css' class='$class $classes' $data_attribute>$wrappedContent</$wrapperTag>";
 	}
+
 
 	public function popup_container( $current_campaign, $generated_styles, $output_content, $class = '', $without_heading = false, $placement = '' ) {
 
@@ -3509,11 +3517,11 @@ class Revenue_Functions {
 				);
 				break;
 			case 'fixed_price':
-				$price        = $value;
+				$price = $value;
 				$save  = array(
 					'type'    => 'amount',
-					'value'   => abs($regular_price-$value),
-					'content' => sprintf( __( 'Save %1$s%2$s', 'revenue' ), $currency_symbol, number_format( abs($regular_price-$value)* $quantity, 2 ) ),
+					'value'   => abs( $regular_price - $value ),
+					'content' => sprintf( __( 'Save %1$s%2$s', 'revenue' ), $currency_symbol, number_format( abs( $regular_price - $value ) * $quantity, 2 ) ),
 				);
 				break;
 			default:

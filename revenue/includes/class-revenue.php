@@ -19,7 +19,9 @@ use Revenue\Revenue_Server;
 use Revenue\Revenue_Install;
 use Revenue\Revenue_Normal_Discount;
 use Revenue\Revenue_Volume_Discount;
-use Revenue\Revenue_Notice;
+use REVX\Includes\Durbin\Xpo;
+
+// use Revenue\Revenue_Notice;
 
 
 defined( 'ABSPATH' ) || exit;
@@ -171,7 +173,7 @@ final class Revenue {
 		require_once REVENUE_PATH . 'includes/campaigns/class-revenue-stock-scarcity.php';
 		require_once REVENUE_PATH . 'includes/campaigns/class-revenue-next-order-coupon.php';
 
-		require_once REVENUE_PATH . 'includes/class-revenue-notice.php';
+		// require_once REVENUE_PATH . 'includes/class-revenue-notice.php';
 
 		if ( $this->is_request( 'frontend' ) || $this->is_rest_api_request() ) {
 			$this->frontend_includes();
@@ -186,6 +188,11 @@ final class Revenue {
 	public function include_revenue_menu() {
 		if ( is_admin() ) {
 			require_once REVENUE_PATH . 'includes/admin/class-revenue-menu.php';
+			require_once REVENUE_PATH . 'includes/durbin/class-durbin-client.php';
+			require_once REVENUE_PATH . 'includes/durbin/class-our-plugins.php';
+			require_once REVENUE_PATH . 'includes/durbin/class-xpo.php';
+			require_once REVENUE_PATH . 'includes/deactive/class-deactive.php';
+			require_once REVENUE_PATH . 'includes/notice/class-notice.php';
 		}
 	}
 
@@ -197,6 +204,9 @@ final class Revenue {
 	public function init_menu() {
 		if ( is_admin() ) {
 			new Revenue_Menu();
+			new \REVX\Includes\Deactive\Deactive();
+			new \REVX\Includes\Notice\Notice();
+			new \REVX\Includes\Durbin\OurPlugins();
 		}
 	}
 
@@ -248,7 +258,7 @@ final class Revenue {
 		Revenue_Stock_Scarcity::instance()->init();
 		Revenue_Next_Order_Coupon::instance()->init();
 
-		Revenue_Notice::instance()->init();
+		// Revenue_Notice::instance()->init();
 	}
 
 	/**
@@ -269,7 +279,24 @@ final class Revenue {
 	 * @since 1.0.0
 	 */
 	public function plugin_action_links( $links ) {
-		return $links;
+		$setting_link                     = array();
+		$setting_link['revenue_campaign'] = '<a href="' . esc_url( admin_url( 'admin.php?page=revenue#/campaigns' ) ) . '">' . esc_html__( 'Options', 'revenue' ) . '</a>';
+		$upgrade_link                     = array();
+		if ( ! defined( 'REVENUE_PRO_VER' ) || Xpo::is_lc_expired() ) {
+			// This will add product automatically to the cart.
+			// Discuss with Anik/TiBRO bro about this for your plugin.
+			$url = ! defined( 'REVENUE_PRO_VER' ) ? Xpo::generate_utm_link(
+				array(
+					'utmKey' => 'plugin_dir_pro',
+				)
+			)
+				: 'https://account.wpxpo.com/checkout/?edd_license_key=' . Xpo::get_lc_key();
+
+				$text                        = ! defined( 'REVENUE_PRO_VER' ) ? esc_html__( 'Switch to Pro', 'revenue' ) : esc_html__( 'Renew License', 'revenue' );
+				$upgrade_link['revenue_pro'] = '<a style="color: #e83838; font-weight: bold;" target="_blank" href="' . esc_url( $url ) . '">' . $text . '</a>';
+		}
+		return array_merge( $setting_link, $links, $upgrade_link );
+		// return $links;
 	}
 
 

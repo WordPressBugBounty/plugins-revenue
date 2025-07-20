@@ -9,6 +9,8 @@
 
 namespace Revenue;
 
+use REVX\Includes\Durbin\Xpo;
+
 /**
  * Revenue Menu
  *
@@ -49,7 +51,6 @@ class Revenue_Menu {
 		add_filter( 'woocommerce_json_search_found_categories', array( $this, 'modify_woocommerce_category_search_response' ) );
 		add_action( 'admin_head', array( $this, 'clear_interface' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
-
 	}
 
 
@@ -80,6 +81,11 @@ class Revenue_Menu {
 		if ( 'toplevel_page_revenue' === $screen->id ) {
 			remove_all_actions( 'admin_notices' );
 		}
+		echo '<style>
+		.revx-menu-upgrade-to-pro:hover {
+			// background-color: #005539 !important;
+		}
+		</style>';
 	}
 
 	/**
@@ -113,22 +119,31 @@ class Revenue_Menu {
 		$dashboard_hook = add_menu_page($menu_title, $menu_title, $capability, $slug, array($this, 'dashboard'), $menu_icon, $menu_position);
 
 		if (revenue()->is_user_allowed_to_revenue_dashboard()) {
-			$submenu[$slug][] = array(__('Dashboard', 'revenue'), $capability, 'admin.php?page=' . $slug . '#/');
+			$submenu[$slug][] = array(__('Overview', 'revenue'), $capability, 'admin.php?page=' . $slug . '#/');
 			$submenu[$slug][] = array(__('Campaigns', 'revenue'), $capability, 'admin.php?page=' . $slug . '#/campaigns');
+			$submenu[$slug][] = array(__('Analytics', 'revenue'), $capability, 'admin.php?page=' . $slug . '#/analytics');
 			// $submenu[ $slug ][] = array( __( 'Global Settings', 'revenue' ), $capability, 'admin.php?page=' . $slug . '#/settings' );
 
 			if (! revenue()->is_whitelabel_enabled()) {
 				if (revenue()->is_pro_ready()) {
 					$submenu[$slug][] = array(__('License', 'revenue'), $capability, 'admin.php?page=' . $slug . '#/license');
 				}
-				$submenu[$slug][] = array(__('Quick Support', 'revenue'), $capability, 'admin.php?page=' . $slug . '#/support');
 				$submenu[$slug][] = array(__('Suggest Features', 'revenue'), $capability, 'https://www.wowrevenue.com/roadmap/');
 			}
 
-			if(!revenue()->is_pro_active()) {
-				$name = sprintf( '<span class="revx-menu-upgrade-to-pro" style="background-color:#00a464; color:#ffffff; padding: 5px 12px; margin: -5px -12px; display: block; ">%s</span>', __('Upgrade to Pro', 'revenue') );
+			if ( ! Xpo::is_lc_active() || Xpo::is_lc_expired() ) {
+				$icon = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px; vertical-align: middle;">
+					<path d="M2.85952 6.55725C2.74933 6.07978 3.32046 5.74522 3.68305 6.07485L6.70249 8.81979C6.8986 8.99808 7.20913 8.95036 7.34268 8.72143L9.64009 4.783C9.80087 4.50737 10.1991 4.50737 10.3599 4.783L12.6573 8.72143C12.7909 8.95036 13.1014 8.99808 13.2975 8.81979L16.317 6.07485C16.6795 5.74522 17.2507 6.07977 17.1405 6.55725L15.1491 15.1867C15.0618 15.5648 14.7251 15.8327 14.3371 15.8327H5.66293C5.27488 15.8327 4.93819 15.5648 4.85093 15.1867L2.85952 6.55725Z" stroke="white" stroke-width="1.25"/>
+				</svg>';
 
-				$submenu[$slug][] = array($name, $capability, 'https://www.wowrevenue.com/#pricing');
+				$name = sprintf(
+					'<span class="revx-menu-upgrade-to-pro custom-upgrade-btn" style="background-color:#00A464; color:#ffffff; padding: 10px 12px; margin: 0px -3px; display: flex; align-items: center;border-radius:8px;">%s%s</span>',
+					$icon,
+					Xpo::is_lc_expired() ? __('Renew License', 'revenue') : __('Upgrade Pro', 'revenue')
+				);
+				$license_key   = Xpo::get_lc_key();
+				$pro_link = !Xpo::is_lc_expired() ? 'https://account.wpxpo.com/checkout/?edd_license_key=' . $license_key : Xpo::generate_utm_link(array('utmKey' => 'submenu'));
+				$submenu[$slug][] = array($name, $capability, $pro_link);
 			}
 
 			$submenu[$slug] = apply_filters('revenue_submenu_slugs', $submenu[$slug], $slug); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
@@ -149,6 +164,8 @@ class Revenue_Menu {
 		wp_set_script_translations('revenue-admin', 'revenue');
 
 		wp_enqueue_style('revx-atc', REVENUE_URL . 'assets/css/frontend/animated-atc.css', array(), 588);
+		$user_info = get_userdata( get_current_user_id() );
+
 
 		$localize_data = array(
 			'url'                          => REVENUE_URL,
@@ -189,6 +206,14 @@ class Revenue_Menu {
 			'is_show_bundle_with_trigger_product' => revenue()->is_show_bundle_with_trigger_product(),
 			'campaign_list_trigger_row_message' => revenue()->get_campaign_list_trigger_row(),
 			'campaign_enabled_quantity_selector' => revenue()->show_quantity_selector_on_campaigns(),
+			'campaign_counts'                  => revenue()->get_campaign_counts(),
+			'helloBar'                  => Xpo::get_transient_without_cache('revx_helloBar'),
+			'license'                  => Xpo::get_lc_key(),
+			'userInfo'          => array(
+				'name'  => $user_info->first_name ? $user_info->first_name . ( $user_info->last_name ? ' ' . $user_info->last_name : '' ) : $user_info->user_login,
+				'email' => $user_info->user_email,
+			),
+ 
 		);
 
 		if(!revenue()->is_pro_active()) {
@@ -197,7 +222,7 @@ class Revenue_Menu {
 		wp_localize_script(
 			'revenue-admin',
 			'revenue',
-			$localize_data
+			array_merge($localize_data, Xpo::get_wow_products_details())
 		);
 
 		// Add inline script.
@@ -258,21 +283,7 @@ class Revenue_Menu {
 		// Hello bar notice
 		$current_time = gmdate( 'U' );
 
-		if(! revenue()->is_pro_active()  &&  $current_time > strtotime( '23-06-2025' ) && $current_time < strtotime( '09-07-2025' )) {
-			$close_url = add_query_arg( 'revx-notice-disable', 'ss_hello_bar_211' );
-
-			$notice_status = Revenue_Notice::get_user_notice('ss_hello_bar_211');
-
-			if($notice_status !== 'off'){
-				?>
-
-				<div class="rvx-setting-hellobar"><span class="dashicons dashicons-bell revx-ring">
-
-				</span>Summer Sale Alert:   Enjoy a <strong>&nbsp;  Up to 65% Discount   </strong> &nbsp;on WowRevenue Pro - 
-				<a href="https://www.wowrevenue.com/?utm_source=revenue-menu&utm_medium=summer-topbar&utm_campaign=wowrevenue-DB#pricing" target="_blank">Grab Now &nbsp; ➤</a><a href="<?php echo esc_url($close_url); ?>" class="helobarClose"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31.1 31.25"><path stroke="rgba(0,0,0,0)" stroke-miterlimit="10" d="M27.1 30.153 15.549 18.601 4 30.153a2.05 2.05 0 0 1-2.9-2.9l11.551-11.55L1.1 4.153a2.05 2.05 0 0 1 2.9-2.9l11.549 11.552L27.1 1.253a2.05 2.05 0 0 1 2.9 2.9l-11.553 11.55L30 27.253a2.05 2.05 0 1 1-2.9 2.9Z"></path></svg></a></div>
-				<?php
-			}
-		}
+		
 
 		$is_activate =  class_exists('WooCommerce') ? true : false;
 		$is_woo_installed = file_exists(WP_PLUGIN_DIR . '/woocommerce/woocommerce.php') ? true : false;
