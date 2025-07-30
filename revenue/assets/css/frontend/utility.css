@@ -59,7 +59,9 @@
 
 .revx-campaign-item__image img {
     border-radius: inherit;
+    aspect-ratio: 1/1;
     box-shadow: none !important;
+    height: auto;
 }
 
 .revx-campaign-item__prices {
@@ -687,4 +689,10 @@ Button Size
 .revx-builder-btn:hover {
 	background-color: var(--revx-hover-color) !important;
 	color: var(--revx-hover-text-color) !important;
+}
+
+/* theme compatibility */
+
+.wp-theme-thegem-elementor #site-header .header-main {
+    position: unset;
 }

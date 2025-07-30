@@ -293,24 +293,23 @@ $is_show_cta_button = isset( $campaign['enable_cta_button'] ) ? $campaign['enabl
 											?>
 											</div>
 										</div>
-										<div class="revx-upsell-slider-actions revx-flex">
-										<div class="revx-builder__quantity revx-align-center revx-width-full  <?php echo esc_attr( $classes ); ?>" style="<?php echo esc_attr( $quantity_style ); ?>">
-											<div class="revx-quantity-minus revx-justify-center" style="<?php echo esc_attr( $quantity_button_style ); ?>">
-											<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-											<path d="M3.33333 8H12.6667" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-											</svg>
-											</div>
-											
-												<input  data-name="revx_quantity"  type="number"  data-product-id="<?php echo esc_attr( $upsell_product['item_id'] ); ?>" data-campaign-id="<?php echo esc_attr( $current_campaign['id'] ); ?>" name="<?php echo esc_attr( 'revx-quantity-' . $current_campaign['id'] . '-' . $upsell_product['item_id'] ); ?>" style="<?php echo esc_attr( $quantity_input_style ); ?>" value="1"/>
-												
-											
-											<div class="revx-quantity-plus revx-justify-center" style="<?php echo esc_attr( $quantity_button_style ); ?>">
-											<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-										<path d="M8 3.33301V12.6663" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-										<path d="M3.33334 8H12.6667" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-										</svg>
-											</div>
-										</div>
+										<div class="revx-upsell-slider-actions revx-flex revx-align-center">
+                                            <div class="revx-builder__quantity revx-align-center revx-width-full  <?php echo esc_attr( $classes ); ?>" style="<?php echo esc_attr( $quantity_style ); ?>">
+                                                <div class="revx-quantity-minus revx-justify-center" style="<?php echo esc_attr( $quantity_button_style ); ?>">
+                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M3.33333 8H12.6667" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                    </svg>
+                                                </div>
+                                                
+                                                    <input  data-name="revx_quantity"  type="number"  data-product-id="<?php echo esc_attr( $upsell_product['item_id'] ); ?>" data-campaign-id="<?php echo esc_attr( $current_campaign['id'] ); ?>" name="<?php echo esc_attr( 'revx-quantity-' . $current_campaign['id'] . '-' . $upsell_product['item_id'] ); ?>" style="<?php echo esc_attr( $quantity_input_style ); ?>" value="1"/>
+                                                    
+                                                <div class="revx-quantity-plus revx-justify-center" style="<?php echo esc_attr( $quantity_button_style ); ?>">
+                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M8 3.33301V12.6663" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                        <path d="M3.33334 8H12.6667" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
 
 										<?php
 										echo wp_kses(

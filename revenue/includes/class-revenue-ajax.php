@@ -161,9 +161,8 @@ class Revenue_Ajax {
 					}
 				}
 
-				$chilren      = $product->get_children();
-				$child_data   = array();
-				$product_link = get_permalink( $product_id );
+				$chilren    = $product->get_children();
+				$child_data = array();
 
 				if ( is_array( $chilren ) ) {
 					foreach ( $chilren as $child_id ) {
@@ -176,7 +175,7 @@ class Revenue_Ajax {
 								'regular_price' => $child->get_regular_price(),
 								'sale_price'    => $child->get_sale_price(),
 								'parent'        => $product_id,
-								'url'           => $product_link,
+								'url'           => $child->get_permalink(),
 							);
 						}
 					}
@@ -400,12 +399,12 @@ class Revenue_Ajax {
 		} elseif ( empty( $data['campaign_trigger_relation'] ) ) {
 				$data['campaign_trigger_relation'] = 'or';
 		}
-		
+
 		if ( empty( $data['campaign_placement'] ) && 'next_order_coupon' == $data['campaign_type'] ) {
-			$data['campaign_placement'] = 'thankyou_page';
+			$data['campaign_placement']       = 'thankyou_page';
 			$data['campaign_inpage_position'] = 'before_thankyou';
 		}
-		
+
 		if ( empty( $data['campaign_placement'] ) ) {
 			$data['campaign_placement'] = 'multiple';
 		}
@@ -470,8 +469,7 @@ class Revenue_Ajax {
 						'drawer_position'          => 'top-left',
 					),
 				);
-			}
-			else {
+			} else {
 				$data['placement_settings'] = array(
 					$data['campaign_placement'] => array(
 						'page'                     => $data['campaign_placement'],
@@ -540,7 +538,7 @@ class Revenue_Ajax {
 		$campaign = (array) revenue()->get_campaign_data( $campaign_id );
 
 		$offers = revenue()->get_campaign_meta( $campaign['id'], 'offers', true );
-		
+
 		$status = false;
 
 		$cart_item_data = array(
@@ -549,11 +547,12 @@ class Revenue_Ajax {
 			'revx_campaign_type'   => $campaign['campaign_type'],
 		);
 
+		$product_index = 0;
 		if ( 'buy_x_get_y' === $campaign['campaign_type'] ) {
 
-			$bxgy_data = isset( $_POST['bxgy_data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['bxgy_data'] ) ) : array();
+			$bxgy_data         = isset( $_POST['bxgy_data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['bxgy_data'] ) ) : array();
 			$bxgy_trigger_data = isset( $_POST['bxgy_trigger_data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['bxgy_trigger_data'] ) ) : array();
-			$bxgy_offer_data = isset( $_POST['bxgy_offer_data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['bxgy_offer_data'] ) ) : array();
+			$bxgy_offer_data   = isset( $_POST['bxgy_offer_data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['bxgy_offer_data'] ) ) : array();
 
 			$trigger_product_relation = isset( $campaign['campaign_trigger_relation'] ) ? $campaign['campaign_trigger_relation'] : 'or';
 
@@ -720,7 +719,7 @@ class Revenue_Ajax {
 			}
 		} else {
 
-			$offer_qty = '';
+			$offer_qty  = '';
 			$flag_check = true;
 			if ( is_array( $offers ) ) {
 				foreach ( $offers as $offer_idx => $offer ) {
@@ -750,7 +749,7 @@ class Revenue_Ajax {
 								$offer_qty = max( $quantity, $offer_qty );
 							}
 
-							if ( ! ( 'volume_discount' === $campaign['campaign_type'] ) ) {
+							if ( ! ( 'volume_discount' === $campaign['campaign_type'] ) && $product_index == $index ) {
 								$status = WC()->cart->add_to_cart(
 									$product_id,
 									$offer_qty,
@@ -761,6 +760,7 @@ class Revenue_Ajax {
 								revenue()->increment_campaign_add_to_cart_count( $campaign_id );
 							}
 						}
+						$product_index++;
 					}
 				}
 			}
@@ -1140,7 +1140,7 @@ class Revenue_Ajax {
 									'thumbnail'     => wp_get_attachment_url( $child->get_image_id() ),
 									'regular_price' => $child->get_regular_price(),
 									'parent'        => $product->get_id(),
-									'url'           => $product_link,
+									'url'           => $child->get_permalink(),
 								);
 							}
 						}

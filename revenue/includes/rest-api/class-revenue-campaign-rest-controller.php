@@ -770,11 +770,16 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		$args           = array();
 		$where_clause   = array();
 		if ( isset( $request['s'] ) && ! empty( $request['s'] ) ) {
-			$args['s']      = sanitize_text_field( $request['s'] );
-			$args['s']      = stripslashes( $args['s'] );
-			$args['s']      = str_replace( array( "\r", "\n" ), '', $args['s'] );
-			$like           = '%' . $wpdb->esc_like( $args['s'] ) . '%';
-			$where_clause[] = "campaigns.campaign_name LIKE '{$like}'";
+			$args['s'] = sanitize_text_field( $request['s'] );
+			$args['s'] = stripslashes( $args['s'] );
+			$args['s'] = str_replace( array( "\r", "\n" ), '', $args['s'] );
+			$like      = '%' . $wpdb->esc_like( $args['s'] ) . '%';
+
+			if ( is_numeric( $args['s'] ) ) {
+				$where_clause[] = "(campaigns.campaign_name LIKE '{$like}' OR campaigns.id = {$args['s']})";
+			} else {
+				$where_clause[] = "campaigns.campaign_name LIKE '{$like}'";
+			}
 		}
 
 		if ( isset( $request['campaign_type'] ) && ! empty( $request['campaign_type'] ) ) {
@@ -976,7 +981,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		}
 
 		$data_keys     = isset( $request['data_keys'] ) ? $request['data_keys'] : array();
-		$select_clause = 'campaigns.id, campaigns.campaign_name, campaigns.campaign_status, ';
+		$select_clause = 'campaigns.id,campaigns.campaign_type, campaigns.campaign_name, campaigns.campaign_status, ';
 		$join_clause   = '';
 		$from          = "{$wpdb->prefix}revenue_campaigns AS campaigns";
 
@@ -1007,10 +1012,13 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 					$has_analytics_data = true;
 					break;
 				case 'conversion_rate':
-					$select_clause       .= 'CASE
-                                     WHEN COALESCE(analytics.total_impressions, 0) > 0 THEN (stats.order_count/ analytics.total_impressions) * 100
-                                     ELSE 0
-                                     END AS conversion_rate, ';
+					$select_clause       .= 'ROUND(
+						CASE
+							WHEN COALESCE(analytics.total_impressions, 0) > 0 THEN (stats.order_count / analytics.total_impressions) * 100
+							ELSE 0
+						END,
+						2
+					) AS conversion_rate, ';
 					$has_analytics_data   = true;
 					$has_order_stats_data = true;
 					break;
@@ -1155,10 +1163,14 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
                 DATE(analytics.date) AS date,
                 COALESCE(SUM(order_stats.total_sales), 0) AS total_sales,
                 COALESCE(SUM(CASE WHEN order_stats.parent_id = 0 THEN 1 ELSE 0 END), 0) AS orders_count,
-                CASE
-                WHEN COALESCE(SUM(analytics.impression_count), 0) > 0 THEN (COALESCE(SUM(CASE WHEN order_stats.parent_id = 0 THEN 1 ELSE 0 END), 0) / SUM(analytics.impression_count)) * 100
-                ELSE 0
-                END AS conversion_rate,
+                ROUND(
+					CASE
+						WHEN COALESCE(SUM(analytics.impression_count), 0) > 0 THEN
+							(COALESCE(SUM(CASE WHEN order_stats.parent_id = 0 THEN 1 ELSE 0 END), 0) / SUM(analytics.impression_count)) * 100
+						ELSE 0
+					END,
+					2
+				) AS conversion_rate,
                 COALESCE(SUM(analytics.impression_count), 0) AS impression_count,
                 COALESCE(SUM(analytics.add_to_cart_count), 0) AS add_to_cart,
                 COALESCE(SUM(analytics.rejection_count), 0) AS rejection_count,
@@ -2967,87 +2979,87 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'countdown_timer_evergreen_settings'          => array(
+				'countdown_timer_evergreen_settings'       => array(
 					'description' => __( 'Countdown Timer Campaign EverGreen Settings', 'revenue' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'countdown_timer_daily_recurring_settings'          => array(
+				'countdown_timer_daily_recurring_settings' => array(
 					'description' => __( 'Countdown Timer Campaign Daily Recurring Settings', 'revenue' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'countdown_timer_shop_progress_bar'                     => array(
+				'countdown_timer_shop_progress_bar'        => array(
 					'description' => __( 'Countdown Timer Campaign Shop page progress Bar', 'revenue' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'countdown_timer_entire_site_action_type'                     => array(
+				'countdown_timer_entire_site_action_type'  => array(
 					'description' => __( 'Countdown Timer Campaign Entire Site Action Type', 'revenue' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'countdown_timer_entire_site_action_link'                     => array(
+				'countdown_timer_entire_site_action_link'  => array(
 					'description' => __( 'Countdown Timer Campaign Entire Site Action Link', 'revenue' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'countdown_timer_entire_site_action_enable'                     => array(
+				'countdown_timer_entire_site_action_enable' => array(
 					'description' => __( 'Countdown Timer Campaign Entire Site Action Enable', 'revenue' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'countdown_timer_enable_close_button'                     => array(
+				'countdown_timer_enable_close_button'      => array(
 					'description' => __( 'Countdown Timer Campaign Entire Site Enable Close Button', 'revenue' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'animation_settings_enable'                  => array(
+				'animation_settings_enable'                => array(
 					'description' => __( 'Campaign countdown timer enabled or not', 'revenue' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'animation_type'                  => array(
+				'animation_type'                           => array(
 					'description' => __( 'Campaign countdown timer enabled or not', 'revenue' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'animation_duration'                  => array(
+				'animation_duration'                       => array(
 					'description' => __( 'Campaign countdown timer enabled or not', 'revenue' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'delay_between_loop'                  => array(
+				'delay_between_loop'                       => array(
 					'description' => __( 'Campaign countdown timer enabled or not', 'revenue' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'stock_scarcity_message_type'                     => array(
+				'stock_scarcity_message_type'              => array(
 					'description' => __( 'Stock Scarcity Message Type', 'revenue' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'stock_scarcity_enable_fake_stock'                     => array(
+				'stock_scarcity_enable_fake_stock'         => array(
 					'description' => __( 'Stock Scarcity Enable Fake Stock', 'revenue' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'stock_scarcity_general_message_settings'          => array(
+				'stock_scarcity_general_message_settings'  => array(
 					'description' => __( 'Stock Scarcity General Message Settings', 'revenue' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'stock_scarcity_flip_message_settings'          => array(
+				'stock_scarcity_flip_message_settings'     => array(
 					'description' => __( 'Stock Scarcity Flip Message Settings', 'revenue' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'stock_scarcity_animation_settings'          => array(
+				'stock_scarcity_animation_settings'        => array(
 					'description' => __( 'Stock Scarcity Animation Settings', 'revenue' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'revx_next_order_coupon'          => array(
+				'revx_next_order_coupon'                   => array(
 					'description' => __( 'Next Order Coupon Settings', 'revenue' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit' ),

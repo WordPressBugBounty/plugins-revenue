@@ -67,7 +67,7 @@ jQuery( function ( $ ) {
 		const qty =
 			$button.data( 'quantity' ) ||
 			$(
-				`input[name="revx-quantity-${ campaignId }-${ productId }"]`
+				`input[name="revx-quantity-${ campaignId }-${ productId }-${ index }"]`
 			).val() ||
 			1;
 

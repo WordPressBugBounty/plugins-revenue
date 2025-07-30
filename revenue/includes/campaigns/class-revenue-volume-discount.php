@@ -67,7 +67,6 @@ class Revenue_Volume_Discount {
 		// Set Discounted Price on Cart Before Calculate Totals.
 		add_action( "revenue_campaign_{$this->campaign_type}_before_calculate_cart_totals", array( $this, 'set_price_on_cart' ), 10, 2 );
 		add_filter( "revenue_campaign_{$this->campaign_type}_cart_item_price", array( $this, 'cart_item_price' ), 9999, 2 );
-
 	}
 
 
@@ -90,38 +89,35 @@ class Revenue_Volume_Discount {
 		$variation_id  = $cart_item['variation_id'];
 		$cart_quantity = $cart_item['quantity'];
 
-		$offered_price = $cart_item['data']->get_regular_price('edit' );
-		
+		$offered_price = $cart_item['data']->get_regular_price( 'edit' );
 
 		if ( is_array( $offers ) ) {
 			$offer_type         = '';
 			$offer_value        = '';
-			$offer_qty = '';
+			$offer_qty          = '';
 			$offered_products[] = $product_id;
 
 			foreach ( $offers as $offer ) {
 
 				if ( in_array( $product_id, $offered_products ) && $offer['quantity'] <= $cart_quantity ) {
 					$offer_type  = $offer['type'];
-					$offer_value = $offer['value'];
-					$offer_qty =  intval($offer['quantity']);
+					$offer_value = isset( $offer['value'] ) ? $offer['value'] : null;
+					$offer_qty   = intval( $offer['quantity'] );
 				}
 			}
 
 			if ( $offer_type && ( 'free' === $offer_type || $offer_value ) ) {
-				$regular_price = $cart_item['data']->get_regular_price('edit');
+				$regular_price = $cart_item['data']->get_regular_price( 'edit' );
 
-				if('fixed_total_price' === $offer_type) {
-					if($offer_qty == $cart_quantity) {
-						$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price,false,1,'volume_discount' );
-						$offered_price = $offered_price/$offer_qty;
-					} 
-					
+				if ( 'fixed_total_price' === $offer_type ) {
+					if ( $offer_qty == $cart_quantity ) {
+						$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price, false, 1, 'volume_discount' );
+						$offered_price = $offered_price / $offer_qty;
+					}
 				} else {
 					$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price );
 				}
 			}
-			
 		}
 
 		$offered_price = apply_filters( 'revenue_campaign_volume_discount_price', $offered_price, $product_id );
@@ -141,10 +137,9 @@ class Revenue_Volume_Discount {
 		$product_id    = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
 		$variation_id  = $cart_item['variation_id'];
 		$cart_quantity = $cart_item['quantity'];
-		$offer_qty = '';
+		$offer_qty     = '';
 
-
-		$offered_price = $cart_item['data']->get_regular_price( );
+		$offered_price = $cart_item['data']->get_regular_price();
 
 		if ( is_array( $offers ) ) {
 			$offer_type         = '';
@@ -156,29 +151,25 @@ class Revenue_Volume_Discount {
 				if ( in_array( $product_id, $offered_products ) && $offer['quantity'] <= $cart_quantity ) {
 					$offer_type  = $offer['type'];
 					$offer_value = $offer['value'];
-					$offer_qty =  intval($offer['quantity']);
+					$offer_qty   = intval( $offer['quantity'] );
 
 				}
 			}
 
 			if ( $offer_type && ( 'free' === $offer_type || $offer_value ) ) {
-				$regular_price = $cart_item['data']->get_regular_price( );
+				$regular_price = $cart_item['data']->get_regular_price();
 				// $offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price );
 
-				if('fixed_total_price' === $offer_type) {
-					if($offer_qty === $cart_quantity) {
-						$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price,false,1,'volume_discount' );
+				if ( 'fixed_total_price' === $offer_type ) {
+					if ( $offer_qty === $cart_quantity ) {
+						$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price, false, 1, 'volume_discount' );
 
-						$offered_price = $offered_price/$offer_qty;
-					} 
-					
+						$offered_price = $offered_price / $offer_qty;
+					}
 				} else {
 					$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price );
 				}
-				
 			}
-
-			
 		}
 
 		$offered_price = apply_filters( 'revenue_campaign_volume_discount_price', $offered_price, $product_id );
@@ -229,7 +220,6 @@ class Revenue_Volume_Discount {
 			$this->current_position = $data['position'];
 			$this->render_views( $data );
 		}
-
 	}
 
 
@@ -252,7 +242,6 @@ class Revenue_Volume_Discount {
 			$this->campaigns['popup'][] = $campaign;
 			$this->render_views( $data );
 		}
-
 	}
 
 	/**
@@ -289,7 +278,7 @@ class Revenue_Volume_Discount {
 	 *
 	 * @return void
 	 */
-	public function render_views($data=[]) {
+	public function render_views( $data = array() ) {
 		global $post;
 
 		if ( ! empty( $this->campaigns['inpage'][ $this->current_position ] ) ) {
@@ -302,7 +291,6 @@ class Revenue_Volume_Discount {
 				$file_path = REVENUE_PATH . 'includes/campaigns/views/volume-discount/inpage.php';
 
 				$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'volume_discount', 'inpage', $campaign );
-
 
 				ob_start();
 				if ( file_exists( $file_path ) ) {
@@ -334,7 +322,6 @@ class Revenue_Volume_Discount {
 
 				$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'volume_discount', 'popup', $campaign );
 
-
 				ob_start();
 				if ( file_exists( $file_path ) ) {
 					extract($data); //phpcs:ignore
@@ -358,12 +345,11 @@ class Revenue_Volume_Discount {
 			foreach ( $campaigns as $campaign ) {
 				$current_campaign = $campaign;
 
-				revenue()->update_campaign_impression( $campaign['id']);
+				revenue()->update_campaign_impression( $campaign['id'] );
 
 				$file_path = REVENUE_PATH . 'includes/campaigns/views/volume-discount/floating.php';
 
 				$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'volume_discount', 'floating', $campaign );
-
 
 				ob_start();
 				if ( file_exists( $file_path ) ) {
@@ -379,5 +365,4 @@ class Revenue_Volume_Discount {
 			}
 		}
 	}
-
 }

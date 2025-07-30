@@ -27,6 +27,13 @@
     z-index: 999;
 }
 
+.revx-floating-main {
+    display: none;
+}
+.revx-floating-main.floating-visible{
+    display: block;
+}
+
 .revx-floating.revx-mix-match-grid {
     max-width: 720px;
 }

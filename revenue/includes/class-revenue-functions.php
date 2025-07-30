@@ -302,8 +302,6 @@ class Revenue_Functions {
 			'after_single_product_summary' => _x( 'After single product summary', 'Display Positions', 'revenue' ),
 			'before_single_product'        => _x( 'Before single product', 'Stock Scarcity Positions', 'revenue' ),
 			'after_single_product'         => _x( 'After single product', 'Stock Scarcity Positions', 'revenue' ),
-			'after_shop_loop_item_title'   => _x( 'Should Remove', 'Display Positions', 'revenue' ),
-			'shop_loop_item_title'         => _x( 'Should Remove', 'Display Positions', 'revenue' ),
 		);
 
 		$theme = get_option( 'template' );
@@ -3402,6 +3400,7 @@ class Revenue_Functions {
 				'offered_price'    => 0,
 				'regular_price'    => 0,
 				'source'           => '',
+				'index'            => ''
 			)
 		);
 

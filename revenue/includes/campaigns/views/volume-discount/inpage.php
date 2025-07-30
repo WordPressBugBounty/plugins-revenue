@@ -50,18 +50,18 @@ if ( 'list' === $view_mode ) {
 		$has_selected = false;
 		foreach ( $offers as $offer_index => $offer ) {
 			if ( ! $has_selected && isset( $offer['isEnableTag'] ) && 'yes' === $offer['isEnableTag'] ) {
-				$is_selected = true;
+				$is_selected  = true;
 				$has_selected = true;
 			} elseif ( ! $has_selected && $offer_index === $offer_length - 1 ) {
 				// If no previous selection and this is the last item, select it by default.
-				$is_selected = true;
+				$is_selected  = true;
 				$has_selected = true;
 			} else {
 				$is_selected = false;
 			}
-			$offered_product            = $product;
-			$offer_type                 = $offer['type'];
-			$offer_value                = $offer['value'];
+			$offered_product = $product;
+			$offer_type                 = isset( $offer['type'] ) ? $offer['type'] : null;
+			$offer_value                = isset( $offer['value'] ) ? $offer['value'] : 0;
 			$offer_qty                  = $offer['quantity'];
 			$regular_price              = $offered_product->get_regular_price();
 			$in_percentage              = revenue()->calculate_discount_percentage( $regular_price, $offered_price );

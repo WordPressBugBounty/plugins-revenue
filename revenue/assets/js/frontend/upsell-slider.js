@@ -167,7 +167,7 @@
 			} );
 
 			// Quantity controls
-			$slider.find( '.revx-quantity-minus' ).on( 'click', function () {
+			$slider.find( '.revx-quantity-minus' ).attr('data-skip-global', true).on( 'click', function () {
 				const $input = $( this ).siblings( 'input[type="number"]' );
 				const currentValue = parseInt( $input.val(), 10 );
 				if ( currentValue > 1 ) {
@@ -175,11 +175,12 @@
 				}
 			} );
 
-			$slider.find( '.revx-quantity-plus' ).on( 'click', function () {
-				const $input = $( this ).siblings( 'input[type="number"]' );
-				const currentValue = parseInt( $input.val(), 10 );
-				$input.val( currentValue + 1 ).trigger( 'change' );
-			} );
+			$slider.find('.revx-quantity-plus').attr('data-skip-global', true).on('click', function (e) {
+
+				const $input = $(this).siblings('input[type="number"]');
+				const currentValue = parseInt($input.val(), 10);
+				$input.val(currentValue + 1).trigger('change');
+			});
 		}
 	}
 

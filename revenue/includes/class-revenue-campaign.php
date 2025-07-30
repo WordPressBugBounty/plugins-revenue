@@ -220,22 +220,22 @@ class Revenue_Campaign {
 	public function custom_cart_text_injection( $block_registry ) {
 		// Map WooCommerce blocks to their corresponding revenue filters.
 		$block_mappings = array(
-			'woocommerce/cart-line-items-block' => array(
+			'woocommerce/cart-line-items-block'     => array(
 				'filters' => array(
-					'revenue_block_before_cart_table'  => 'before',
-					'revenue_block_after_cart_table'   => 'after',
+					'revenue_block_before_cart_table' => 'before',
+					'revenue_block_after_cart_table'  => 'after',
 				),
 			),
-			'woocommerce/filled-cart-block' => array(
+			'woocommerce/filled-cart-block'         => array(
 				'filters' => array(
-					'revenue_block_before_cart_form'  => 'before',
-					'revenue_block_after_cart_form'   => 'after',
+					'revenue_block_before_cart_form' => 'before',
+					'revenue_block_after_cart_form'  => 'after',
 				),
 			),
-			'woocommerce/cart-order-summary-block' => array(
+			'woocommerce/cart-order-summary-block'  => array(
 				'filters' => array(
 					'revenue_block_before_cart_totals'  => 'before',
-					'revenue_block_proceed_to_checkout'   => 'after',
+					'revenue_block_proceed_to_checkout' => 'after',
 				),
 			),
 			'woocommerce/proceed-to-checkout-block' => array(
@@ -702,11 +702,13 @@ class Revenue_Campaign {
 			$which_page = 'checkout_page';
 		}
 
-		$campaigns     = revenue()->get_available_campaigns( $post->ID, $which_page, 'drawer', 'top_left' );
-		$all_campaigns = revenue()->get_available_campaigns( $post->ID, 'all_page', 'bottom', 'top_left' );
+		if ( $post ) {
+			$campaigns     = revenue()->get_available_campaigns( $post->ID, $which_page, 'drawer', 'top_left' );
+			$all_campaigns = revenue()->get_available_campaigns( $post->ID, 'all_page', 'bottom', 'top_left' );
 
-		$this->run_campaigns( $campaigns, 'drawer', $which_page, 'top_left' );
-		$this->run_campaigns( $all_campaigns, 'bottom', 'all_page', 'top_left' );
+			$this->run_campaigns( $campaigns, 'drawer', $which_page, 'top_left' );
+			$this->run_campaigns( $all_campaigns, 'bottom', 'all_page', 'top_left' );
+		}
 	}
 
 
@@ -2450,11 +2452,16 @@ class Revenue_Campaign {
 			}
 		} elseif ( is_shop() ) {
 			$which_page = 'shop_page';
-		} elseif ( is_checkout() ) {
+		} elseif ( is_checkout() && function_exists( 'WC' ) && WC()->cart && method_exists( WC()->cart, 'get_cart' ) ) {
+			// check if it is rendered once.
+			$is_inside = false;
 			foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
 				$product    = $cart_item['data'];
 				$product_id = $cart_item['product_id'];
 
+				if ( $is_inside ) {
+					break;
+				}
 				$this->run_shortcode(
 					$campaign,
 					array(
@@ -2463,6 +2470,7 @@ class Revenue_Campaign {
 						'placement'    => 'checkout_page',
 					)
 				);
+				$is_inside = true;
 			}
 		}
 	}

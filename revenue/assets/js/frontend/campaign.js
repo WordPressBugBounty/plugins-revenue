@@ -453,6 +453,10 @@
 		e.stopPropagation(); // Stop event propagation to parent elements
 		const $input = $( this ).siblings( 'input[type="number"]' );
 
+		if ( $( this ).data( 'skip-global' ) ) {
+			return;
+		}
+
 		if ( ! $input ) {
 			return;
 		}
@@ -465,9 +469,10 @@
 			if ( ! isNaN( currentValue ) && currentValue > 0 ) {
 				$input.val( currentValue - 1 );
 			}
-		} else if ( ! isNaN( currentValue ) && currentValue - 1 > 0 ) {
-			$input.val( currentValue - 1 );
 		}
+		// else if ( ! isNaN( currentValue ) && currentValue - 1 > 0 ) {
+		// 	$input.val( currentValue - 1 );
+		// }
 
 		$input.trigger( 'change' );
 	} );
@@ -476,6 +481,11 @@
 	$( document ).on( 'click', '.revx-quantity-plus', function ( e ) {
 		e.preventDefault();
 		e.stopPropagation(); // Stop event propagation to parent elements
+
+		// Skip if it has data-skip-global attribute
+		if ( $( this ).data( 'skip-global' ) ) {
+			return;
+		}
 
 		const $input = $( this ).siblings( 'input[type="number"]' );
 		if ( ! $input.length ) {
@@ -2599,10 +2609,7 @@
 		try {
 			document.execCommand( 'copy' );
 			// $btn.text( 'Copied!' );
-			$( '.revx-Coupon-button' ).css(
-						'background-color',
-						'#008000'
-					)
+			$( '.revx-Coupon-button' ).css( 'background-color', '#008000' );
 			$( '.revx-Coupon-button' ).css( {
 				transition: 'background-color 0.4s',
 			} );

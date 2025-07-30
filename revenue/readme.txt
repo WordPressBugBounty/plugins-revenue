@@ -4,7 +4,7 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 5.0    
 Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -226,6 +226,26 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page
 
 == Changelog ==
+
+= 1.2.9 – 30 July 2025 =
+* New: Introduced a confirmation modal to warn users of unsaved changes when navigating back on the campaign page.
+* Improvement: Enhanced campaign analytics with updated detail metrics.
+* Fix: Resolved issue where Double Order campaigns rendered multiple times when using shortcodes.
+* Fix: Corrected initial display of "undefined %" in Double Order campaigns.
+* Fix: Fixed issue where the campaign name was not appearing if only one campaign existed.
+* Fix: Addressed NaN display and incorrect discount calculation on initial page load.
+* Fix: Resolved fatal error encountered after activating the Revenue plugin.
+* Fix: Eliminated warning triggered during initial rule creation with Spending Goal campaigns.
+* Fix: Enabled proper scrolling when campaign content overflows the container.
+* Fix: Suppressed warning when no products are assigned to a campaign.
+* Fix: Synchronized countdown timer and scheduled settings with the calendar correctly.
+* Fix: Corrected broken variable product links in campaign trigger products.
+* Fix: Selecting all campaigns now properly marks the header checkbox; unselecting also works as expected.
+* Fix: Resolved product duplication issue when using the "Add to Cart" button.
+* Fix: Fixed increment/decrement functionality for product quantities within campaigns.
+* Fix: Addressed initial date selection issue in the campaign calendar.
+* Fix: Fixed Floating issue in cart page.
+* Fix: Resolved issue where end time options were not displayed when start time was unset.
 
 = 1.2.8 – 20 July 2025 =
 * New: Introduced a new Overview page.

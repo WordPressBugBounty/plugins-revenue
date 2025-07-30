@@ -44,6 +44,7 @@ $generated_styles = revenue()->campaign_style_generator( 'inpage', $campaign, $p
 $total_offer_products = 0;
 
 $offer_data = array();
+$product_index_count = 0;
 
 if ( is_array( $offers ) ) {
 	$offer_length = count( $offers );
@@ -172,6 +173,7 @@ if ( is_array( $offers ) ) {
 											'generated_styles' => $generated_styles,
 											'current_campaign' => $campaign,
 											'offered_product' => $offered_product,
+											'index'        => $product_index_count++,
 										)
 									),
 									revenue()->get_allowed_tag()
