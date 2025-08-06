@@ -696,3 +696,7 @@ Button Size
 .wp-theme-thegem-elementor #site-header .header-main {
     position: unset;
 }
+
+.revx-mix-match .revx-campaign-item__regular-price {
+    display: none;
+}

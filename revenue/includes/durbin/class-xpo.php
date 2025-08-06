@@ -208,20 +208,26 @@ class Xpo {
 				'campaign' => 'revenue-dashboard',
 			),
 			'summer_db'      => array(
-				'source'   => 'db-revenue-notice',
-				'medium'   => 'summer-sale',
+				'source'   => 'db-revenue-notice-text',
+				'medium'   => 'final-hour-sale',
 				'campaign' => 'revenue-dashboard',
 			),
-			'submenu'        => array(
-				'source'   => 'db-revenue-submenu',
-				'medium'   => 'upgrade-pro',
+			'summer_db2'      => array(
+				'source'   => 'db-revenue-notice-logo',
+				'medium'   => 'massive-sale',
 				'campaign' => 'revenue-dashboard',
 			),
-			'plugin_dir_pro' => array(
-				'source'   => 'db-revenue-plugin',
-				'medium'   => 'upgrade-pro',
+			'summer_db3'      => array(
+				'source'   => 'db-revenue-notice-text',
+				'medium'   => 'flash-sale',
 				'campaign' => 'revenue-dashboard',
 			),
+			'summer_db4'      => array(
+				'source'   => 'db-revenue-notice-logo',
+				'medium'   => 'exclusive-deals',
+				'campaign' => 'revenue-dashboard',
+			),
+			
 		);
 
 		// Step 1: Get parameters.

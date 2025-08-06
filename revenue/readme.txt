@@ -4,7 +4,7 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 5.0    
 Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 1.2.9
+Stable tag: 1.2.10
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -226,6 +226,11 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page
 
 == Changelog ==
+
+= 1.2.10 – 06 August 2025 =
+* Fix: Enabled required product issue in Mix and Match campaign.
+* Fix: Set default discount value in free shipping logic.
+* Fix: Set minimum/default to 1 for min_quantity and discount to avoid zero-value issues.
 
 = 1.2.9 – 30 July 2025 =
 * New: Introduced a confirmation modal to warn users of unsaved changes when navigating back on the campaign page.

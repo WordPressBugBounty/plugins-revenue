@@ -188,12 +188,13 @@ final class Revenue {
 	public function include_revenue_menu() {
 		if ( is_admin() ) {
 			require_once REVENUE_PATH . 'includes/admin/class-revenue-menu.php';
-			require_once REVENUE_PATH . 'includes/durbin/class-durbin-client.php';
-			require_once REVENUE_PATH . 'includes/durbin/class-our-plugins.php';
-			require_once REVENUE_PATH . 'includes/durbin/class-xpo.php';
-			require_once REVENUE_PATH . 'includes/deactive/class-deactive.php';
-			require_once REVENUE_PATH . 'includes/notice/class-notice.php';
+
 		}
+		require_once REVENUE_PATH . 'includes/durbin/class-durbin-client.php';
+		require_once REVENUE_PATH . 'includes/durbin/class-our-plugins.php';
+		require_once REVENUE_PATH . 'includes/durbin/class-xpo.php';
+		require_once REVENUE_PATH . 'includes/deactive/class-deactive.php';
+		require_once REVENUE_PATH . 'includes/notice/class-notice.php';
 	}
 
 	/**
@@ -204,6 +205,8 @@ final class Revenue {
 	public function init_menu() {
 		if ( is_admin() ) {
 			new Revenue_Menu();
+		}
+		if ( is_admin() || $this->is_rest_api_request() ) {
 			new \REVX\Includes\Deactive\Deactive();
 			new \REVX\Includes\Notice\Notice();
 			new \REVX\Includes\Durbin\OurPlugins();

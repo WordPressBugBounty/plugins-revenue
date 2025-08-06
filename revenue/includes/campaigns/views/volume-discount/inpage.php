@@ -59,7 +59,7 @@ if ( 'list' === $view_mode ) {
 			} else {
 				$is_selected = false;
 			}
-			$offered_product = $product;
+			$offered_product            = $product;
 			$offer_type                 = isset( $offer['type'] ) ? $offer['type'] : null;
 			$offer_value                = isset( $offer['value'] ) ? $offer['value'] : 0;
 			$offer_qty                  = $offer['quantity'];

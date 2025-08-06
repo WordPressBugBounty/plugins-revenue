@@ -188,8 +188,8 @@ class Revenue_Analytics_REST_Controller extends WP_REST_Controller {
 		$growth_message = '';
 		switch ( $preset ) {
 			case 'last_month':
-				$previous_date_start = ( clone $date_start )->modify( 'last day of previous month' );
-				$previous_date_end   = ( clone $date_end )->modify( 'first day of previous month' );
+				$previous_date_start = ( clone $date_start )->modify( 'first day of previous month' );
+				$previous_date_end   = ( clone $date_start )->modify( 'last day of previous month' );
 				$growth_message      = __( '{value} than last month', 'revenue' );
 				break;
 			case 'today':
