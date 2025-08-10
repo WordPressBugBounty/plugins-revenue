@@ -458,10 +458,9 @@ final class Revenue {
 
 			$last_part = array(
 				'get_discounts' => sprintf(
-					'<a style="color:#00a44a; font-weight: 700;" target="_blank" href="%s">%s %s</a>',
+					'<a style="color:#00a44a; font-weight: 700;" target="_blank" href="%s">%s</a>',
 					$pricing_url,
-					esc_html__( 'Upgrade Pro', 'revenue' ),
-					'(<span style="font-weight:700;">' . __( 'Up to 65% OFF', 'revenue' ) . '</span>)'
+					esc_html__( 'Upgrade to Pro', 'revenue' )
 				),
 			);
 

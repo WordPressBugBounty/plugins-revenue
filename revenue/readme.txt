@@ -4,7 +4,7 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 5.0    
 Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 1.2.10
+Stable tag: 1.2.11
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -19,7 +19,7 @@ WooCommerce discount rules for product bundles, mix & match product bundles, bul
 
 😲 [**Free Demo**](https://try.wowrevenue.com/) | 🔥 [**WowRevenue Pro**](https://www.wowrevenue.com/) | 📃 [**Documentation**](https://www.wowrevenue.com/docs/)
 
-### WowRevenue - #1 WooCommerce Plugin to Skyrocket Sales, and Order Value!
+### WowRevenue - The Ultimate Plugin to Skyrocket Sales, and Order Value!
 
 WowRevenue is a proven solution specially crafted to boost the WooCommerce store’s revenue by increasing the average order value. Its effective marketing campaigns help you start upselling and cross-selling instantly. As a result, you can enjoy better revenue without increasing the number of customers. So you don’t need to spend more on customer acquisition.
 
@@ -70,6 +70,8 @@ You can offer slow-moving items for free or at a low price by using the Buy X Ge
 ✔ Buy X Get Y Free 
 ✔ Buy One Get One
 ✔ Buy 2 Get 1 Free
+
+[youtube https://www.youtube.com/watch?v=b-cnufUh3Ao]
 
 **BOGO**
 
@@ -154,13 +156,15 @@ With WowRevenue, you have full control over how you create and launch campaigns 
 
 We have more useful plugins for WooCommerce and WordPress users. Take a look at them:
 
-💝 [**WowStore**](https://wordpress.org/plugins/product-blocks/): An all-in-one solution to build gorgeous-looking and professional WooCommerce stores with various conversion-focused features.
+💝 [**WowStore**](https://wordpress.org/plugins/product-blocks/): The ultimate solution for building and managing eCommerce sites. Packed with features to enhance conversions and boost sales, it streamlines your store’s performance.
 
-📦 [**WholesaleX**](https://wordpress.org/plugins/wholesalex/): A collection of dynamic features for setting advanced pricing and discounts based on user roles. You can use it for creating complete B2B or B2B+B2C hybrid stores.
+📦 [**WholesaleX**](https://wordpress.org/plugins/wholesalex/): An all-in-one wholesaling solution for WooCommerce, with features for B2B and B2C hybrid stores. Manage retail and wholesale effortlessly with advanced tools.
 
-🧲 [**WowOptin**](https://wordpress.org/plugins/optin/): The next-generation opt-in plugin for collecting leads, increasing sales, and boosting conversions. It is powered by a canvas-like opt-in builder and advanced placement & targeting options.
+🧲 [**WowOptin**](https://wordpress.org/plugins/optin/): A cutting-edge plugin for creating opt-ins and popups to capture leads and drive sales. It’s Canva-like builder ensures quick, customized designs to meet your goals.
 
-📃 [**PostX**](https://wordpress.org/plugins/ultimate-post/): The #1 News Magazine plugin powered by the first ever dynamic site builder for Gutenberg. With its rich library of Templates, you can build any kind of News, Magazine, or Blogging site with three simple steps.
+📃 [**PostX**](https://wordpress.org/plugins/ultimate-post/): The top plugin for creating news, magazine, or blog sites. With PostX, build professional websites in three easy steps, enjoying complete customization freedom.
+
+➕ [**WowAddons**](https://wordpress.org/plugins/product-addons/): The most advanced product addons plugin for WooCommerce that helps you add extra fields & options to product pages with ease.
 
 = Author =
 Developed by [WPXPO](https://www.wpxpo.com). [Contribute to Revenue on Bitbucket](https://bitbucket.org/wpstabon/revenue/src/main/) and join the party.
@@ -226,6 +230,10 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page
 
 == Changelog ==
+
+= 1.2.11 – 10 August 2025 =
+* Fix – Resolved user input issue in bundle discount.
+* Improvement – Optimized defaults and applied min/max limits to discount values.
 
 = 1.2.10 – 06 August 2025 =
 * Fix: Enabled required product issue in Mix and Match campaign.

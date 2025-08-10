@@ -250,7 +250,7 @@ class Notice {
 				'end'                => '2025-08-14 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'summer_db',
+						'utmKey' => 'final_hour',
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
@@ -268,7 +268,7 @@ class Notice {
 				'end'                => '2025-08-29 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'summer_db2',
+						'utmKey' => 'massive_sale',
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
@@ -279,6 +279,7 @@ class Notice {
 				'icon'               => REVENUE_URL . 'assets/images/icons/wowrevenue_logo.svg',
 				'button_text'        => __( 'Upgrade to Pro &nbsp;➤', 'revenue' ),
 				'is_discount_logo'   => false,
+				'background_color'   => '#f85f05',
 			),
 			array(
 				'key'                => 'revx_dashboard_content_notice4',
@@ -286,7 +287,7 @@ class Notice {
 				'end'                => '2025-09-21 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'summer_db3',
+						'utmKey' => 'flash_sale',
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
@@ -304,7 +305,7 @@ class Notice {
 				'end'                => '2025-09-30 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'summer_db4',
+						'utmKey' => 'exclusive_deals',
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
@@ -315,6 +316,7 @@ class Notice {
 				'icon'               => REVENUE_URL . 'assets/images/icons/wowrevenue_logo.svg',
 				'button_text'        => __( 'Upgrade to Pro &nbsp;➤', 'revenue' ),
 				'is_discount_logo'   => false,
+				'background_color'   => '#00a464',
 			),
 		);
 
@@ -356,7 +358,11 @@ class Notice {
 					style="border-left: 3px solid <?php echo esc_attr( $border_color ); ?>;"
 					> 
 						<?php
-						if ( isset( $notice['icon'] ) ) {
+						if ( $notice['is_discount_logo'] ) {
+							?>
+								<div class="revx-notice-discout-icon"> <img src="<?php echo esc_url( $notice['icon'] ); ?>"/>  </div>
+							<?php
+						} else {
 							?>
 								<div class="revx-notice-icon"> <img src="<?php echo esc_url( $notice['icon'] ); ?>"/>  </div>
 							<?php
@@ -379,7 +385,9 @@ class Notice {
 										<?php echo esc_html( $notice['button_text'] ); ?>
 									</a>
 								<?php else : ?>
-									<a class="revx-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank">
+									<a class="revx-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank"
+									style="background-color: <?php echo ! empty( $notice['background_color'] ) ? esc_attr( $notice['background_color'] ) : '#00a464'; ?>;"
+									>
 									<?php echo esc_html( $notice['button_text'] ); ?>
 										
 									</a>
@@ -418,7 +426,7 @@ class Notice {
 				margin: 15px 0px !important;
 				display: flex;
 				align-items: center;
-				background: #F7F9FF;
+				/* background: #F7F9FF; */
 				width: 100%;
 				padding: 10px 0px;
 				position: relative;
@@ -432,17 +440,26 @@ class Notice {
 				width: 100%;
 			}
 			.revx-notice-icon {
-				margin-left: 15px;
+				margin-left: 10px;
+				margin-right: 10px;
+			}
+			.revx-notice-discout-icon {
+				margin-left: 5px;
 			}
 			.revx-notice-icon img {
 				max-width: 42px;
-				width: 100%;
+				/* width: 70px; */
+				height: 70px;
+			}
+			.revx-notice-discout-icon img {
+				height: 70px;
+				width: 70px;
 			}
 			.revx-notice-btn {
 				font-weight: 600;
 				text-transform: uppercase !important;
 				padding: 2px 10px !important;
-				background-color: #00a464 !important;
+				/* background-color: #00a464 !important; */
 				border: none !important;
 			}
 			.discount_btn {
@@ -899,7 +916,7 @@ class Notice {
 	 * @return STRING | Redirect URL
 	 */
 	public function install_activate_plugin() {
-		if ( ! isset( $_POST['install_plugin'] ) ) {
+		if ( ! isset( $_POST['install_plugin'] ) || ! current_user_can( 'manage_options' ) ) {
 			return wp_send_json_error( esc_html__( 'Invalid request.', 'revenue' ) );
 		}
 		$plugin_slug = sanitize_text_field( wp_unslash( $_POST['install_plugin'] ) );
