@@ -1,14 +1,14 @@
-===  Product Bundles, Quantity/Bulk Discount, BOGO, Buy X Get Y - WowRevenue ===
+===  Upsell with Product Bundles, Quantity/Bulk Discount, Buy X Get Y – WowRevenue ===
 Contributors: wpxpo, anik4e, jakirhasan
-Tags: product bundles, bogo, bulk discount, bought together, upsells
+Tags: upsell, woocommerce upsell, bought together, bulk discount, product bundles
 Requires at least: 5.0    
 Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 1.2.11
+Stable tag: 1.2.12
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-WooCommerce discount rules for product bundles, mix & match product bundles, bulk discount, quantity discount, and buy x get y discount.
+Create upsell campaigns with product bundles, mix & match product bundles, bulk discount, quantity discount, and buy x get y discount.
 
 == Description ==
 
@@ -230,6 +230,9 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page
 
 == Changelog ==
+
+= 1.2.12 – 18 August 2025 =
+* Fix – Resolved hidden issue with Builder Editing component.
 
 = 1.2.11 – 10 August 2025 =
 * Fix – Resolved user input issue in bundle discount.
