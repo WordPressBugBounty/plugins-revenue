@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
-"Project-Id-Version: WowRevenue 1.2.12\n"
+"Project-Id-Version: WowRevenue 1.2.13\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/revenue\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-08-18T09:45:19+00:00\n"
+"POT-Creation-Date: 2025-09-15T08:27:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: revenue\n"
@@ -323,7 +323,17 @@ msgstr ""
 msgid "Edit Campaign"
 msgstr ""
 
-#: includes/class-revenue-campaign.php:1729
+#: includes/class-revenue-campaign.php:941
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:59225
+msgid "Added to cart"
+msgstr ""
+
+#: includes/class-revenue-campaign.php:942
+msgid "Adding..."
+msgstr ""
+
+#: includes/class-revenue-campaign.php:1732
 msgid "WoW Revenue Free Shipping"
 msgstr ""
 
@@ -1076,7 +1086,7 @@ msgid "New Support Ticket is not Created Due to Some Issues."
 msgstr ""
 
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:535
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:1945
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:1961
 msgid "Invalid campaign ID."
 msgstr ""
 
@@ -1157,457 +1167,457 @@ msgstr ""
 msgid "Campaign end date is invalid!"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2000
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2016
 msgid "Untitled Campaign"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2043
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2059
 msgid "Could not update campaign into the database."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2051
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2067
 msgid "Could not insert campaign into the database."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2192
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2208
 msgid "Unique identifier for campaign."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2198
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2214
 msgid "Campaign name."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2203
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2219
 msgid "The date the campaign was created, in the site's timezone."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2209
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2225
 msgid "The date the campaign was created, as GMT."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2215
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2231
 msgid "The date the campaign was last modified, in the site's timezone."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2221
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2237
 msgid "The date the campaign was last modified, as GMT."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2227
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2243
 msgid "campaign type."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2234
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2250
 msgid "campaign status"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2241
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2257
 msgid "campaign trigger type"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2247
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2263
 msgid "campaign trigger relation"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2252
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2857
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2268
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2873
 msgid "Trigger items"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2259
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2285
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2275
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2301
 msgid "Item Description"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2264
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2290
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2280
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2306
 msgid "Item Name"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2269
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2285
 msgid "Item quantity"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2278
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2294
 msgid "Trigger exclude items"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2299
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2315
 msgid "Placement Settings"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2306
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2322
 msgid "Page Name"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2311
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2327
 msgid "Page Status"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2316
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2363
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2332
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2379
 msgid "Campaign display types"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2322
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2327
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2368
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2338
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2343
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2384
 msgid "In page display position"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2332
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2373
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2348
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2389
 msgid "In page campaign popup animation"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2338
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2379
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2390
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2354
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2395
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2406
 msgid "campaign popup animation trigger delay in second"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2343
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2384
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2359
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2400
 msgid "Floating positon"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2349
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2365
 msgid "campaign floating animation trigger delay in second"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2358
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2374
 msgid "campaign placement"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2395
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2411
 msgid "Campaign behavior"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2401
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2417
 msgid "Campaign recommendation"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2407
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2453
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2423
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2469
 msgid "List of Offered items"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2414
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2460
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2430
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2476
 msgid "Offers Row ID."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2419
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2465
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2435
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2481
 msgid "Offered Products."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2424
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2470
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2440
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2486
 msgid "Offer quantity"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2429
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2475
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2445
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2491
 msgid "Offer value"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2434
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2480
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2450
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2496
 msgid "Offer type."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2439
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2485
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2455
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2501
 msgid "Offer tags"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2444
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2490
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2460
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2506
 msgid "Offer description"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2507
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2523
 msgid "Bundle discount campaign allow bundle with trigger product"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2514
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2530
 msgid "Volumne Discount Campaign Allow more than required quantity"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2521
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2537
 msgid "Mix Match Campaign Is Required Products"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2526
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2542
 msgid "Mix Match Campaign Initial Products Selection"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2534
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2550
 msgid "Spending Goal Campaign Reward Type"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2540
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2545
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2550
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2556
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2561
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2566
 #: assets/js/backend/revenue-admin.js:2
 #: assets/js/backend/revenue-admin.js:59309
 msgid "Spending Goal"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2555
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2571
 msgid "Spending Goal calculate based on"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2560
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2576
 msgid "Spending Goal Discount Type"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2565
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2581
 msgid "Spending Goal Discount Value"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2572
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2588
 msgid "Campaign Banner heading"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2577
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2593
 msgid "Campaign Banner sub heading"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2584
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2600
 msgid "Campaign stock scarcity enabled or not"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2590
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2606
 msgid "Campaign stock scarcity actions"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2597
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2613
 msgid "Stock scarcity actions Row ID."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2602
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2618
 msgid "Stock scarcity row action."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2607
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2623
 msgid "Stock scarcity action stock status"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2612
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2628
 msgid "Stock scarcity action message."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2617
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2633
 msgid "Stock scarcity action stock value."
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2626
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2647
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2642
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2663
 msgid "Campaign spending progress messages"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2633
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2654
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2649
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2670
 msgid "Spending Progress Status"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2638
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2659
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2654
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2675
 msgid "Spending Progress message"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2670
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3018
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3023
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3028
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3033
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2686
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3034
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3039
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3044
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3049
 msgid "Campaign countdown timer enabled or not"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2675
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2680
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2691
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2696
 msgid "Is spending goal upsell enabled or not"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2685
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2701
 msgid "Does campaign coundown start right now ot schedule to later"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2691
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2707
 msgid "Campaign countdown start date"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2696
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2712
 msgid "Campaign countdown start time"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2701
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2717
 msgid "Campaign countdown end date"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2706
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2722
 msgid "Campaign countdown end time"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2713
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2729
 msgid "Campaign animated add to cart enabled or not"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2718
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2734
 msgid "Campaign animated add to cart animation trigger type"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2724
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2740
 msgid "Campaign animated add to cart animation type"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2730
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2746
 msgid "Campaign animated add to cart animation start delay"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2737
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2753
 msgid "Campaign free shipping enabled or not"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2744
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2760
 msgid "Campaign Time Schedule End Time status"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2749
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2765
 msgid "Campaign Schedule start date"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2754
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2770
 msgid "Campaign Schedule start time"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2759
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2775
 msgid "Campaign Schedule end date"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2764
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2780
 msgid "Campaign Schedule end time"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2771
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2787
 msgid "Skip Add to cart button for offered products"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2776
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2792
 msgid "Enabled Quantity selector for offered products"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2781
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2797
 msgid "If the offered products are already in cart action"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2786
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2802
 msgid "action if click on product title or image"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2792
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2797
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2802
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2807
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2812
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2817
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2822
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2827
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2832
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2837
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2842
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2847
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2852
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2808
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2813
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2818
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2823
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2828
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2833
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2838
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2843
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2848
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2853
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2858
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2863
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2868
 msgid "Builder Data"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2862
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2878
 msgid "Builder unique id"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2867
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2872
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2877
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2882
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2887
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2892
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2897
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2902
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2907
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2912
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2883
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2888
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2893
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2898
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2903
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2908
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2913
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2918
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2923
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2928
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2933
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2938
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2943
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2948
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2953
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2958
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2963
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2968
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2934
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2939
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2944
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2949
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2954
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2959
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2964
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2969
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2974
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2979
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2984
 msgid "Builder view class"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2973
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2989
 msgid "Countdown Timer Campaign Countdown Type"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2978
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2994
 msgid "Countdown Timer Campaign Static Settings"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2983
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2999
 msgid "Countdown Timer Campaign EverGreen Settings"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2988
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3004
 msgid "Countdown Timer Campaign Daily Recurring Settings"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2993
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3009
 msgid "Countdown Timer Campaign Shop page progress Bar"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:2998
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3014
 msgid "Countdown Timer Campaign Entire Site Action Type"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3003
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3019
 msgid "Countdown Timer Campaign Entire Site Action Link"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3008
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3024
 msgid "Countdown Timer Campaign Entire Site Action Enable"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3013
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3029
 msgid "Countdown Timer Campaign Entire Site Enable Close Button"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3038
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3054
 msgid "Stock Scarcity Message Type"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3043
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3059
 msgid "Stock Scarcity Enable Fake Stock"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3048
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3064
 msgid "Stock Scarcity General Message Settings"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3053
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3069
 msgid "Stock Scarcity Flip Message Settings"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3058
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3074
 msgid "Stock Scarcity Animation Settings"
 msgstr ""
 
-#: includes/rest-api/class-revenue-campaign-rest-controller.php:3063
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3079
 #: assets/js/backend/revenue-admin.js:2
 #: assets/js/backend/revenue-admin.js:94687
 msgid "Next Order Coupon Settings"
@@ -1906,11 +1916,6 @@ msgstr ""
 #: assets/js/backend/revenue-admin.js:59223
 #: assets/js/backend/revenue-admin.js:81648
 msgid "Order"
-msgstr ""
-
-#: assets/js/backend/revenue-admin.js:2
-#: assets/js/backend/revenue-admin.js:59225
-msgid "Added to cart"
 msgstr ""
 
 #: assets/js/backend/revenue-admin.js:2

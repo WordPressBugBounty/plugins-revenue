@@ -1088,6 +1088,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		if ( ! empty( $limit_query ) ) {
 			$sql .= ' ' . $limit_query;
 		}
+		// echo '<pre>'; print_r($sql); echo '</pre>';
 
 		if ( empty( $select_clause ) || 0 == $total_campaign->total ) {
 			$results = array();
@@ -1156,42 +1157,57 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			)
 		);
 
-		$order_meta_select = revenue()->is_custom_orders_table_usages_enabled() ? "SELECT order_id, meta_value AS campaign_id FROM {$wpdb->prefix}wc_orders_meta " : "select  post_id as order_id, meta_value as campaign_id from {$wpdb->prefix}postmeta ";
+		$is_custom_orders = revenue()->is_custom_orders_table_usages_enabled();
+		$meta_table       = $is_custom_orders ? "{$wpdb->prefix}wc_orders_meta" : "{$wpdb->prefix}postmeta";
+		$id_column        = $is_custom_orders ? 'order_id' : 'post_id';
 
-		$query = "
-            SELECT
-                DATE(analytics.date) AS date,
-                COALESCE(SUM(order_stats.total_sales), 0) AS total_sales,
-                COALESCE(SUM(CASE WHEN order_stats.parent_id = 0 THEN 1 ELSE 0 END), 0) AS orders_count,
-                ROUND(
+		$analytics_subquery = "
+			SELECT DATE(`date`) AS date,
+				SUM(impression_count) AS impression_count,
+				SUM(add_to_cart_count) AS add_to_cart_count,
+				SUM(rejection_count) AS rejection_count,
+				SUM(checkout_count) AS checkout_count
+			FROM {$wpdb->prefix}revenue_campaign_analytics
+			WHERE campaign_id = %d
+			GROUP BY DATE(`date`)
+		";
+
+			$orders_subquery = "
+			SELECT DATE(os.date_created) AS date,
+				SUM(os.total_sales) AS total_sales,
+				SUM(CASE WHEN os.parent_id = 0 THEN 1 ELSE 0 END) AS orders_count
+			FROM {$wpdb->prefix}wc_order_stats os
+			INNER JOIN $meta_table meta
+				ON os.order_id = meta.$id_column
+				AND meta.meta_key = '_revx_campaign_id'
+			WHERE meta.meta_value = %d
+			AND os.status NOT IN ('wc-auto-draft', 'wc-trash', 'wc-pending', 'wc-failed', 'wc-cancelled', 'wc-checkout-draft')
+			GROUP BY DATE(os.date_created)
+		";
+
+			$query = "
+			SELECT
+				a.date,
+				COALESCE(os.total_sales, 0) AS total_sales,
+				COALESCE(os.orders_count, 0) AS orders_count,
+				ROUND(
 					CASE
-						WHEN COALESCE(SUM(analytics.impression_count), 0) > 0 THEN
-							(COALESCE(SUM(CASE WHEN order_stats.parent_id = 0 THEN 1 ELSE 0 END), 0) / SUM(analytics.impression_count)) * 100
+						WHEN COALESCE(a.impression_count, 0) > 0 THEN
+							(COALESCE(os.orders_count, 0) / a.impression_count) * 100
 						ELSE 0
 					END,
 					2
 				) AS conversion_rate,
-                COALESCE(SUM(analytics.impression_count), 0) AS impression_count,
-                COALESCE(SUM(analytics.add_to_cart_count), 0) AS add_to_cart,
-                COALESCE(SUM(analytics.rejection_count), 0) AS rejection_count,
-                COALESCE(SUM(analytics.checkout_count), 0) AS checkout_count
-            FROM
-                {$wpdb->prefix}revenue_campaign_analytics AS analytics
-            LEFT JOIN (
-                $order_meta_select
-                WHERE
-                    meta_key = '_revx_campaign_id'
-                    AND meta_value IS NOT NULL
-            ) AS orders ON analytics.campaign_id = orders.campaign_id
-            LEFT JOIN {$wpdb->prefix}wc_order_stats order_stats ON (order_stats.order_id = orders.order_id OR order_stats.parent_id = orders.order_id) AND orders.order_id IS NOT NULL
-            AND order_stats.status NOT IN ('wc-auto-draft', 'wc-trash', 'wc-pending', 'wc-failed', 'wc-cancelled', 'wc-checkout-draft')
-            WHERE
-                analytics.campaign_id = %d
-            GROUP BY
-                DATE(analytics.date)
-        ";
+				COALESCE(a.impression_count, 0) AS impression_count,
+				COALESCE(a.add_to_cart_count, 0) AS add_to_cart,
+				COALESCE(a.rejection_count, 0) AS rejection_count,
+				COALESCE(a.checkout_count, 0) AS checkout_count
+			FROM ($analytics_subquery) a
+			LEFT JOIN ($orders_subquery) os ON a.date = os.date
+			ORDER BY a.date
+		";
 
-		$prepared_query = $wpdb->prepare( $query, $campaign_id ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$prepared_query = $wpdb->prepare( $query, $campaign_id, $campaign_id ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$results        = $wpdb->get_results( $prepared_query ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$start_date = new DateTime( $campaign_start_date );

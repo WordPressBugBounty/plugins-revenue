@@ -4,6 +4,7 @@ jQuery( function ( $ ) {
 		console.error( 'Revenue campaign script not loaded.' );
 		return;
 	}
+	let prevButtonText = '';
 
 	// Initialize event handlers
 
@@ -37,6 +38,8 @@ jQuery( function ( $ ) {
 		e.preventDefault();
 
 		const $button = $( e.currentTarget );
+		prevButtonText = $button.text();
+
 		const data = prepareData( $button, index );
 
 		const preventAddToCart = $( document.body ).triggerHandler(
@@ -51,7 +54,7 @@ jQuery( function ( $ ) {
 
 		addRequest( {
 			type: 'POST',
-			url: '/?wc-ajax=revenue_add_to_cart',
+			url: revenue_campaign.ajax,
 			data,
 			success: ( response ) =>
 				handleAddToCartSuccess( response, $button, data ),
@@ -159,7 +162,7 @@ jQuery( function ( $ ) {
 		}
 
 		toggleLoading( $button, false, 'Added to Cart' );
-		showToast( 'Added to cart' );
+		showToast( revenue_campaign.added_to_cart );
 
 		$( document.body ).trigger( 'added_to_cart', [
 			response?.data?.fragments,
@@ -191,10 +194,14 @@ jQuery( function ( $ ) {
 		showToast( 'Error adding to cart', 'error' );
 	};
 
-	const toggleLoading = ( $button, isLoading, text = 'Adding...' ) => {
+	const toggleLoading = (
+		$button,
+		isLoading,
+		text = revenue_campaign.adding
+	) => {
 		$button
 			.toggleClass( 'revx-loading', isLoading )
-			.text( isLoading ? text : 'Add to Cart' );
+			.text( isLoading ? text : prevButtonText );
 	};
 
 	const getFbtData = ( campaignId ) => {
@@ -350,7 +357,7 @@ jQuery( function ( $ ) {
 		] );
 
 		toggleLoading( $button, false, 'Added to Cart' );
-		showToast( 'Added to cart' );
+		showToast( revenue_campaign.added_to_cart );
 
 		if ( $button.hasClass( 'revx-builder-atc-skip' ) ) {
 			// Remove revx-loading class and update button text to 'Added to Cart'
