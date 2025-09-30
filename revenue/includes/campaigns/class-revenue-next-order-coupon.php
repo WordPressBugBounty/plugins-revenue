@@ -471,6 +471,14 @@ class Revenue_Next_Order_Coupon {
 	 * @return void
 	 */
 	public function custom_save_coupon_action() {
+
+		if ( ! current_user_can( 'manage_options' ) &&
+			( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'revenue-dashboard' ) )
+		) {
+			wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+			exit;
+		}
+
 		// Check if it's a valid coupon ID.
 		if ( isset( $_POST['post_ID'] ) && is_numeric( $_POST['post_ID'] ) ) {
 			$coupon_id = intval( $_POST['post_ID'] );

@@ -1859,7 +1859,7 @@ class Revenue_Functions {
 				break;
 
 			case 'no_discount':
-				$offered_price        = $regular_price - $offer_value;
+				$offered_price        = $regular_price;
 				$save_data['type']    = 'amount';
 				$save_data['value']   = 0;
 				$save_data['message'] = '';

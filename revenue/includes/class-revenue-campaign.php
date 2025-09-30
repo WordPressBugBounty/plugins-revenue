@@ -596,6 +596,8 @@ class Revenue_Campaign {
 			'currency_format_thousand_sep' => wc_get_price_thousand_separator(),
 			'currency_format'              => get_woocommerce_price_format(),
 			'checkout_page_url'            => wc_get_checkout_url(),
+			'added_to_cart'                => __( 'Added to cart', 'revenue' ),
+			'adding'                       => __( 'Adding...', 'revenue' ),
 		);
 
 		if ( ! empty( $this->campaign_additional_data ) ) {

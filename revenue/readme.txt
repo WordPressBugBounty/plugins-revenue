@@ -4,7 +4,7 @@ Tags: upsell, woocommerce upsell, bought together, bulk discount, product bundle
 Requires at least: 5.0    
 Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 1.2.13
+Stable tag: 1.2.14
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -230,6 +230,10 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page
 
 == Changelog ==
+
+= 1.2.14 – 30 September 2025 =
+* Fixed – Resolved conflict issues in Bundle Discount when the same product was included multiple times.
+* Fixed – Corrected coupon creation permission issue.
 
 = 1.2.13 – 15 September 2025 =
 * Improvement – Added full translation support for the Add to Cart button on the frontend.

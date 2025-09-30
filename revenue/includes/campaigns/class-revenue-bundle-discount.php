@@ -98,7 +98,6 @@ class Revenue_Bundle_Discount {
 		add_action( 'revenue_check_cart_items', array( $this, 'validate_bundle_items' ) );
 		add_action( "revenue_campaign_{$this->campaign_type}_before_calculate_cart_totals", array( $this, 'before_calculate_cart_totals' ), 10, 3 );
 		add_filter( 'woocommerce_order_formatted_line_subtotal', array( $this, 'order_formatted_line_subtotal' ), 10, 3 );
-
 	}
 
 	/**
@@ -279,14 +278,14 @@ class Revenue_Bundle_Discount {
 				do_action( 'revenue_bundled_item_after_add_to_cart', $product_id, $item_quantity, $variation_id, $variations, $bundle_cart_data );
 			}
 
-			foreach ( $bundler_offer_data as $offer ) {
-				foreach ( $offer['products'] as $offer_product_id ) {
+			foreach ( $bundler_offer_data as $idx => $offer ) {
+				foreach ( $offer['products'] as  $offer_product_id ) {
 
 					$bundle_cart_data = array(
 						'revx_campaign_id'     => $cart_item_data['revx_campaign_id'],
 						'revx_campaign_type'   => $cart_item_data['revx_campaign_type'],
 						'revx_bundle_id'       => $cart_item_data['revx_bundle_id'],
-						'revx_bundle_type'     => 'offer',
+						'revx_bundle_index'    => $idx,
 						'revx_bundle_data'     => $cart_item_data['revx_bundle_data'],
 						'revx_bundled_by'      => $cart_item_key,
 						'revx_min_qty'         => $offer['quantity'],
@@ -390,48 +389,55 @@ class Revenue_Bundle_Discount {
 	 * @return void
 	 */
 	public function before_calculate_cart_totals( $cart_item, $campaign_id, $cart ) {
-		$cart_quantity = false;
 		foreach ( $cart->get_cart() as $cart_item ) {
 			if ( ! isset( $cart_item['revx_campaign_id'] ) ) {
 				continue;
 			}
+			$cart_index    = $cart_item['revx_bundle_index'] ?? '';
 			$campaign_id   = intval( $cart_item['revx_campaign_id'] );
 			$offers        = revenue()->get_campaign_meta( $campaign_id, 'offers', true );
 			$product_id    = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
-			$variation_id  = $cart_item['variation_id'];
 			$cart_quantity = $cart_item['quantity'];
 
 			$offered_price = $cart_item['data']->get_regular_price( 'edit' );
 
 			if ( is_array( $offers ) ) {
-				$offer_type  = '';
-				$offer_value = '';
+				$applicable_offers = array();
 
 				// If bundle discount then check bundle with trigger product, if yes then add trigger product into offer.
-				foreach ( $offers as $offer ) {
-
+				foreach ( $offers as $idx => $offer ) {
 					$offered_products = $offer['products'];
 
-					if ( isset( $cart_item['revx_trigger_pid'] ) && $product_id == $cart_item['revx_trigger_pid'] ) {
+					if ( $cart_index !== '' && $cart_index != $idx ) {
+						continue;
+					}
 
+					if ( isset( $cart_item['revx_trigger_pid'] ) && $product_id === $cart_item['revx_trigger_pid'] ) {
 						$offered_products[] = $product_id;
 					}
 
-					if ( in_array( $product_id, $offered_products ) && $offer['quantity'] <= $cart_quantity ) {
-						$offer_type  = isset( $offer['type'] ) ? $offer['type'] : '';
-						$offer_value = isset( $offer['value'] ) ? $offer['value'] : '';
+					// Check if product is in offer and cart quantity meets the minimum requirement.
+					if ( in_array( $product_id, $offered_products ) && isset( $offer['quantity'] ) && $offer['quantity'] <= $cart_quantity ) {
+						$applicable_offers[] = $offer;
+
+							// Apply the selected offer.
+						if ( 'no_discount' !== $offer['type'] ) {
+							$offer_type  = $offer['type'];
+							$offer_value = isset( $offer['value'] ) ? $offer['value'] : '';
+
+							if ( 'free' === $offer_type || $offer_value ) {
+								$regular_price = $cart_item['data']->get_regular_price( 'edit' );
+								$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price );
+							}
+
+							$cart_item['revx_offered_price'] = $offered_price;
+							$cart_item['data']->set_price( $offered_price );
+						} else {
+							$cart_item['data']->set_price( $offered_price );
+						}
 					}
 				}
-
-				if ( $offer_type && ( 'free' == $offer_type || $offer_value ) ) {
-					$regular_price = $cart_item['data']->get_regular_price('edit' );
-					$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price );
-				}
 			}
-			$cart_item['revx_offered_price'] = $offered_price;
-
-			$cart_item['data']->set_price( $offered_price );
-
 		}
 	}
 
@@ -452,7 +458,6 @@ class Revenue_Bundle_Discount {
 			$this->current_position                           = $data['position'];
 			$this->render_views( $data );
 		}
-
 	}
 
 	/**
@@ -471,7 +476,6 @@ class Revenue_Bundle_Discount {
 
 			$this->render_views( $data );
 		}
-
 	}
 
 	/**
@@ -596,7 +600,6 @@ class Revenue_Bundle_Discount {
 				echo wp_kses( $output, revenue()->get_allowed_tag() );
 			}
 		}
-
 	}
 
 
@@ -624,8 +627,8 @@ class Revenue_Bundle_Discount {
 	 */
 	public function get_bundle_product_id() {
 		$product_id = get_option( 'revenue_bundle_parent_product_id', false ); // __revx_bundle_dummy_product_id
-		$prod = wc_get_product($product_id);
-		if($prod) {
+		$prod       = wc_get_product( $product_id );
+		if ( $prod ) {
 			$post = get_post( $product_id );
 			if ( $post->post_status === 'trash' ) {
 				wp_untrash_post( $product_id );
@@ -808,8 +811,8 @@ class Revenue_Bundle_Discount {
 	public function cart_item_price( $subtotal, $cart_item ) {
 
 		if ( self::is_bundle_parent_item( $cart_item ) ) {
-			$regular_price    = self::get_parent_cart_item_regular_price( $subtotal, $cart_item );
-			$discounted_price = self::get_parent_cart_item_price( $subtotal, $cart_item );
+			$regular_price    = self::get_parent_cart_item_regular_price( $subtotal, $cart_item, true );
+			$discounted_price = self::get_parent_cart_item_price( $subtotal, $cart_item, true );
 			if ( $regular_price != $discounted_price ) {
 				$subtotal = '<del>' . wc_price( $regular_price ) . '</del>' . wc_price( $discounted_price );
 			}
@@ -832,32 +835,42 @@ class Revenue_Bundle_Discount {
 		$product_id    = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
 		$variation_id  = $cart_item['variation_id'];
 		$cart_quantity = $cart_item['quantity'];
+		$cart_index    = $cart_item['revx_bundle_index'] ?? '';
 
 		$offered_price = $cart_item['data']->get_regular_price();
 
 		if ( is_array( $offers ) ) {
-			$offer_type  = '';
-			$offer_value = '';
 
-			// If bundle discount then check bundle with trigger product, if yes then add trigger product into offer.
-			foreach ( $offers as $offer ) {
-
+				// If bundle discount then check bundle with trigger product, if yes then add trigger product into offer.
+			foreach ( $offers as $idx => $offer ) {
 				$offered_products = $offer['products'];
 
-				if ( isset( $cart_item['revx_trigger_pid'] ) && $product_id == $cart_item['revx_trigger_pid'] ) {
+				if ( $cart_index !== '' && $cart_index != $idx ) {
+					continue;
+				}
 
+				if ( isset( $cart_item['revx_trigger_pid'] ) && $product_id === $cart_item['revx_trigger_pid'] ) {
 					$offered_products[] = $product_id;
 				}
 
-				if ( in_array( $product_id, $offered_products ) && $offer['quantity'] <= $cart_quantity ) {
-					$offer_type  = isset( $offer['type'] ) ? $offer['type'] : '';
-					$offer_value = isset( $offer['value'] ) ? $offer['value'] : '';
-				}
-			}
+				// Check if product is in offer and cart quantity meets the minimum requirement.
+				if ( in_array( $product_id, $offered_products ) && isset( $offer['quantity'] ) && $offer['quantity'] <= $cart_quantity ) {
+					$applicable_offers[] = $offer;
 
-			if ( $offer_type && ( 'free' == $offer_type || $offer_value ) ) {
-				$regular_price = $cart_item['data']->get_regular_price();
-				$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price );
+						// Apply the selected offer.
+					if ( 'no_discount' !== $offer['type'] ) {
+						$offer_type  = $offer['type'];
+						$offer_value = isset( $offer['value'] ) ? $offer['value'] : '';
+
+						if ( 'free' === $offer_type || $offer_value ) {
+							$regular_price = $cart_item['data']->get_regular_price( 'edit' );
+							$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price );
+						}
+
+						$cart_item['revx_offered_price'] = $offered_price;
+						$cart_item['data']->set_price( $offered_price );
+					}
+				}
 			}
 		}
 		return $offered_price;
@@ -879,7 +892,6 @@ class Revenue_Bundle_Discount {
 		}
 
 		return $data;
-
 	}
 
 	/**
@@ -925,7 +937,6 @@ class Revenue_Bundle_Discount {
 				do_action( 'revenue_bundled_cart_item_removed', $child_key, $cart );
 			}
 		}
-
 	}
 	/**
 	 * Restore Cart Item
@@ -966,7 +977,6 @@ class Revenue_Bundle_Discount {
 
 			}
 		}
-
 	}
 
 	/**
@@ -1324,6 +1334,4 @@ class Revenue_Bundle_Discount {
 	public static function is_removing_bundle_parent_item( $cart_item_key ) {
 		return self::$removing_parent_key === $cart_item_key;
 	}
-
-
 }
