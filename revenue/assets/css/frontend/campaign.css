@@ -1,3 +1,35 @@
+/* 
+	use to unset other plugin/theme css and styles
+	scope to particular class, tag, ids
+	all: unset; is dangerous to use globally, may break other styles, so use it carefully
+	can also use specific properties instead of all: unset;
+	example - margin: unset; padding: unset; border: unset; etc
+ */
+/* .revx-template, */
+.revx-template span,
+.revx-template bdi {
+	all: unset;
+}
+/* to handle woodmart shop page no width issue */
+.revx-template {
+	width: 100%;
+}
+
+/*================================
+    Specific use case on stock scarcity 
+	trigger = variation product
+	condition = variation product has stock scarcity
+==================================*/
+.woocommerce-variation-availability .revx-template {
+	visibility: visible;
+	opacity: 1;
+}
+
+.woocommerce-variation-price:not(:empty)
++ .woocommerce-variation-availability:has(.revx-template) {
+	width: 100%;
+	margin-left: 0;
+}
 /*================================
     Common Campaign
 ==================================*/
@@ -385,7 +417,7 @@
 }
 
 .revx-inpage-container.revx-campaign-grid {
-	visibility: hidden;
+	/* visibility: hidden; */
 }
 
 .revx-builder-element__content_separator {
@@ -614,6 +646,24 @@
 	position: fixed !important;
 	z-index: 9999;
 	bottom: 0;
+}
+
+.revx-slider-wrapper {
+	overflow: hidden;
+}
+
+.revx-slider-wrapper .item {
+	flex: 0 1 calc(100% / var(--revx-column-count));
+	align-items: start;
+}
+
+.revx-slider-wrapper .revx-grid-item {
+	padding-right: var(--revx-grid-gap);
+	flex-shrink: 0;
+	flex-basis: var(--revx-column-width);
+	transform: translateX(var(--revx-slider-translate));
+	transition: transform 0.5s;
+	box-sizing: content-box !important;
 }
 
 .revenue-campaign-shortcode .revx-inpage-container {

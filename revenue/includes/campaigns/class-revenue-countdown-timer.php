@@ -1,7 +1,5 @@
 <?php //phpcs:ignore Generic.Files.LineEndings.InvalidEOLChar
 /**
- * Revenue Campaign: Countdown Timer
- *
  * @package Revenue
  */
 
@@ -9,9 +7,8 @@ namespace Revenue;
 
 //phpcs:disable WordPress.PHP.StrictInArray.MissingTrueStrict, WordPress.PHP.StrictComparisons.LooseComparison
 
-
 /**
- * Revenue Campaign: Normal Discount
+ * WowRevenue Campaign: Countdown Timer
  *
  * @hooked on init
  */
@@ -42,7 +39,7 @@ class Revenue_Countdown_Timer {
 	public function init() {
 		add_filter( 'woocommerce_add_cart_item_data', array( $this, 'wsx_store_campaign_data_for_cart' ), 10, 2 );
 		add_action( 'wp_footer', array( $this, 'rvex_add_hidden_page_type_field' ) );
-		// add_filter( 'woocommerce_get_item_data', array( $this, 'wsx_display_cart_item_meta' ), 10, 2 );
+		// add_filter( 'woocommerce_get_item_data', array( $this, 'wsx_display_cart_item_meta' ), 10, 2 );.
 	}
 
 	/**
@@ -100,15 +97,20 @@ class Revenue_Countdown_Timer {
 		}
 		// Loop through each position and fetch campaigns.
 		foreach ( $positions as $position ) {
-			$campaigns = revenue()->get_available_campaigns( $product_id, $current_page, 'inpage', $position, false, false, 'countdown_timer' );
+			$campaigns = revenue()->get_available_campaigns(
+				$product_id,
+				$current_page,
+				'inpage',
+				$position,
+				false,
+				false,
+				'countdown_timer'
+			);
 
 			if ( ! empty( $campaigns ) ) {
 				foreach ( $campaigns as $key => $campaign ) {
-					// $cart_item_data['revx_campaign_id']   = $campaign['id'];
-					// $cart_item_data['revx_campaign_type'] = $campaign['campaign_type'];
-
-					$cart_item_data['revx_campaign_countdown_timer_id'] = $campaign['id'];
-					// $cart_item_data['revx_campaign_countdown_timer_'] = $campaign['id'];
+					$cart_item_data['revx_campaign_id_countdown_timer']   = $campaign['id'];
+					$cart_item_data['revx_campaign_type_countdown_timer'] = $campaign['campaign_type'];
 					revenue()->increment_campaign_add_to_cart_count( $campaign['id'] );
 					break; // Stop after setting campaign data for one position.
 				}
@@ -131,14 +133,12 @@ class Revenue_Countdown_Timer {
 	 */
 	public function output_inpage_views( $campaigns, $data ) {
 		foreach ( $campaigns as $campaign ) {
-
 			$this->campaigns['inpage'][ $data['position'] ][] = $campaign;
-
-			$this->current_position = $data['position'];
-			do_action( 'revenue_campaign_countdown_timer_inpage_before_render_content' );
-			$this->render_views( $data );
-			do_action( 'revenue_campaign_countdown_timer_inpage_after_render_content' );
 		}
+		$this->current_position = $data['position'];
+		do_action( 'revenue_campaign_countdown_timer_inpage_before_render_content' );
+		$this->render_views( $data );
+		do_action( 'revenue_campaign_countdown_timer_inpage_after_render_content' );
 	}
 
 	/**
@@ -155,14 +155,12 @@ class Revenue_Countdown_Timer {
 	 */
 	public function output_top_views( $campaigns, $data ) {
 		foreach ( $campaigns as $campaign ) {
-
 			$this->campaigns['top'][ $data['position'] ][] = $campaign;
-
-			$this->current_position = $data['position'];
-			do_action( 'revenue_campaign_countdown_timer_top_before_render_content' );
-			$this->render_views( $data );
-			do_action( 'revenue_campaign_countdown_timer_top_after_render_content' );
 		}
+		$this->current_position = $data['position'];
+		do_action( 'revenue_campaign_countdown_timer_top_before_render_content' );
+		$this->render_views( $data );
+		do_action( 'revenue_campaign_countdown_timer_top_after_render_content' );
 	}
 
 	/**
@@ -179,14 +177,12 @@ class Revenue_Countdown_Timer {
 	 */
 	public function output_bottom_views( $campaigns, $data ) {
 		foreach ( $campaigns as $campaign ) {
-
 			$this->campaigns['bottom'][ $data['position'] ][] = $campaign;
-
-			$this->current_position = $data['position'];
-			do_action( 'revenue_campaign_countdown_timer_bottom_before_render_content' );
-			$this->render_views( $data );
-			do_action( 'revenue_campaign_countdown_timer_bottom_after_render_content' );
 		}
+		$this->current_position = $data['position'];
+		do_action( 'revenue_campaign_countdown_timer_bottom_before_render_content' );
+		$this->render_views( $data );
+		do_action( 'revenue_campaign_countdown_timer_bottom_after_render_content' );
 	}
 
 
@@ -208,98 +204,81 @@ class Revenue_Countdown_Timer {
 	 * @return void
 	 */
 	public function render_views( $data = array() ) {
-		global $post;
-		
 		if ( ! empty( $this->campaigns['inpage'][ $this->current_position ] ) ) {
 			$campaigns = $this->campaigns['inpage'][ $this->current_position ];
-			wp_enqueue_script( 'revenue-campaign-countdown' );
-			wp_enqueue_style( 'revenue-campaign-countdown' );
+			// wp_enqueue_script( 'revenue-campaign-countdown' );
+			// wp_enqueue_style( 'revenue-campaign-countdown' );
 
-			foreach ( $campaigns as $campaign ) {
-				revenue()->update_campaign_impression( $campaign['id'], $post->ID );
-				$output = '';
+			$campaign = $campaigns[0];
 
-				$file_path = apply_filters( 'revenue_campaign_view_path', REVENUE_PATH . 'includes/campaigns/views/countdown-timer/inpage.php', 'countdown_timer', 'inpage', $campaign );
-
-				ob_start();
-				?>
-				<article class="upsells">
-				<?php
-				if ( file_exists( $file_path ) ) {
-					extract($data); //phpcs:ignore
-					include $file_path;
-				}
-				?>
-				</article>
-				<?php
-
-				$output .= ob_get_clean();
+			if ( revenue()->is_for_new_builder( $campaign ) ) {
+				wp_enqueue_script( 'revenue-campaign-countdown' );
+				wp_enqueue_style( 'revenue-campaign-countdown' );
+			} else {
+				wp_enqueue_script( 'revenue-v1-campaign-countdown' );
+				wp_enqueue_style( 'revenue-v1-campaign-countdown' );
 			}
+			revenue()->update_campaign_impression( $campaign['id']);
 
-			if ( $output ) {
-				echo $output;
+			$file_path = revenue()->get_campaign_path( $campaign, 'inpage', 'countdown-timer' );
+
+			$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'countdown_timer', 'inpage', $campaign );
+
+			if ( file_exists( $file_path ) ) {
+				extract($data); //phpcs:ignore
+				do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
+				include $file_path;
 			}
 		}
 		if ( ! empty( $this->campaigns['top'][ $this->current_position ] ) ) {
 			$campaigns = $this->campaigns['top'][ $this->current_position ];
-			wp_enqueue_script( 'revenue-campaign-countdown' );
-			wp_enqueue_style( 'revenue-campaign-countdown' );			
+			$campaign  = $campaigns[0];
+			// wp_enqueue_script( 'revenue-campaign-countdown' );
+			// wp_enqueue_style( 'revenue-campaign-countdown' );
 
-			foreach ( $campaigns as $campaign ) {
-				$output = '';
-
-				revenue()->update_campaign_impression( $campaign['id'], $post->ID );
-
-				$file_path = apply_filters( 'revenue_campaign_view_path', REVENUE_PATH . 'includes/campaigns/views/countdown-timer/toppage.php', 'countdown_timer', 'toppage', $campaign );
-
-				ob_start();
-				?>
-				<article class="upsells">
-				<?php
-				if ( file_exists( $file_path ) ) {
-					extract($data); //phpcs:ignore
-					include $file_path;
-				}
-				?>
-				</article>
-				<?php
-
-				$output .= ob_get_clean();
+			if ( revenue()->is_for_new_builder( $campaign ) ) {
+				wp_enqueue_script( 'revenue-campaign-countdown' );
+				wp_enqueue_style( 'revenue-campaign-countdown' );
+			} else {
+				wp_enqueue_script( 'revenue-v1-campaign-countdown' );
+				wp_enqueue_style( 'revenue-v1-campaign-countdown' );
 			}
 
-			if ( $output ) {
-				echo $output;
+			revenue()->update_campaign_impression( $campaign['id'] );
+			$file_path = revenue()->get_campaign_path( $campaign, 'toppage', 'countdown-timer' );
+
+			$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'countdown_timer', 'toppage', $campaign );
+
+			if ( file_exists( $file_path ) ) {
+				extract($data); //phpcs:ignore
+				do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
+				include $file_path;
 			}
 		}
 		if ( ! empty( $this->campaigns['bottom'][ $this->current_position ] ) ) {
 			$campaigns = $this->campaigns['bottom'][ $this->current_position ];
-			wp_enqueue_script( 'revenue-campaign-countdown' );
-			wp_enqueue_style( 'revenue-campaign-countdown' );
+			$campaign  = $campaigns[0];
+			// wp_enqueue_script( 'revenue-campaign-countdown' );
+			// wp_enqueue_style( 'revenue-campaign-countdown' );
 
-			foreach ( $campaigns as $campaign ) {
-				$output = '';
-
-				revenue()->update_campaign_impression( $campaign['id'], $post->ID );
-
-				$file_path = apply_filters( 'revenue_campaign_view_path', REVENUE_PATH . 'includes/campaigns/views/countdown-timer/bottompage.php', 'countdown_timer', 'bottompage', $campaign );
-
-				ob_start();
-				?>
-				<article class="upsells">
-				<?php
-				if ( file_exists( $file_path ) ) {
-					extract($data); //phpcs:ignore
-					include $file_path;
-				}
-				?>
-				</article>
-				<?php
-
-				$output .= ob_get_clean();
+			if ( revenue()->is_for_new_builder( $campaign ) ) {
+				wp_enqueue_script( 'revenue-campaign-countdown' );
+				wp_enqueue_style( 'revenue-campaign-countdown' );
+			} else {
+				wp_enqueue_script( 'revenue-v1-campaign-countdown' );
+				wp_enqueue_style( 'revenue-v1-campaign-countdown' );
 			}
+			
+			revenue()->update_campaign_impression( $campaign['id'] );
 
-			if ( $output ) {
-				echo $output;
+			$file_path = revenue()->get_campaign_path( $campaign, 'bottompage', 'countdown-timer' );
+
+			$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'countdown_timer', 'bottompage', $campaign );
+
+			if ( file_exists( $file_path ) ) {
+				extract($data); //phpcs:ignore
+				do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
+				include $file_path;
 			}
 		}
 	}
@@ -361,8 +340,8 @@ class Revenue_Countdown_Timer {
 			$is_all_page_enable = 'yes';
 		}
 
-
 		$data = array(
+			'modifiedDateTime'    => esc_js( $campaign['date_modified'] ?? '' ),
 			'timeFrameMode'       => esc_js( $static_time_frame_mode ),
 			'endDateTime'         => esc_js( $end_date_time ),
 			'startDateTime'       => esc_js( $start_date_time ),

@@ -343,7 +343,7 @@ $grid_class      = 'revx-campaign-view__items ' . ( 'list' == $view_mode ? 'revx
 ob_start();
 if ( 'list' == $view_mode ) {
 	?>
-	<div class="revx-campaign-container__wrapper" style="<?php echo esc_attr( $wrapper_style ); ?>">
+	<div class="revx-campaign-container__wrapper" style="<?php echo esc_attr( $wrapper_style ); ?> width:100%;">
 		<?php
 			echo wp_kses( $output_content, revenue()->get_allowed_tag() );
 		?>

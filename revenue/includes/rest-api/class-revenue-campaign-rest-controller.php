@@ -1,13 +1,13 @@
-<?php //phpcs:ignore Generic.Files.LineEndings.InvalidEOLChar
-/**
- * REST API: Revenue_Campaign_REST_Controller class
- *
- * @package Revenue
- */
+<?php  //phpcs:ignore Generic.Files.LineEndings.InvalidEOLChar
+		/**
+		 * REST API: Revenue_Campaign_REST_Controller class
+		 *
+		 * @package Revenue
+		 */
 
 namespace Revenue;
 
-//phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.PHP.StrictInArray.MissingTrueStrict, WordPress.PHP.StrictComparisons.LooseComparison
+  //phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.PHP.StrictInArray.MissingTrueStrict, WordPress.PHP.StrictComparisons.LooseComparison
 
 
 use WP_REST_Controller;
@@ -18,69 +18,69 @@ use WC_DateTime;
 use DateTimeZone;
 use DateTime;
 
-/**
- * REST API controller for managing revenue campaigns.
- *
- * Handles CRUD operations for campaigns through the WordPress REST API.
- *
- * @since 1.0.0
- */
+	/**
+	 * REST API controller for managing revenue campaigns.
+	 *
+	 * Handles CRUD operations for campaigns through the WordPress REST API.
+	 *
+	 * @since 1.0.0
+	 */
 class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
-	/**
-	 * Endpoint namespace
-	 *
-	 * @since 1.0.0
-	 * @var   string
-	 */
+		/**
+		 * Endpoint namespace
+		 *
+		 * @since 1.0.0
+		 * @var   string
+		 */
 	protected $namespace = 'revenue/v1';
 
-	/**
-	 * Route name
-	 *
-	 * @since 1.0.0
-	 * @var   string
-	 */
+		/**
+		 * Route name
+		 *
+		 * @since 1.0.0
+		 * @var   string
+		 */
 	protected $base = 'campaigns';
 
-	/**
-	 * Post type
-	 *
-	 * @since 1.0.0
-	 * @var   string
-	 */
+		/**
+		 * Post type
+		 *
+		 * @since 1.0.0
+		 * @var   string
+		 */
 	protected $post_type = 'revenue-campaign';
 
-	/**
-	 * Post status
-	 *
-	 * @since 1.0.0
-	 * @var   array
-	 */
+		/**
+		 * Post status
+		 *
+		 * @since 1.0.0
+		 * @var   array
+		 */
 	protected $post_status = array( 'publish', 'draft' );
 
 
-	/**
-	 * Must exist campaign meta keys
-	 *
-	 * @since 1.0.0
-	 * @var   array
-	 */
+		/**
+		 * Must exist campaign meta keys
+		 *
+		 * @since 1.0.0
+		 * @var   array
+		 */
 	protected $must_exist_meta_keys = array();
 
-	/**
-	 * Total sales data
-	 *
-	 * @since 1.0.0
-	 * @var   array
-	 */
+		/**
+		 * Total sales data
+		 *
+		 * @since 1.0.0
+		 * @var   array
+		 */
 	protected $total_sales_data = array();
 
-	/**
-	 * Register all routes related with stores
-	 *
-	 * @return void
-	 */
+		/**
+		 * Register all routes related with stores
+		 *
+		 * @return void
+		 */
 	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
@@ -205,6 +205,19 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			)
 		);
 
+		// to get realtime counting of the campaings without refreshing.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->base . '/limits',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE, // GET.
+					'callback'            => array( $this, 'get_campaign_limits_callback' ),
+					'permission_callback' => array( $this, 'get_campaign_permissions_check' ), // reuse existing.
+				),
+			)
+		);
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->base . '/support/',
@@ -219,12 +232,12 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		);
 	}
 
-	/**
-	 * Get Support Callaback.
-	 *
-	 * @param  array $request Request.
-	 * @return array
-	 */
+		/**
+		 * Get Support Callaback.
+		 *
+		 * @param  array $request Request.
+		 * @return array
+		 */
 	public function get_support_callback( $request ) {
 		$action = sanitize_text_field( $request['type'] );
 
@@ -263,96 +276,96 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		}
 	}
 
-	/**
-	 * Get campaign permissions check
-	 *
-	 * @param bool $request Request.
-	 *
-	 * @since  1.0.0
-	 * @return bool
-	 */
+		/**
+		 * Get campaign permissions check
+		 *
+		 * @param bool $request Request.
+		 *
+		 * @since  1.0.0
+		 * @return bool
+		 */
 	public function get_campaign_permissions_check( $request = false ) {
 		$has_permission = current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
 		return apply_filters( 'revenue_get_campaigns_permission_check', $has_permission, $request );
 	}
 
-	/**
-	 * Create_campaign_permissions_check
-	 *
-	 * @param bool $request Request.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return bool
-	 */
+		/**
+		 * Create_campaign_permissions_check
+		 *
+		 * @param bool $request Request.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @return bool
+		 */
 	public function create_campaign_permissions_check( $request = false ) {
 		$has_permission = current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
 		return apply_filters( 'revenue_create_campaign_permission_check', $has_permission, $request );
 	}
 
-	/**
-	 * Get_single_campaign_permissions_check
-	 *
-	 * @param bool $request Request.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return bool
-	 */
+		/**
+		 * Get_single_campaign_permissions_check
+		 *
+		 * @param bool $request Request.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @return bool
+		 */
 	public function get_single_campaign_permissions_check( $request = false ) {
 		$has_permission = current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
 		return apply_filters( 'revenue_get_campaign_permission_check', $has_permission, $request );
 	}
 
-	/**
-	 * Update_campaign_permissions_check
-	 *
-	 * @param bool $request Request.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return bool
-	 */
+		/**
+		 * Update_campaign_permissions_check
+		 *
+		 * @param bool $request Request.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @return bool
+		 */
 	public function update_campaign_permissions_check( $request = false ) {
 		$has_permission = current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
 		return apply_filters( 'revenue_update_campaign_permission_check', $has_permission, $request );
 	}
 
-	/**
-	 * Delete campaign permission checking
-	 *
-	 * @param bool $request Request.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return bool
-	 */
+		/**
+		 * Delete campaign permission checking
+		 *
+		 * @param bool $request Request.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @return bool
+		 */
 	public function delete_campaign_permissions_check( $request = false ) {
 		$has_permission = current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
 		return apply_filters( 'revenue_delete_campaign_permission_check', $has_permission, $request );
 	}
-	/**
-	 * Clone campaign permission checking
-	 *
-	 * @param bool $request Request.
-	 * @since 1.0.0
-	 *
-	 * @return bool
-	 */
+		/**
+		 * Clone campaign permission checking
+		 *
+		 * @param bool $request Request.
+		 * @since 1.0.0
+		 *
+		 * @return bool
+		 */
 	public function clone_item_permissions_check( $request = false ) {
 		$has_permission = current_user_can( 'manage_woocommerce' ) || current_user_can( 'manage_options' );
 		return apply_filters( 'revenue_clone_campaign_permission_check', $has_permission, $request );
 	}
 
 
-	/**
-	 * Prepare a single campaign for create or update.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param  WP_REST_Request $request Request object.
-	 * @return WP_Error|stdClass $data Campaign data.
-	 */
+		/**
+		 * Prepare a single campaign for create or update.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param  WP_REST_Request $request Request object.
+		 * @return WP_Error|stdClass $data Campaign data.
+		 */
 	protected function prepare_item_for_database( $request ) {
 		$data = array();
 
@@ -382,11 +395,11 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		if ( isset( $request['schedule_end_time_enabled'], $request['schedule_end_date'], $request['schedule_end_time'] ) && 'yes' === sanitize_key( $request['schedule_end_time_enabled'] ) && ! empty( $request['schedule_end_date'] ) && ! empty( $request['schedule_end_time'] ) ) {
 			$end_date_time                  = sanitize_text_field( $request['schedule_end_date'] ) . ' ' . sanitize_text_field( $request['schedule_end_time'] );
 			$date                           = new DateTime( $end_date_time );
-			$timestamp                      = $date->getTimestamp(); // Convert to milliseconds.
+			$timestamp                      = $date->getTimestamp();                                                                                              // Convert to milliseconds.
 			$data['campaign_end_date_time'] = gmdate( 'Y-m-d H:i:s', $timestamp );
 		}
 
-		/**
+			/**
 		 * Filter the query_vars used in `get_items` for the constructed query.
 		 *
 		 * @param array       $data An array representing a single item prepared
@@ -396,15 +409,15 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		return apply_filters( 'revenue_rest_pre_insert_campaign', $data, $request );
 	}
 
-	/**
-	 * Prepare a single campaign output for response.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param  int             $campaign_id Campaign id.
-	 * @param  WP_REST_Request $request     Request object.
-	 * @return WP_REST_Response
-	 */
+		/**
+		 * Prepare a single campaign output for response.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param  int             $campaign_id Campaign id.
+		 * @param  WP_REST_Request $request     Request object.
+		 * @return WP_REST_Response
+		 */
 	public function prepare_item_for_response( $campaign_id, $request ) {
 		$data = revenue()->get_campaign_data( $campaign_id, 'raw' );
 
@@ -436,10 +449,10 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$data    = $this->filter_response_by_context( $data, $context );
 
-		// Wrap the data in a response object.
+			// Wrap the data in a response object.
 		$response = rest_ensure_response( $data );
 
-		/**
+			/**
 		 * Filter the data for a response.
 		 *
 		 * The dynamic portion of the hook name, $this->post_type, refers to post_type of the post being
@@ -454,12 +467,12 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
 
 
-	/**
-	 * Create a single campaign.
-	 *
-	 * @param  WP_REST_Request $request Full details about the request.
-	 * @return WP_Error|WP_REST_Response
-	 */
+		/**
+		 * Create a single campaign.
+		 *
+		 * @param  WP_REST_Request $request Full details about the request.
+		 * @return WP_Error|WP_REST_Response
+		 */
 	public function create_item( $request ) {
 		$nonce = '';
 		if ( isset( $request['security'] ) ) {
@@ -478,7 +491,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
 		try {
 
-			// Set Default Value.
+				// Set Default Value.
 			if ( isset( $request['campaign_placement'] ) && empty( $request['campaign_placement'] ) ) {
 				$request['campaign_placement'] = 'multiple';
 			}
@@ -494,7 +507,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			}
 
 			$campaign_id = $this->save_campaign( $request );
-			/**
+				/**
 			 * Fires after a single item is created or updated via the REST API.
 			 *
 			 * @param int             $campaign_id      campaign data.
@@ -514,12 +527,12 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		}
 	}
 
-	/**
-	 * Delete a single item.
-	 *
-	 * @param  WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error
-	 */
+		/**
+		 * Delete a single item.
+		 *
+		 * @param  WP_REST_Request $request Full details about the request.
+		 * @return WP_REST_Response|WP_Error
+		 */
 	public function delete_item( $request ) {
 		$nonce = '';
 		if ( isset( $request['security'] ) ) {
@@ -558,7 +571,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			return new WP_Error( 'revenue_rest_cannot_delete', __( 'The campaign cannot be deleted.', 'revenue' ), array( 'status' => 500 ) );
 		}
 
-		/**
+			/**
 		 * Fires after a single item is deleted or trashed via the REST API.
 		 *
 		 * @param object           $campaign     The deleted item.
@@ -572,12 +585,12 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		return $response;
 	}
 
-	/**
-	 * Delete multiple items.
-	 *
-	 * @param  WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error
-	 */
+		/**
+		 * Delete multiple items.
+		 *
+		 * @param  WP_REST_Request $request Full details about the request.
+		 * @return WP_REST_Response|WP_Error
+		 */
 	public function delete_items( $request ) {
 		$nonce = '';
 		if ( isset( $request['security'] ) ) {
@@ -621,12 +634,12 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 	}
 
 
-	/**
-	 * Update a single product.
-	 *
-	 * @param  WP_REST_Request $request Full details about the request.
-	 * @return WP_Error|WP_REST_Response
-	 */
+		/**
+		 * Update a single product.
+		 *
+		 * @param  WP_REST_Request $request Full details about the request.
+		 * @return WP_Error|WP_REST_Response
+		 */
 	public function update_item( $request ) {
 		$nonce = '';
 		if ( isset( $request['security'] ) ) {
@@ -649,7 +662,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
 			$campaign = revenue()->get_campaign_data( $campaign_id );
 
-			/**
+				/**
 			 * Fires after a single item is created or updated via the REST API.
 			 *
 			 * @param $campaign  Post data.
@@ -666,12 +679,12 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		}
 	}
 
-	/**
-	 * Get a single campaign.
-	 *
-	 * @param  WP_REST_Request $request Full details about the request.
-	 * @return WP_Error|WP_REST_Response
-	 */
+		/**
+		 * Get a single campaign.
+		 *
+		 * @param  WP_REST_Request $request Full details about the request.
+		 * @return WP_Error|WP_REST_Response
+		 */
 	public function get_item( $request ) {
 		$nonce = '';
 		if ( isset( $request['security'] ) ) {
@@ -693,6 +706,52 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		$response = rest_ensure_response( $data );
 
 		return $response;
+	}
+
+	/**
+	 * Calculate campaign limits.
+	 *
+	 * @return array
+	 */
+	private function calculate_campaign_remainting_limtis() {
+		$counts = revenue()->get_campaign_counts();
+
+		return array(
+			'total_campaigns'            => max( 5 - $counts->total_campaigns, 0 ),
+			'normal_discount'            => max( 3 - $counts->normal_discount, 0 ),
+			'volume_discount'            => max( 1 - $counts->volume_discount, 0 ),
+			'bundle_discount'            => max( 1 - $counts->bundle_discount, 0 ),
+			'buy_x_get_y'                => max( 1 - $counts->buy_x_get_y, 0 ),
+			'stock_scarcity'             => max( 1 - $counts->stock_scarcity, 0 ),
+			'free_shipping_bar'          => max( 1 - $counts->free_shipping_bar, 0 ),
+			'next_order_coupon'          => max( 1 - $counts->next_order_coupon, 0 ),
+			'countdown_timer'            => max( 1 - $counts->countdown_timer, 0 ),
+			'mix_match'                  => 0, // pro campaign limits 0.
+			'frequently_bought_together' => 0,
+			'spending_goal'              => 0,
+			'double_order'               => 0,
+		);
+	}
+	/**
+	 * Get campaign limits.
+	 *
+	 * @param  WP_REST_Request $request Full details about the request.
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function get_campaign_limits_callback( $request ) {
+		$nonce = $request->get_param( 'security' );
+
+		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'revenue-dashboard' ) ) {
+			return new WP_Error(
+				'revenue_rest_nonce_error',
+				__( 'Nonce verification failed.', 'revenue' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		$limits = $this->calculate_campaign_remainting_limtis();
+
+		return rest_ensure_response( $limits );
 	}
 
 	/**
@@ -722,13 +781,24 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			return new WP_Error( "revenue_rest_invalid_{$this->post_type}_campaign", __( 'Invalid Campaign.', 'revenue' ), array( 'status' => 404 ) );
 		}
 
+		if ( ! revenue()->is_pro_active() ) {
+			$limits = $this->calculate_campaign_remainting_limtis();
+			if ( $limits['total_campaigns'] <= 0 || $limits[ $old_campaign['campaign_type'] ] <= 0 ) {
+				// revenue_rest_clone_limit_reached is used to handle api response on admin panel frontend, do not chnage.
+				return new WP_Error(
+					'revenue_rest_clone_limit_reached',
+					__( 'You have reached the maximum number of campaigns allowed.', 'revenue' ),
+					array( 'status' => 400 )
+				);
+			}
+		}
 		unset( $old_campaign['id'] );
 
 		$old_campaign['campaign_name'] = __( 'Duplicate of ', 'revenue' ) . $old_campaign['campaign_name'];
 
 		try {
 			$campaign_id = $this->save_campaign( $old_campaign, true );
-			/**
+				/**
 			 * Fires after a single item is created or updated via the REST API.
 			 *
 			 * @param int             $campaign_id      campaign data.
@@ -748,12 +818,12 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		}
 	}
 
-	/**
-	 * Get a collection of campaigns.
-	 *
-	 * @param  WP_REST_Request $request Full details about the request.
-	 * @return WP_Error|WP_REST_Response
-	 */
+		/**
+		 * Get a collection of campaigns.
+		 *
+		 * @param  WP_REST_Request $request Full details about the request.
+		 * @return WP_Error|WP_REST_Response
+		 */
 	public function get_items( $request ) {
 		$nonce = '';
 		if ( isset( $request['security'] ) ) {
@@ -765,7 +835,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		}
 
 		global $wpdb;
-		$total_campaign = $wpdb->get_row( "SELECT COUNT(*) as total FROM {$wpdb->prefix}revenue_campaigns" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$total_campaign = $wpdb->get_row( "SELECT COUNT(*) as total FROM {$wpdb->prefix}revenue_campaigns" );  //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$paginations    = array( 'total' => $total_campaign->total );
 		$args           = array();
 		$where_clause   = array();
@@ -837,7 +907,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			if ( $campaign_inpage_position ) {
 				$where_clause[] = $wpdb->prepare( 'campaigns.campaign_inpage_position=%s', $campaign_inpage_position );
 			} else {
-				return new WP_Error( 'revenue_rest_campaign_inpage_position_is_empty', __( 'Campaign in page position is empty!', 'revenue' ), array( 'status' => 400 ) );
+				return new WP_Error( 'revenue_rest_campaign_inpage_position_is_empty', __( "Campaign 'in page' position is empty!", 'revenue' ), array( 'status' => 400 ) );
 			}
 		}
 
@@ -942,7 +1012,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 					$end_date  = str_replace( array( "\r", "\n" ), '', $end_date );
 					$end_date  = $this->build_mysql_datetime( gmdate( 'Y-m-d', strtotime( $end_date ) ) );
 					$end_date  = new DateTime( $end_date );
-					$timestamp = $end_date->getTimestamp() * 1000; // Convert to milliseconds.
+					$timestamp = $end_date->getTimestamp() * 1000;                                          // Convert to milliseconds.
 					if ( $end_date ) {
 						$where_clause[] = $wpdb->prepare( 'campaigns.campaign_end_date_time<=%s', $timestamp );
 					} else {
@@ -953,7 +1023,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		}
 
 		$limit_query = '';
-		// Per page.
+			// Per page.
 		if ( isset( $request['per_page'] ) && ! empty( $request['per_page'] ) ) {
 			$limit                   = intval( sanitize_text_field( $request['per_page'] ) );
 			$limit_query             = $wpdb->prepare( 'limit %d;', $limit );
@@ -971,13 +1041,13 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		}
 
 		$order_by_query        = '';
-		$valid_order_by_colums = array( 'campaign_name', 'date_created', 'date_modified', 'start_date', 'end_date', 'id', 'campaign_total_order', 'conversion_rate', 'total_impressions', 'total_add_to_cart', 'total_checkout', 'total_rejections', 'total_orders', 'total_sales' );
+		$valid_order_by_colums = array( 'campaign_status', 'campaign_name', 'date_created', 'date_modified', 'start_date', 'end_date', 'id', 'campaign_total_order', 'conversion_rate', 'total_impressions', 'total_add_to_cart', 'total_checkout', 'total_rejections', 'total_orders', 'total_sales' );
 
 		if ( isset( $request['order_by'] ) && in_array( $request['order_by'], $valid_order_by_colums ) ) {
 			$order_by = sanitize_text_field( $request['order_by'] );
 			$is_asc   = isset( $request['order'] ) ? 'asc' === sanitize_text_field( $request['order'] ) : false;
 
-			$order_by_query = $is_asc ? $wpdb->prepare( "order by {$order_by} asc" ) : $wpdb->prepare( "order by {$order_by} desc" ); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$order_by_query = $is_asc ? $wpdb->prepare( "order by {$order_by} asc" ) : $wpdb->prepare( "order by {$order_by} desc" );  //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		}
 
 		$data_keys     = isset( $request['data_keys'] ) ? $request['data_keys'] : array();
@@ -1028,7 +1098,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 					break;
 
 				default:
-					// code...
+						// code...
 					break;
 			}
 		}
@@ -1056,7 +1126,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			$join_clause .= " LEFT JOIN (
                             select count(DISTINCT orders.order_id) as order_count,SUM(COALESCE(order_stats.total_sales, 0)) as total_sales, orders.campaign_id as campaign_id from {$wpdb->prefix}wc_order_stats as order_stats
                             inner join (
-                            $order_meta_select where meta_key='_revx_campaign_id' and meta_value IS NOT NULL
+                            $order_meta_select where meta_key = '_revx_campaign_id' and meta_value IS NOT NULL
                             )
                             orders ON (order_stats.order_id = orders.order_id OR order_stats.parent_id = orders.order_id)
                             group by orders .campaign_id
@@ -1078,7 +1148,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
 		if ( ! empty( $where_clause ) ) {
 			$where = implode( ' AND ', $where_clause );
-			$sql  .= "where {$where}"; //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$sql  .= "where {$where}";                   //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		}
 
 		if ( ! empty( $order_by_query ) ) {
@@ -1088,16 +1158,15 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		if ( ! empty( $limit_query ) ) {
 			$sql .= ' ' . $limit_query;
 		}
-		// echo '<pre>'; print_r($sql); echo '</pre>';
 
 		if ( empty( $select_clause ) || 0 == $total_campaign->total ) {
 			$results = array();
 		} else {
-			$results = $wpdb->get_results( $sql ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$results = $wpdb->get_results( $sql );  //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		foreach ( $results as $key => $value ) {
-			$id                          = $value->id;
+					$id                  = $value->id;
 			$results[ $key ]->stats_data = $this->get_campaign_stats( $id, $data_keys );
 
 			$_campaign = revenue()->get_campaign_data( $id );
@@ -1116,11 +1185,11 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 				$results[ $key ]->triggers              = $trigger_items;
 				$results[ $key ]->campaign_trigger_type = 'products';
 			} elseif ( 'category' == $_campaign['campaign_trigger_type'] ) {
-				$trigger_items                          = $_campaign['campaign_trigger_items'];
+						$trigger_items                  = $_campaign['campaign_trigger_items'];
 				$results[ $key ]->triggers              = $trigger_items;
 				$results[ $key ]->campaign_trigger_type = 'category';
 			} else {
-				$trigger_items                          = $_campaign['campaign_trigger_items'];
+						$trigger_items                  = $_campaign['campaign_trigger_items'];
 				$results[ $key ]->triggers              = $trigger_items;
 				$results[ $key ]->campaign_trigger_type = $_campaign['campaign_trigger_type'];
 			}
@@ -1139,17 +1208,17 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 	}
 
 
-	/**
-	 * Get Campaign Stats.
-	 *
-	 * @param  string|int $campaign_id Campaign Id.
-	 * @param  array      $data_keys   Data keys.
-	 * @return array.
-	 */
+		/**
+		 * Get Campaign Stats.
+		 *
+		 * @param  string|int $campaign_id Campaign Id.
+		 * @param  array      $data_keys   Data keys.
+		 * @return array.
+		 */
 	public function get_campaign_stats( $campaign_id, $data_keys ) {
 		global $wpdb;
 
-		// Get campaign start date.
+			// Get campaign start date.
 		$campaign_start_date = $wpdb->get_var( //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
 				"SELECT DATE(date_created) FROM {$wpdb->prefix}revenue_campaigns WHERE id = %d",
@@ -1157,58 +1226,43 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			)
 		);
 
-		$is_custom_orders = revenue()->is_custom_orders_table_usages_enabled();
-		$meta_table       = $is_custom_orders ? "{$wpdb->prefix}wc_orders_meta" : "{$wpdb->prefix}postmeta";
-		$id_column        = $is_custom_orders ? 'order_id' : 'post_id';
+		$order_meta_select = revenue()->is_custom_orders_table_usages_enabled() ? "SELECT order_id, meta_value AS campaign_id FROM {$wpdb->prefix}wc_orders_meta " : "select  post_id as order_id, meta_value as campaign_id from {$wpdb->prefix}postmeta ";
 
-		$analytics_subquery = "
-			SELECT DATE(`date`) AS date,
-				SUM(impression_count) AS impression_count,
-				SUM(add_to_cart_count) AS add_to_cart_count,
-				SUM(rejection_count) AS rejection_count,
-				SUM(checkout_count) AS checkout_count
-			FROM {$wpdb->prefix}revenue_campaign_analytics
-			WHERE campaign_id = %d
-			GROUP BY DATE(`date`)
-		";
-
-			$orders_subquery = "
-			SELECT DATE(os.date_created) AS date,
-				SUM(os.total_sales) AS total_sales,
-				SUM(CASE WHEN os.parent_id = 0 THEN 1 ELSE 0 END) AS orders_count
-			FROM {$wpdb->prefix}wc_order_stats os
-			INNER JOIN $meta_table meta
-				ON os.order_id = meta.$id_column
-				AND meta.meta_key = '_revx_campaign_id'
-			WHERE meta.meta_value = %d
-			AND os.status NOT IN ('wc-auto-draft', 'wc-trash', 'wc-pending', 'wc-failed', 'wc-cancelled', 'wc-checkout-draft')
-			GROUP BY DATE(os.date_created)
-		";
-
-			$query = "
-			SELECT
-				a.date,
-				COALESCE(os.total_sales, 0) AS total_sales,
-				COALESCE(os.orders_count, 0) AS orders_count,
-				ROUND(
+		$query = "
+            SELECT
+                DATE(analytics.date) AS date,
+                COALESCE(SUM(order_stats.total_sales), 0) AS total_sales,
+                COALESCE(SUM(CASE WHEN order_stats.parent_id = 0 THEN 1 ELSE 0 END), 0) AS orders_count,
+                ROUND(
 					CASE
-						WHEN COALESCE(a.impression_count, 0) > 0 THEN
-							(COALESCE(os.orders_count, 0) / a.impression_count) * 100
+						WHEN COALESCE(SUM(analytics.impression_count), 0) > 0 THEN
+							(COALESCE(SUM(CASE WHEN order_stats.parent_id = 0 THEN 1 ELSE 0 END), 0) / SUM(analytics.impression_count)) * 100
 						ELSE 0
 					END,
 					2
 				) AS conversion_rate,
-				COALESCE(a.impression_count, 0) AS impression_count,
-				COALESCE(a.add_to_cart_count, 0) AS add_to_cart,
-				COALESCE(a.rejection_count, 0) AS rejection_count,
-				COALESCE(a.checkout_count, 0) AS checkout_count
-			FROM ($analytics_subquery) a
-			LEFT JOIN ($orders_subquery) os ON a.date = os.date
-			ORDER BY a.date
-		";
+                COALESCE(SUM(analytics.impression_count), 0) AS impression_count,
+                COALESCE(SUM(analytics.add_to_cart_count), 0) AS add_to_cart,
+                COALESCE(SUM(analytics.rejection_count), 0) AS rejection_count,
+                COALESCE(SUM(analytics.checkout_count), 0) AS checkout_count
+            FROM
+                {$wpdb->prefix}revenue_campaign_analytics AS analytics
+            LEFT JOIN (
+                $order_meta_select
+                WHERE
+                    meta_key = '_revx_campaign_id'
+                    AND meta_value IS NOT NULL
+            ) AS orders ON analytics.campaign_id = orders.campaign_id
+            LEFT JOIN {$wpdb->prefix}wc_order_stats order_stats ON (order_stats.order_id = orders.order_id OR order_stats.parent_id = orders.order_id) AND orders.order_id IS NOT NULL
+            AND order_stats.status NOT IN ('wc-auto-draft', 'wc-trash', 'wc-pending', 'wc-failed', 'wc-cancelled', 'wc-checkout-draft')
+            WHERE
+                analytics.campaign_id = %d
+            GROUP BY
+                DATE(analytics.date)
+        ";
 
-		$prepared_query = $wpdb->prepare( $query, $campaign_id, $campaign_id ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$results        = $wpdb->get_results( $prepared_query ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$prepared_query = $wpdb->prepare( $query, $campaign_id );  //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$results        = $wpdb->get_results( $prepared_query );   //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$start_date = new DateTime( $campaign_start_date );
 		$end_date   = new DateTime( 'now' );
@@ -1241,25 +1295,25 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
 
 
-	/**
-	 * Builds a MySQL format date/time based on some query parameters.
-	 *
-	 * You can pass an array of values (year, month, etc.) with missing parameter values being defaulted to
-	 * either the maximum or minimum values (controlled by the $default_to parameter). Alternatively you can
-	 * pass a string that will be passed to date_create().
-	 *
-	 * @since 3.7.0
-	 *
-	 * @param  string|array $datetime       An array of parameters or a strtotime() string.
-	 * @param  bool         $default_to_max Whether to round up incomplete dates. Supported by values
-	 *                                      of $datetime that are arrays, or string values that are a
-	 *                                      subset of MySQL date format ('Y', 'Y-m', 'Y-m-d', 'Y-m-d H:i').
-	 *                                      Default: false.
-	 * @return string|false A MySQL format date/time or false on failure.
-	 */
+		/**
+		 * Builds a MySQL format date/time based on some query parameters.
+		 *
+		 * You can pass an array of values (year, month, etc.) with missing parameter values being defaulted to
+		 * either the maximum or minimum values (controlled by the $default_to parameter). Alternatively you can
+		 * pass a string that will be passed to date_create().
+		 *
+		 * @since 3.7.0
+		 *
+		 * @param  string|array $datetime       An array of parameters or a strtotime() string.
+		 * @param  bool         $default_to_max Whether to round up incomplete dates. Supported by values
+		 *                                      of $datetime that are arrays, or string values that are a
+		 *                                      subset of MySQL date format ('Y', 'Y-m', 'Y-m-d', 'Y-m-d H:i').
+		 * Default: false.
+		 * @return string|false A MySQL format date/time or false on failure.
+		 */
 	public function build_mysql_datetime( $datetime, $default_to_max = false ) {
 		if ( ! is_array( $datetime ) ) {
-			/*
+				/*
 			* Try to parse some common date formats, so we can detect
 			* the level of precision and support the 'inclusive' parameter.
 			*/
@@ -1288,11 +1342,11 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 				);
 			}
 
-			// If no match is found, we don't support default_to_max.
+				// If no match is found, we don't support default_to_max.
 			if ( ! is_array( $datetime ) ) {
 				$wp_timezone = wp_timezone();
 
-				// Assume local timezone if not provided.
+					// Assume local timezone if not provided.
 				$dt = date_create( $datetime, $wp_timezone );
 
 				if ( false === $dt ) {
@@ -1332,13 +1386,13 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		return sprintf( '%04d-%02d-%02d %02d:%02d:%02d', $datetime['year'], $datetime['month'], $datetime['day'], $datetime['hour'], $datetime['minute'], $datetime['second'] );
 	}
 
-	/**
-	 * Saves a campaign to the database.
-	 *
-	 * @param  WP_REST_Request $request  Full details about the request.
-	 * @param  bool            $is_clone Whether the request is for a clone operation.
-	 * @return int
-	 */
+		/**
+		 * Saves a campaign to the database.
+		 *
+		 * @param  WP_REST_Request $request  Full details about the request.
+		 * @param  bool            $is_clone Whether the request is for a clone operation.
+		 * @return int
+		 */
 	public function save_campaign( $request, $is_clone = false ) {
 		$campaign_data = $this->prepare_item_for_database( $request );
 
@@ -1355,12 +1409,12 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
 		return $id;
 	}
-	/**
-	 * Updatge a campaign to the database.
-	 *
-	 * @param  WP_REST_Request $request Full details about the request.
-	 * @return int
-	 */
+		/**
+		 * Updatge a campaign to the database.
+		 *
+		 * @param  WP_REST_Request $request Full details about the request.
+		 * @return int
+		 */
 	public function update_campaign( $request ) {
 		$id = isset( $request['id'] ) ? $request['id'] : 0;
 
@@ -1370,13 +1424,13 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
 		$campaign_data = $this->prepare_item_for_database( $request );
 
-		// Update Campaign Table.
+			// Update Campaign Table.
 		$update_status = $this->insert_update_campaign( $campaign_data, true );
 
-		// Update Campaign Meta.
+			// Update Campaign Meta.
 		$updates = $this->update_campaign_meta( $id, $campaign_data );
 
-		// Update Campaign Triggers and trigger items.
+			// Update Campaign Triggers and trigger items.
 		if ( ! ( isset( $request['source'] ) && 'campaign_list' == $request['source'] ) ) {
 			$this->update_campaign_triggers( $id, $campaign_data );
 		}
@@ -1389,17 +1443,17 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 	}
 
 
-	/**
-	 * Update Campaign Triggers.
-	 *
-	 * @param int   $id   Campaign ID.
-	 * @param array $data Campaign Data.
-	 */
+		/**
+		 * Update Campaign Triggers.
+		 *
+		 * @param int   $id   Campaign ID.
+		 * @param array $data Campaign Data.
+		 */
 	protected function update_campaign_meta( $id, $data ) {
 		$campaign_data = revenue()->get_campaign_data( $id );
 		$updated_props = array();
 		foreach ( revenue()->get_campaign_keys( 'meta' ) as $key ) {
-			// Perform update meta operation only changes.
+				// Perform update meta operation only changes.
 			if ( 'placement_settings' == $key ) {
 				continue;
 			}
@@ -1416,11 +1470,11 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 	}
 
 
-	/**
-	 * Get meta keys
-	 *
-	 * @param array $data Data.
-	 */
+		/**
+		 * Get meta keys
+		 *
+		 * @param array $data Data.
+		 */
 	private function get_meta_key( $data ) {
 		$position         = $data['campaign_inpage_position'];
 		$display_type     = $data['campaign_display_style'];
@@ -1467,16 +1521,16 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		);
 	}
 
-	/**
-	 * Delete and Update Meta
-	 *
-	 * @param  string $campaign_id Campaign ID.
-	 * @param  array  $ids         IDs.
-	 * @param  string $type        Type.
-	 * @param  string $meta_key    Meta key.
-	 * @param  string $for         For which(delete or update).
-	 * @return void
-	 */
+		/**
+		 * Delete and Update Meta
+		 *
+		 * @param  string $campaign_id Campaign ID.
+		 * @param  array  $ids         IDs.
+		 * @param  string $type        Type.
+		 * @param  string $meta_key    Meta key.
+		 * @param  string $for         For which(delete or update).
+		 * @return void
+		 */
 	private function delete_update_meta( $campaign_id, $ids, $type, $meta_key, $for = 'delete' ) {
 		switch ( $type ) {
 			case 'category':
@@ -1503,13 +1557,13 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		}
 	}
 
-	/**
-	 * Process Triggers
-	 *
-	 * @param  array  $data Data.
-	 * @param  string $type Type.
-	 * @return array
-	 */
+		/**
+		 * Process Triggers
+		 *
+		 * @param  array  $data Data.
+		 * @param  string $type Type.
+		 * @return array
+		 */
 	private function processTriggers( $data, $type = 'include' ) {
 		$res = array(
 			'is_all_products'    => isset( $args['campaign_trigger_type'] ) && 'all_products' == $args['campaign_trigger_type'],
@@ -1533,10 +1587,6 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 						$res['include_products'][] = intval( $trigger['item_id'] );
 						break;
 
-					// case 'eventin_events':
-					// $res['include_products'][] = intval( $trigger['item_id'] );
-					// break;
-
 					case 'category':
 						$res['include_categories'][] = intval( $trigger['item_id'] );
 
@@ -1544,7 +1594,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
 					default:
 						$res = apply_filters( 'revenue_process_campaign_trigger', $res, $trigger['trigger_type'], $trigger['trigger_action'], $trigger['item_id'] );
-						// code...
+							// code...
 						break;
 				}
 			} elseif ( 'exclude' == $trigger['trigger_action'] ) {
@@ -1554,9 +1604,6 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 					case 'products':
 						$res['exclude_products'][] = intval( $trigger['item_id'] );
 						break;
-					// case 'eventin_events':
-					// $res['exclude_products'][] = intval( $trigger['item_id'] );
-					// break;
 					case 'category':
 						$res['exclude_categories'][] = intval( $trigger['item_id'] );
 						break;
@@ -1569,7 +1616,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			}
 		}
 
-		// Ensure unique IDs and add to result if necessary.
+			// Ensure unique IDs and add to result if necessary.
 		$res['exclude_products']   = array_unique( $res['exclude_products'] );
 		$res['include_products']   = array_unique( $res['include_products'] );
 		$res['exclude_categories'] = array_unique( $res['exclude_categories'] );
@@ -1578,14 +1625,14 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		return $res;
 	}
 
-	/**
-	 * Campaign Campaign Triggers
-	 *
-	 * @param  string|int $campaign_id Campaign ID.
-	 * @param  array      $args        Args.
-	 * @param  boolean    $is_delete   Should delete.
-	 * @return void
-	 */
+		/**
+		 * Campaign Campaign Triggers
+		 *
+		 * @param  string|int $campaign_id Campaign ID.
+		 * @param  array      $args        Args.
+		 * @param  boolean    $is_delete   Should delete.
+		 * @return void
+		 */
 	protected function update_campaign_triggers( $campaign_id, $args, $is_delete = false ) {
 		global $wpdb;
 
@@ -1612,7 +1659,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
 		if ( $is_update ) {
 
-			$meta_keys = $this->get_meta_key( $before_update_campaign ); // Get Include and Exclude Meta keys form old campaign(Before Updated), so that we delete this.
+			$meta_keys = $this->get_meta_key( $before_update_campaign );  // Get Include and Exclude Meta keys form old campaign(Before Updated), so that we delete this.
 
 			$exclude_meta_keys = $meta_keys['to_be_add']['exclude_meta_key'];
 			$include_meta_keys = $meta_keys['to_be_add']['include_meta_key'];
@@ -1620,7 +1667,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			$tbd_exclude_meta_keys = $meta_keys['to_be_delete']['exclude_meta_key'];
 			$tbd_include_meta_keys = $meta_keys['to_be_delete']['include_meta_key'];
 
-			// $to_be_add
+				// $to_be_add
 			$pre_trigger_item = $this->processTriggers( $previous_data );
 
 			$prev_exclude_item = $this->processTriggers( $before_update_campaign['campaign_trigger_exclude_items'] );
@@ -1649,7 +1696,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			}
 		}
 
-		// update placement_settings.
+			// update placement_settings.
 
 		if ( ! empty( $args['placement_settings'] ) ) {
 			revenue()->update_campaign_meta( $campaign_id, 'placement_settings', $args['placement_settings'] );
@@ -1672,7 +1719,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 				}
 
 				if ( isset( $args['campaign_trigger_type'] ) && 'all_products' == $args['campaign_trigger_type'] && $excluded_trigger && is_array( $excluded_trigger ) ) {
-					// Excluded Product and Categories.
+						// Excluded Product and Categories.
 					$excluded_products  = isset( $excluded_trigger['exclude_products'] ) ? $excluded_trigger['exclude_products'] : array();
 					$exclude_categories = isset( $excluded_trigger['exclude_categories'] ) ? $excluded_trigger['exclude_categories'] : array();
 
@@ -1702,9 +1749,6 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 						}
 					}
 				}
-			}
-
-			if ( isset( $args['campaign_trigger_items'] ) && is_array( $args['campaign_trigger_items'] ) ) {
 
 				$updated_trigger_data = array();
 
@@ -1786,7 +1830,16 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			$previous_data = $previous_data['campaign_trigger_exclude_items'];
 		}
 
-		if ( ( isset( $args['campaign_trigger_type'] ) && ( 'all_products' == $args['campaign_trigger_type'] || 'category' == $args['campaign_trigger_type'] ) ) && isset( $args['campaign_trigger_exclude_items'] ) && is_array( $args['campaign_trigger_exclude_items'] ) ) {
+		if ( (
+				isset( $args['campaign_trigger_type'] ) &&
+				(
+					'all_products' == $args['campaign_trigger_type'] ||
+					'category' == $args['campaign_trigger_type']
+				)
+			) &&
+			isset( $args['campaign_trigger_exclude_items'] ) &&
+			is_array( $args['campaign_trigger_exclude_items'] )
+		) {
 
 			$updated_trigger_data = array();
 
@@ -1860,23 +1913,23 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		}
 	}
 
-	/**
-	 * Update meta data in, or delete it from, the database.
-	 *
-	 * Avoids storing meta when it's either an empty string or empty array.
-	 * Other empty values such as numeric 0 and null should still be stored.
-	 * Data-stores can force meta to exist using `must_exist_meta_keys`.
-	 *
-	 * Note: WordPress `get_metadata` function returns an empty string when meta data does not exist.
-	 *
-	 * @param int    $id         The campaign id.
-	 * @param string $meta_key   Meta key to update.
-	 * @param mixed  $meta_value Value to save.
-	 *
-	 * @since 1.0.0 Added to prevent empty meta being stored unless required.
-	 *
-	 * @return bool True if updated/deleted.
-	 */
+		/**
+		 * Update meta data in, or delete it from, the database.
+		 *
+		 * Avoids storing meta when it's either an empty string or empty array.
+		 * Other empty values such as numeric 0 and null should still be stored.
+		 * Data-stores can force meta to exist using `must_exist_meta_keys`.
+		 *
+		 * Note: WordPress `get_metadata` function returns an empty string when meta data does not exist.
+		 *
+		 * @param int    $id         The campaign id.
+		 * @param string $meta_key   Meta key to update.
+		 * @param mixed  $meta_value Value to save.
+		 *
+		 * @since 1.0.0 Added to prevent empty meta being stored unless required.
+		 *
+		 * @return bool True if updated/deleted.
+		 */
 	protected function update_or_delete_post_meta( $id, $meta_key, $meta_value ) {
 		if ( in_array( $meta_value, array( array(), '' ), true ) && ! in_array( $meta_key, $this->must_exist_meta_keys, true ) ) {
 			$updated = revenue()->delete_campaign_meta( $id, $meta_key );
@@ -1886,12 +1939,12 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
 		return (bool) $updated;
 	}
-	/**
-	 * Sets a date prop whilst handling formatting and datetime objects.
-	 *
-	 * @since 1.0.0
-	 * @param string|integer $value Value of the prop.
-	 */
+		/**
+		 * Sets a date prop whilst handling formatting and datetime objects.
+		 *
+		 * @since 1.0.0
+		 * @param string|integer $value Value of the prop.
+		 */
 	protected function get_wc_date( $value ) {
 		try {
 			if ( empty( $value ) || '0000-00-00 00:00:00' === $value ) {
@@ -1902,10 +1955,10 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			if ( is_a( $value, 'WC_DateTime' ) ) {
 				$datetime = $value;
 			} elseif ( is_numeric( $value ) ) {
-				// Timestamps are handled as UTC timestamps in all cases.
+					// Timestamps are handled as UTC timestamps in all cases.
 				$datetime = new WC_DateTime( "@{$value}", new DateTimeZone( 'UTC' ) );
 			} else {
-				// Strings are defined in local WP timezone. Convert to UTC.
+					// Strings are defined in local WP timezone. Convert to UTC.
 				if ( 1 === preg_match( '/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(Z|((-|\+)\d{2}:\d{2}))$/', $value, $date_bits ) ) {
 					$offset    = ! empty( $date_bits[7] ) ? iso8601_timezone_to_offset( $date_bits[7] ) : wc_timezone_offset();
 					$timestamp = gmmktime( $date_bits[4], $date_bits[5], $date_bits[6], $date_bits[2], $date_bits[3], $date_bits[1] ) - $offset;
@@ -1915,7 +1968,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 				$datetime = new WC_DateTime( "@{$timestamp}", new DateTimeZone( 'UTC' ) );
 			}
 
-			// Set local timezone or offset.
+				// Set local timezone or offset.
 			if ( get_option( 'timezone_string' ) ) {
 				$datetime->setTimezone( new DateTimeZone( wc_timezone_string() ) );
 			} else {
@@ -1928,24 +1981,24 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		} // @codingStandardsIgnoreLine.
 	}
 
-	/**
-	 * Only return writable props from schema.
-	 *
-	 * @param  array $schema Schema.
-	 * @return bool
-	 */
+		/**
+		 * Only return writable props from schema.
+		 *
+		 * @param  array $schema Schema.
+		 * @return bool
+		 */
 	protected function filter_writable_props( $schema ) {
 		return empty( $schema['readonly'] );
 	}
 
 
-	/**
-	 * Insert and Update Campaign.
-	 *
-	 * @param  array   $args     Args.
-	 * @param  boolean $wp_error wp error.
-	 * @return mixed
-	 */
+		/**
+		 * Insert and Update Campaign.
+		 *
+		 * @param  array   $args     Args.
+		 * @param  boolean $wp_error wp error.
+		 * @return mixed
+		 */
 	public function insert_update_campaign( $args, $wp_error = false ) {
 		global $wpdb;
 		$campaign_id = 0;
@@ -2013,7 +2066,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			$campaign_table_data['date_modified_gmt'] = current_time( 'mysql', 1 );
 		} else {
 			$campaign_table_data = array(
-				'campaign_name'             => isset( $args['campaign_name'] ) ? wp_kses_post( $args['campaign_name'] ) : __( 'Untitled Campaign', 'revenue' ),
+				'campaign_name'             => isset( $args['campaign_name'] ) ? wp_kses_post( $args['campaign_name'] ) : ( isset( $args['campaign_type'] ) ? sanitize_text_field( revenue()->get_campaign_type_name( $args['campaign_type'] ) ) : __( 'Untitled Campaign', 'revenue' ) ),
 				'campaign_author'           => $user_id,
 				'campaign_status'           => isset( $args['campaign_status'] ) ? sanitize_text_field( $args['campaign_status'] ) : 'draft',
 				'campaign_type'             => isset( $args['campaign_type'] ) ? sanitize_text_field( $args['campaign_type'] ) : '',
@@ -2037,12 +2090,12 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			if ( isset( $args['schedule_end_time_enabled'], $args['schedule_end_date'], $args['schedule_end_time'] ) && 'yes' === sanitize_key( $args['schedule_end_time_enabled'] ) && ! empty( $args['schedule_end_date'] ) && ! empty( $args['schedule_end_time'] ) ) {
 				$end_date_time = sanitize_text_field( $args['schedule_end_date'] ) . ' ' . sanitize_text_field( $args['schedule_end_time'] );
 				$date          = new DateTime( $end_date_time );
-				$timestamp     = $date->getTimestamp() * 1000; // Convert to milliseconds.
+				$timestamp     = $date->getTimestamp() * 1000;                                                                                 // Convert to milliseconds.
 				$campaign_table_data['campaign_end_date_time'] = gmdate( 'Y-m-d H:i:s', $timestamp );
 			} elseif ( isset( $args['campaign_end_date_time'] ) ) {
 				$campaign_table_data['campaign_end_date_time'] = sanitize_text_field( $args['campaign_end_date_time'] );
 			}
-			// Insert New Campaign.
+				// Insert New Campaign.
 			$campaign_table_data['date_created']      = current_time( 'mysql' );
 			$campaign_table_data['date_modified']     = current_time( 'mysql' );
 			$campaign_table_data['date_created_gmt']  = current_time( 'mysql', 1 );
@@ -2078,12 +2131,12 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		return $campaign_id;
 	}
 
-	/**
-	 * Bulk Update Campaign Status
-	 *
-	 * @param  object $request Request.
-	 * @return mixed
-	 */
+		/**
+		 * Bulk Update Campaign Status
+		 *
+		 * @param  object $request Request.
+		 * @return mixed
+		 */
 	public function bulk_update_campaign_status( $request ) {
 		global $wpdb;
 
@@ -2095,14 +2148,14 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		foreach ( $campaign_ids as $campaign_id ) {
 			$campaign_id = intval( $campaign_id );
 
-			// Get previous data.
+				// Get previous data.
 			$campaign_before = revenue()->get_campaign_data( $campaign_id );
 
 			if ( is_null( $campaign_before ) ) {
-				continue; // Skip if campaign doesn't exist.
+				continue;  // Skip if campaign doesn't exist.
 			}
 
-			// Check if status is different, if yes, update it.
+				// Check if status is different, if yes, update it.
 			if ( $campaign_before['campaign_status'] !== $new_status ) {
 				$updated_data = array(
 					'campaign_status'   => $new_status,
@@ -2112,7 +2165,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
 				$where = array( 'id' => $campaign_id );
 
-				//phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				  //phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$result = $wpdb->update( $wpdb->prefix . 'revenue_campaigns', $updated_data, $where );
 
 				if ( false !== $result ) {
@@ -2129,12 +2182,12 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 	}
 
 
-	/**
-	 * Sanitize Campaign.
-	 *
-	 * @param  array $campaign Campaign.
-	 * @return array
-	 */
+		/**
+		 * Sanitize Campaign.
+		 *
+		 * @param  array $campaign Campaign.
+		 * @return array
+		 */
 	public function sanitize_campaign( $campaign ) {
 		if ( ! is_array( $campaign ) ) {
 			return false;
@@ -2147,14 +2200,14 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 	}
 
 
-	/**
-	 * Sanitize Campaign Field.
-	 *
-	 * @param  string $field   Field.
-	 * @param  mixed  $value   Value.
-	 * @param  string $context Context.
-	 * @return mixed
-	 */
+		/**
+		 * Sanitize Campaign Field.
+		 *
+		 * @param  string $field   Field.
+		 * @param  mixed  $value   Value.
+		 * @param  string $context Context.
+		 * @return mixed
+		 */
 	public function sanitize_campaign_field( $field, $value, $context = 'display' ) {
 		switch ( $field ) {
 			case 'campaign_name':
@@ -2163,7 +2216,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			case 'campaign_author':
 			case 'id':
 				$value = (int) sanitize_text_field( $value );
-				// code...
+					// code...
 				break;
 			case 'campaign_status':
 				$value = sanitize_text_field( $value );
@@ -2186,18 +2239,18 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 				break;
 
 			default:
-				// code...
+					// code...
 				break;
 		}
 
 		return $value;
 	}
 
-	/**
-	 * Get the campaign schema, conforming to JSON Schema.
-	 *
-	 * @return array
-	 */
+		/**
+		 * Get the campaign schema, conforming to JSON Schema.
+		 *
+		 * @return array
+		 */
 	public function get_item_schema() {
 		$schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
@@ -2519,11 +2572,11 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 				// Frequenty Bought Together - No Settings.
 
 				// Bundle Discount Settings.
-				'bundle_with_trigger_products_enabled'     => array(
-					'description' => __( 'Bundle discount campaign allow bundle with trigger product', 'revenue' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit' ),
-				),
+			'bundle_with_trigger_products_enabled'         => array(
+				'description' => __( 'Bundle discount campaign allow bundle with trigger product', 'revenue' ),
+				'type'        => 'string',
+				'context'     => array( 'view', 'edit' ),
+			),
 
 				// Volume Discount Settings.
 				'allow_more_than_required_quantity'        => array(
@@ -2692,11 +2745,6 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-				'spending_goal_is_upsell_enable'           => array(
-					'description' => __( 'Is spending goal upsell enabled or not', 'revenue' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit' ),
-				),
 				'countdown_start_time_status'              => array(
 					'description' => __( 'Does campaign coundown start right now ot schedule to later', 'revenue' ),
 					'type'        => 'string',
@@ -2793,6 +2841,11 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
+				'multiple_variation_selection_enabled'     => array(
+					'description' => __( 'Allow users to choose the variations of items based on selected quantity', 'revenue' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
 				'offered_product_on_cart_action'           => array(
 					'description' => __( 'If the offered products are already in cart action', 'revenue' ),
 					'type'        => 'string',
@@ -2803,7 +2856,11 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
-
+				'multiple_variation_selection_enabled'     => array(
+					'description' => __( 'Allow users to choose the variations of items based on selected quantity', 'revenue' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
 				'builder'                                  => array(
 					'description' => __( 'Builder Data', 'revenue' ),
 					'type'        => 'object',
@@ -2985,6 +3042,41 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
+				'css'                                      => array(
+					'description' => __( 'Builder view class', 'revenue' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
+				'drawer_css'                               => array(
+					'description' => __( 'Builder view class', 'revenue' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
+				'inpage_css'                               => array(
+					'description' => __( 'Builder view class', 'revenue' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
+				'floating_css'                             => array(
+					'description' => __( 'Builder view class', 'revenue' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
+				'popup_css'                                => array(
+					'description' => __( 'Builder view class', 'revenue' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
+				'top_css'                                  => array(
+					'description' => __( 'Builder view class', 'revenue' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
+				'bottom_css'                               => array(
+					'description' => __( 'Builder view class', 'revenue' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
 				'countdown_timer_type'                     => array(
 					'description' => __( 'Countdown Timer Campaign Countdown Type', 'revenue' ),
 					'type'        => 'string',
@@ -3007,6 +3099,11 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 				),
 				'countdown_timer_shop_progress_bar'        => array(
 					'description' => __( 'Countdown Timer Campaign Shop page progress Bar', 'revenue' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
+				'countdown_timer_cart_progress_bar'        => array(
+					'description' => __( 'Countdown Timer Campaign Cart page progress Bar', 'revenue' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 				),
@@ -3080,10 +3177,20 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit' ),
 				),
+				'activeTemplate'                           => array(
+					'description' => __( 'Active Template', 'revenue' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
+				'campaign_version'                         => array(
+					'description' => __( 'Campaign Version', 'revenue' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+				),
 			),
 		);
 
-		// get_campaign_keys
+			// get_campaign_keys.
 
 		return $this->add_additional_fields_schema( $schema );
 	}

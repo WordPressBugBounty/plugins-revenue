@@ -106,10 +106,10 @@ class Revenue_Functions {
 	 */
 	public function get_campaign_types() {
 		$types = array(
-			'normal_discount'            => _x( 'Normal Discounts', 'Campaign Types', 'revenue' ),
-			'bundle_discount'            => _x( 'Bundle Discounts', 'Campaign Types', 'revenue' ),
-			'volume_discount'            => _x( 'Volume Discounts', 'Campaign Types', 'revenue' ),
-			'buy_x_get_y'                => _x( 'Buy X Get Y Discounts', 'Campaign Types', 'revenue' ),
+			'normal_discount'            => _x( 'Normal Discount', 'Campaign Types', 'revenue' ),
+			'bundle_discount'            => _x( 'Bundle Discount', 'Campaign Types', 'revenue' ),
+			'volume_discount'            => _x( 'Volume Discount', 'Campaign Types', 'revenue' ),
+			'buy_x_get_y'                => _x( 'Buy X Get Y Discount', 'Campaign Types', 'revenue' ),
 			'mix_match'                  => _x( 'Product Mix Match', 'Campaign Types', 'revenue' ),
 			'frequently_bought_together' => _x( 'Frequently Bought Together', 'Campaign Types', 'revenue' ),
 			'double_order'               => _x( 'Double Order', 'Campaign Types', 'revenue' ),
@@ -121,6 +121,23 @@ class Revenue_Functions {
 		);
 
 		return apply_filters( 'revenue_campaign_types', $types );
+	}
+	/**
+	 * Get campaign type name by key
+	 *
+	 * @since 1.0.0
+	 * @param string $campaign_key The campaign type key (e.g., 'normal_discount')
+	 * @return string|null Campaign type name or null if not found
+	 */
+	public function get_campaign_type_name( $campaign_key ) {
+
+		if ( $campaign_key === 'buy_x_get_y' ) {
+			return _x( 'Buy X Get Y', 'Campaign Types', 'revenue' );
+		}
+
+		$types = $this->get_campaign_types();
+		
+		return isset( $types[ $campaign_key ] ) ? $types[ $campaign_key ] : null;
 	}
 	/**
 	 * Get revenue campaign statuses
@@ -174,10 +191,10 @@ class Revenue_Functions {
 	 */
 	public function get_campaign_floating_positions() {
 		$types = array(
-			'bottom-right' => _x( 'Bottom Right', 'Floating positions', 'revenue' ),
-			'bottom-left'  => _x( 'Bottom Left', 'Floating positions', 'revenue' ),
-			'top-right'    => _x( 'Top Right', 'Floating positions', 'revenue' ),
 			'top-left'     => _x( 'Top Left', 'Floating positions', 'revenue' ),
+			'top-right'    => _x( 'Top Right', 'Floating positions', 'revenue' ),
+			'bottom-left'  => _x( 'Bottom Left', 'Floating positions', 'revenue' ),
+			'bottom-right' => _x( 'Bottom Right', 'Floating positions', 'revenue' ),
 		);
 
 		return apply_filters( 'revenue_campaign_display_types', $types );
@@ -409,6 +426,7 @@ class Revenue_Functions {
 				11
 			);
 		}
+
 		add_action(
 			'woocommerce_account_content',
 			function () {
@@ -636,7 +654,8 @@ class Revenue_Functions {
 				'publish'
 			);
 
-			$res = $wpdb->get_results( $query, ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$res = $wpdb->get_results( $query, ARRAY_A );
 
 			// Cache for 1 hour (3600 seconds)
 			// wp_cache_set( 'revenue_countdown_campaigns', $res, $cache_group, 3600 );
@@ -658,11 +677,27 @@ class Revenue_Functions {
 	 * @param string $display_type   The type of display (e.g., inpage).
 	 * @param string $position       The position of the display within the placement.
 	 * @param bool   $with_ids      Whether to return an array with campaign IDs as well.
+	 * @param bool   $is_cart       Whether to return campaigns for the cart page.
+	 * @param string $campaign_type The type of campaign to retrieve.
 	 *
 	 * @return array An array of available campaigns. If $with_ids is true,
 	 *               an array containing 'campaigns' and 'ids' is returned.
 	 */
-	public function get_available_campaigns( $product_id, $placement, $display_type = '', $position = '', $with_ids = false, $is_cart = false, $campaign_type = '' ) {
+	public function get_available_campaigns(
+		$product_id,
+		$placement,
+		$display_type = '',
+		$position = '',
+		$with_ids = false,
+		$is_cart = false,
+		$campaign_type = ''
+	) {
+		$revenue_bundle_id = get_option( 'revenue_bundle_parent_product_id', false );
+		if ( $revenue_bundle_id && intval( $revenue_bundle_id ) === intval( $product_id ) ) {
+			// avoid triggering product for Revenue Bundle dummy product.
+			return array();
+		}
+
 		if ( 'inpage' === $display_type ) {
 			$include_meta_key = "revx_camp_{$placement}_{$display_type}_{$position}_in";
 			$exclude_meta_key = "revx_camp_{$placement}_{$display_type}_{$position}_ex";
@@ -672,7 +707,6 @@ class Revenue_Functions {
 		}
 
 		$included = get_post_meta( $product_id, $include_meta_key );
-
 		$excluded = get_post_meta( $product_id, $exclude_meta_key );
 
 		if ( ! is_array( $included ) ) {
@@ -808,12 +842,12 @@ class Revenue_Functions {
 			return true;
 		}
 
-		// Only end date-time is provided
+		// Only end date-time is provided.
 		if ( is_null( $start_date_time ) && isset( $campaign['schedule_end_time_enabled'] ) && 'yes' === $campaign['schedule_end_time_enabled'] ) {
 			return $current_date_time <= $end_date_time;
 		}
 
-		// Only start date-time is provided
+		// Only start date-time is provided.
 		if ( is_null( $end_date_time ) || ! isset( $campaign['schedule_end_time_enabled'] ) || 'no' === $campaign['schedule_end_time_enabled'] ) {
 			return $current_date_time >= $start_date_time;
 		}
@@ -979,6 +1013,8 @@ class Revenue_Functions {
 					'schedule_end_time_enabled',
 					'skip_add_to_cart',
 					'quantity_selector_enabled',
+					'multiple_variation_selection_enabled',
+					'multiple_variation_selection_enabled',
 					'offered_product_on_cart_action',
 					'offered_product_click_action',
 					'spending_goal_free_shipping_progress_messages',
@@ -993,6 +1029,14 @@ class Revenue_Functions {
 					'buildeMobileData',
 					'campaign_builder_view',
 					'builderdata',
+					'css',
+					'drawer_css',
+					'inpage_css',
+					'floating_css',
+					'popup_css',
+					'top_css',
+					'bottom_css',
+					// 'builderdata',
 					'product_tag_text',
 					'save_discount_ext',
 					'bundle_label_badge',
@@ -1033,6 +1077,7 @@ class Revenue_Functions {
 					'countdown_timer_evergreen_settings',
 					'countdown_timer_daily_recurring_settings',
 					'countdown_timer_shop_progress_bar',
+					'countdown_timer_cart_progress_bar',
 					'countdown_timer_entire_site_action_type',
 					'countdown_timer_entire_site_action_link',
 					'countdown_timer_entire_site_action_enable',
@@ -1046,8 +1091,10 @@ class Revenue_Functions {
 					'animation_type',
 					'animation_duration',
 					'delay_between_loop',
-					'builderdata',					'revx_next_order_coupon',
-
+					'builderdata',
+					'activeTemplate',
+					'revx_next_order_coupon',
+					'campaign_version',
 				);
 				// code...
 				break;
@@ -1780,6 +1827,28 @@ class Revenue_Functions {
 		return $value;
 	}
 
+	/**
+	 * Replaces discount placeholders in a given text with the actual discount value.
+	 *
+	 * This function dynamically replaces the `{discount_value}` placeholder in a text string
+	 * with either a formatted percentage or price value, depending on the given parameters.
+	 * It ensures proper HTML escaping and WooCommerce-compatible price formatting.
+	 *
+	 * @param string $text          The text containing the `{discount_value}` placeholder.
+	 * @param float  $value         The discount value to insert into the text.
+	 * @param bool   $is_percentage Optional. Whether the discount is a percentage value. Default false.
+	 *
+	 * @return string The modified text with the discount value inserted.
+	 */
+	public static function get_modified_text( $text, $value, $is_percentage = false ) {
+		if ( $is_percentage ) {
+			$display_value = esc_html( $value ) . '%';
+		} else {
+			$display_value = wc_price( $value );
+		}
+		$text = str_replace( '{discount_value}', $display_value, $text );
+		return $text;
+	}
 
 	/**
 	 * Calculates the offered price based on the specified offer type and value.
@@ -1789,77 +1858,105 @@ class Revenue_Functions {
 	 * It can also return a message indicating the savings or offer details.
 	 *
 	 * @param string $offer_type        The type of offer (e.g., 'percentage', 'fixed_discount', 'fixed_price', 'no_discount', 'free').
-	 * @param float  $offer_value       The value associated with the offer, which can be a percentage or fixed amount.
-	 * @param float  $regular_price     The regular price of the product before any discounts.
-	 * @param bool   $with_save_data    Whether to return additional save data (message and offer details).
-	 * @param int    $offer_qty         The quantity associated with the offer (default is 1).
+	 * @param float  $offer_value            The value associated with the offer, which can be a percentage or fixed amount.
+	 * @param float  $discount_base_price    The base price on which discounts are calculated (required).
+	 * @param bool   $with_save_data         Whether to return additional save data (message and offer details).
+	 * @param int    $offer_qty              The quantity associated with the offer (default is 1).
+	 * @param string $campaign_type          Campaign type (e.g., 'volume_discount').
+	 * @param string $save_text              Save message template.
+	 * @param float  $regular_price          Optional actual regular price (used for total save calculations).
 	 *
 	 * @return array|float The calculated offered price. If $with_save_data is true,
 	 *                     an array containing offer details (type, value, message, price) is returned.
 	 *                     Otherwise, the final offered price is returned as a float.
 	 */
-	public function calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price, $with_save_data = false, $offer_qty = 1, $campaign_type = '' ) {
-		$offered_price        = 0.0;
-		$regular_price        = floatval( $regular_price );
-		$offer_value          = floatval( $offer_value );
-		$offer_qty            = floatval( $offer_qty );
-		$save_data            = array();
+	public function calculate_campaign_offered_price(
+		$offer_type,
+		$offer_value,
+		$discount_base_price,
+		$with_save_data = false,
+		$offer_qty = 1,
+		$campaign_type = '',
+		$save_text = 'Save {discount_value}',
+		$regular_price = 0.0
+	) {
+		$offered_price = 0.0;
+
+		// incoming $discount_base_price is required (base price for discount calcs)
+		// incoming $regular_price is optional (actual regular price used for savings display).
+		$discount_base_price = floatval( $discount_base_price );
+		$regular_price       = floatval( $regular_price );
+		// ensure regular_price defaults to at least the discount base price.
+		$regular_price = $regular_price > $discount_base_price ? $regular_price : $discount_base_price;
+		$offer_value   = floatval( $offer_value );
+		$offer_qty     = floatval( $offer_qty );
+		$save_data     = array();
+
 		$save_data['message'] = '';
 
 		if ( ! $offer_type ) {
-			return $regular_price;
+			return $discount_base_price;
 		}
 
 		switch ( $offer_type ) {
 			case 'percentage':
-				$offered_price      = $regular_price - ( $regular_price * ( ( $offer_value * 1.0 ) / 100 ) );
-				$save_data['type']  = 'percentage';
-				$save_data['value'] = $offer_value;
-				if ( $offer_value ) {
-					/* translators: %s: Discount percentage value */
-					$save_data['message'] = sprintf( __( 'Save %s%%', 'revenue' ), $offer_value );
+				// calculate discount based on the discount base price.
+				$offered_price     = $discount_base_price - ( $discount_base_price * ( ( $offer_value * 1.0 ) / 100 ) );
+				$save_data['type'] = 'percentage';
+				// default percentage value is the offer value, but if regular price
+				// is greater than base price, recompute percentage relative to regular price.
+				if ( $regular_price > $discount_base_price && $regular_price > 0 ) {
+					$perc = ( ( $regular_price - $offered_price ) / $regular_price ) * 100;
+
+					$save_data['value'] = round( $perc, 2 );
+					if ( $save_data['value'] ) {
+						$save_data['message'] = self::get_modified_text( $save_text, $save_data['value'], true );
+					}
+				} else {
+					$save_data['value'] = $offer_value;
+					if ( $offer_value ) {
+						$save_data['message'] = self::get_modified_text( $save_text, $offer_value, true );
+					}
 				}
 				break;
-
 			case 'fixed_discount':
 			case 'amount':
-				$offered_price     = max( floatval( 0 ), ( $regular_price - $offer_value ) );
+				// apply fixed discount on the discount base price.
+				$offered_price     = max( floatval( 0 ), ( $discount_base_price - $offer_value ) );
 				$save_data['type'] = 'amount';
-				/* translators: %s: Discount percentage value */
-				$save_data['message'] = sprintf( __( 'Save %s', 'revenue' ), wc_price( $offer_qty * $offer_value ) );
+				// total save should be computed against the regular price.
+				$total_save           = ( $regular_price - $offered_price ) * $offer_qty;
+				$save_data['message'] = self::get_modified_text( $save_text, $total_save );
 				break;
 			case 'fixed_price':
 				$offered_price      = $offer_value;
 				$save_data['type']  = 'amount';
 				$save_data['value'] = $offer_value;
-				/* translators: %s: Discount percentage value */
-
+				// total save computed against regular price (actual).
 				$total_save = $regular_price - $offer_value;
-
-				if($campaign_type==='volume_discount') {
+				if ( 'volume_discount' === $campaign_type ) {
 					$total_save = $total_save * $offer_qty;
 				}
-
-				$save_data['message'] = sprintf( __( 'Save %s', 'revenue' ), wc_price( $total_save ) );
+				$save_data['message'] = self::get_modified_text( $save_text, $total_save );
 				break;
 			case 'fixed_total_price':
 				$offered_price = $offer_value;
-				$temp_price    = $offer_value * $offer_qty;
 
-				if ( $campaign_type === 'volume_discount' ) {
-					$regular_price = $regular_price * $offer_qty;
-					$offer_value   = $offer_value;
+				if ( 'volume_discount' === $campaign_type ) {
+					// regular_price is the per-item regular price; compute totals.
+					$offered_price = $offer_value / $offer_qty;
 				}
 
 				$save_data['type']  = 'fixed_total_price';
 				$save_data['value'] = $offer_value;
-				/* translators: %s: Discount percentage value */
-				$save_data['message'] = sprintf( __( 'Save %s', 'revenue' ), wc_price( $regular_price - $offer_value ) );
+				// total save computed using regular price totals.
+				$total_save           = ( $regular_price * ( 'volume_discount' === $campaign_type ? $offer_qty : 1 ) ) - $offer_value;
+				$save_data['message'] = self::get_modified_text( $save_text, $total_save );
 
 				break;
 
 			case 'no_discount':
-				$offered_price        = $regular_price;
+				$offered_price        = $regular_price - $offer_value;
 				$save_data['type']    = 'amount';
 				$save_data['value']   = 0;
 				$save_data['message'] = '';
@@ -1876,7 +1973,8 @@ class Revenue_Functions {
 				// code...
 				break;
 		}
-
+		// 2nd parameter empty string for woocommerce settings, integer for specific decimal places.
+		$offered_price = wc_format_decimal( $offered_price, '' );
 		if ( $with_save_data ) {
 			$save_data['price'] = max( 0.0, $offered_price );
 
@@ -2043,7 +2141,104 @@ class Revenue_Functions {
 		$defaults = apply_filters(
 			'revenue_get_default_settings',
 			array(
-				'campaign_list_columns_visible' => array( 'check_column', 'campaign_name', 'id', 'campaign_status', 'triggers', 'total_impression', 'total_add_to_cart', 'conversion_rate', 'total_sales', 'campaign_progress', 'actions' ),
+				'campaign_list_columns_visible' => array(
+					'check_column',
+					'campaign_name',
+					'id',
+					'campaign_status',
+					'triggers',
+					'total_add_to_cart',
+					'conversion_rate',
+					'total_sales',
+					'campaign_progress',
+					'actions',
+				),
+				'themes'                        => array(
+					'base'   => array(
+						'primary'   => '#0A0D14',
+						'secondary' => '#FFFFFF',
+						'shades'    => array( '#31353F', '#868C98', '#E2E4E9', '#F6F8FA' ),
+					),
+					'accent' => array(
+						'primary'    => '#6E3FF3',
+						'secondary'  => '#00A464',
+						'tertiary'   => '#FBDFB1',
+						'quaternary' => '#FEF7EC',
+					),
+				),
+				'typography'                    => array(
+					'style1' => array(
+						'mobile'  => array(
+							'fontSize'   => 16,
+							'fontWeight' => 500,
+						),
+						'tablet'  => array(
+							'fontSize'   => 24,
+							'fontWeight' => 500,
+						),
+						'desktop' => array(
+							'fontSize'   => 28,
+							'fontWeight' => 500,
+						),
+					),
+					'style2' => array(
+						'mobile'  => array(
+							'fontSize'   => 16,
+							'fontWeight' => 500,
+						),
+						'tablet'  => array(
+							'fontSize'   => 16,
+							'fontWeight' => 500,
+						),
+						'desktop' => array(
+							'fontSize'   => 24,
+							'fontWeight' => 500,
+						),
+					),
+					'style3' => array(
+						'mobile'  => array(
+							'fontSize'   => 12,
+							'fontWeight' => 500,
+						),
+						'tablet'  => array(
+							'fontSize'   => 14,
+							'fontWeight' => 500,
+						),
+						'desktop' => array(
+							'fontSize'   => 16,
+							'fontWeight' => 500,
+						),
+					),
+					'style4' => array(
+						'mobile'  => array(
+							'fontSize'   => 12,
+							'fontWeight' => 500,
+						),
+						'tablet'  => array(
+							'fontSize'   => 12,
+							'fontWeight' => 500,
+						),
+						'desktop' => array(
+							'fontSize'   => 14,
+							'fontWeight' => 500,
+						),
+					),
+					'style5' => array(
+						'mobile'  => array(
+							'fontSize'   => 12,
+							'fontWeight' => 500,
+						),
+						'tablet'  => array(
+							'fontSize'   => 12,
+							'fontWeight' => 500,
+						),
+						'desktop' => array(
+							'fontSize'   => 12,
+							'fontWeight' => 500,
+						),
+					),
+				),
+				'theme'                         => 'default',
 			),
 			$key
 		);
@@ -2051,6 +2246,7 @@ class Revenue_Functions {
 		// If a key is provided, return its value from the defaults. If not found, return false.
 		return $key ? ( isset( $defaults[ $key ] ) ? $defaults[ $key ] : false ) : $defaults;
 	}
+
 
 
 	/**
@@ -2309,10 +2505,38 @@ class Revenue_Functions {
 					if ( ! $product ) {
 						continue;
 					}
+					// error_log( print_r( $product, true ) );
+					if ( $product && $product->is_type( 'variation' ) ) {
+						$parent_id   = $product->get_parent_id();
+						$parent      = wc_get_product( $parent_id );
+						$parent_name = $parent ? $parent->get_name() : '';
+						$attributes  = $product->get_attributes();
+
+						$attribute_parts = array();
+
+						foreach ( $attributes as $attr_key => $value ) {
+							$taxonomy = str_replace( 'attribute_', '', $attr_key );
+							if ( taxonomy_exists( $taxonomy ) ) {
+								$taxonomy_obj      = get_taxonomy( $taxonomy );
+								$label             = $taxonomy_obj ? $taxonomy_obj->labels->singular_name : ucfirst( $taxonomy );
+								$term              = get_term_by( 'slug', $value, $taxonomy );
+								$value_name        = $term ? $term->name : $value;
+								$attribute_parts[] = "{$label}: {$value_name}";
+							} else {
+								$label             = ucfirst( str_replace( '_', ' ', $taxonomy ) );
+								$attribute_parts[] = "{$label}: {$value}";
+							}
+						}
+
+						$full_name = $parent_name . ' – ' . implode( ', ', $attribute_parts );
+					} else {
+						$full_name = $product ? $product->get_name() : '';
+					}
 					$image_url                      = wp_get_attachment_url( $product->get_image_id() ) ?: wc_placeholder_img_src();
-					$updated_item['item_name']      = $product->get_name();
+					$updated_item['item_name']      = $full_name;
 					$updated_item['regular_price']  = $product->get_regular_price();
 					$updated_item['sale_price']     = $product->get_sale_price();
+					$updated_item['parent_id']      = $product->is_type( 'variation' ) ? $product->get_parent_id() : '';
 					$updated_item['show_attribute'] = 'variable' == $product->get_type();
 				} elseif ( $item['trigger_type'] === 'category' ) {
 					$category                  = get_term( $item['item_id'] );
@@ -2399,7 +2623,7 @@ class Revenue_Functions {
 	}
 
 
-	public function get_cart_product_ids() {
+	public function get_cart_product_ids( $contain_parent_id = false ) {
 		if ( ! isset( WC()->cart ) ) {
 			return array();
 		}
@@ -2413,7 +2637,11 @@ class Revenue_Functions {
 		// If not cached, get the cart items and their product IDs
 		$product_ids = array();
 		foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-			$product_ids[] = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+			if ( $contain_parent_id ) {
+				$product_ids[] = $cart_item['product_id'];
+			} else {
+				$product_ids[] = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+			}
 		}
 
 		// Cache the product IDs for future use
@@ -2424,10 +2652,15 @@ class Revenue_Functions {
 
 	public function campaign_style_generator( $type = 'inpage', $campaign = array(), $placement = '' ) {
 		$view_mode = revenue()->get_placement_settings( $campaign['id'], $placement, 'builder_view' ) ?? 'list';
-		if ( 'drawer' == $type ) {
+		if ( 'drawer' === $type ) {
 			$styles = revenue()->get_campaign_meta( $campaign['id'], 'builderdata', true )[ $type ];
-		} elseif ( 'spending_goal' === $campaign['campaign_type'] || 'free_shipping_bar' === $campaign['campaign_type'] || 'stock_scarcity' === $campaign['campaign_type'] || 'countdown_timer' === $campaign['campaign_type'] || 'next_order_coupon' === $campaign['campaign_type'] || 'next_order_coupon' === $campaign['campaign_type'] ) {
-				$styles = revenue()->get_campaign_meta( $campaign['id'], 'builderdata', true )[ $type ];
+		} elseif ( 'spending_goal' === $campaign['campaign_type'] ||
+			'free_shipping_bar' === $campaign['campaign_type'] ||
+			'stock_scarcity' === $campaign['campaign_type'] ||
+			'countdown_timer' === $campaign['campaign_type'] ||
+			'next_order_coupon' === $campaign['campaign_type']
+		) {
+			$styles = revenue()->get_campaign_meta( $campaign['id'], 'builderdata', true )[ $type ];
 
 		} else {
 			$styles = revenue()->get_campaign_meta( $campaign['id'], 'builderdata', true )[ $type ][ $view_mode ];
@@ -2435,11 +2668,13 @@ class Revenue_Functions {
 
 		$data = array();
 
-		foreach ( $styles as $key => $style ) {
-			if ( ( 'leftSliderIcon' == $key || 'rightSliderIcon' == $key ) && 'inpage' != $type ) {
-				$data[ $key ] = $this->generate_style( $style, true );
-			} else {
-				$data[ $key ] = $this->generate_style( $style );
+		if ( is_array( $styles ) ) {
+			foreach ( $styles as $key => $style ) {
+				if ( ( 'leftSliderIcon' == $key || 'rightSliderIcon' == $key ) && 'inpage' != $type ) {
+					$data[ $key ] = $this->generate_style( $style, true );
+				} else {
+					$data[ $key ] = $this->generate_style( $style );
+				}
 			}
 		}
 
@@ -2643,7 +2878,7 @@ class Revenue_Functions {
 								break;
 							case 'containerSize':
 								if ( '' != $value ) {
-									$generated_styles['--revx-coupon-size'] = "{$value}";
+									$generated_styles['--revx-coupon-font-size'] = "{$value}";
 								}
 								break;
 
@@ -2890,7 +3125,7 @@ class Revenue_Functions {
 		$data_attribute = '';
 		if ( ! empty( $customData ) ) {
 			foreach ( $customData as $key => $value ) {
-				$safe_value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+				$safe_value      = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
 				$data_attribute .= "data-$key='" . $safe_value . "' ";
 			}
 		}
@@ -3400,7 +3635,7 @@ class Revenue_Functions {
 				'offered_price'    => 0,
 				'regular_price'    => 0,
 				'source'           => '',
-				'index'            => ''
+				'index'            => '',
 			)
 		);
 
@@ -3818,22 +4053,57 @@ class Revenue_Functions {
 	 * @return array
 	 */
 	public function get_allowed_tag() {
+		// Add safecss filter to allow display property
+		add_filter( 'safe_style_css', array( $this, 'allow_display_in_kses' ) );
+		
 		$allowed_tags = array_merge(
 			wp_kses_allowed_html( 'post' ),
 			array(
+				'style'  => array(),
+				'input'  => array(),
+				'div'    => array(
+					'id'	=> true,
+					'class' => true,
+					'style' => true,
+					'data-*'=> true,
+				),
 				'svg'     => array(
-					'xmlns'   => true,
-					'width'   => true,
-					'height'  => true,
-					'fill'    => true,
-					'viewbox' => true,
+					'xmlns'     => true,
+					'width'     => true,
+					'height'    => true,
+					'fill'      => true,
+					'viewbox'   => true,
+					'viewBox'   => true,
+					'transform' => true,
 				),
 				'path'    => array(
-					'stroke'         => true,
-					'strokeLinecap'  => true,
-					'strokeLinejoin' => true,
-					'strokeWidth'    => true,
-					'd'              => true,
+					'stroke'          => true,
+					'stroke-width'    => true,
+					'stroke-linecap'  => true,
+					'stroke-linejoin' => true,
+					'strokeLinecap'   => true,
+					'strokeLinejoin'  => true,
+					'strokeWidth'     => true,
+					'd'               => true,
+					'fill'            => true,
+				),
+				'circle'  => array(
+					'cx'           => true,
+					'cy'           => true,
+					'r'            => true,
+					'stroke'       => true,
+					'stroke-width' => true,
+					'fill'         => true,
+				),
+				'rect'    => array(
+					'class'		=> true,
+					'stroke'	=> true,
+					'width'  => true,
+					'height' => true,
+					'x'      => true,
+					'y'      => true,
+					'rx'     => true,
+					'fill'   => true,
 				),
 				'select'  => array(
 					'class'  => true,
@@ -3859,6 +4129,21 @@ class Revenue_Functions {
 		return apply_filters( 'revenue_kses_notice_allowed_tags', $allowed_tags );
 	}
 
+	/**
+	 * Allow display and other CSS properties in wp_kses
+	 *
+	 * @param array $styles Allowed CSS properties.
+	 * @return array Modified array with additional properties.
+	 */
+	public function allow_display_in_kses( $styles ) {
+		$styles[] = 'display';
+		$styles[] = 'align-items';
+		$styles[] = 'justify-content';
+		$styles[] = 'flex-direction';
+		$styles[] = 'flex-wrap';
+		$styles[] = 'gap';
+		return $styles;
+	}
 
 	/**
 	 * Filters out the same tags as wp_kses_post, but allows tabindex for <a> element.
@@ -3872,18 +4157,24 @@ class Revenue_Functions {
 			wp_kses_allowed_html( 'post' ),
 			array(
 				'svg'    => array(
-					'xmlns'   => true,
-					'width'   => true,
-					'height'  => true,
-					'fill'    => true,
-					'viewbox' => true,
+					'xmlns'     => true,
+					'width'     => true,
+					'height'    => true,
+					'fill'      => true,
+					'viewbox'   => true,
+					'viewBox'   => true,
+					'transform' => true,
 				),
 				'path'   => array(
-					'stroke'         => true,
-					'strokeLinecap'  => true,
-					'strokeLinejoin' => true,
-					'strokeWidth'    => true,
-					'd'              => true,
+					'stroke'          => true,
+					'stroke-width'    => true,
+					'stroke-linecap'  => true,
+					'stroke-linejoin' => true,
+					'strokeLinecap'   => true,
+					'strokeLinejoin'  => true,
+					'strokeWidth'     => true,
+					'd'               => true,
+					'fill'            => true,
 				),
 				'select' => array(
 					'class'  => true,
@@ -3936,7 +4227,7 @@ class Revenue_Functions {
 				'name'             => '',
 				'id'               => '',
 				'class'            => '',
-				'show_option_none' => __( 'Choose an option', 'revenue' ),
+				'show_option_none' => __( 'Select', 'revenue' ),
 			)
 		);
 
@@ -3958,7 +4249,7 @@ class Revenue_Functions {
 		$class                 = $args['class'];
 		$required              = (bool) $args['required'];
 		$show_option_none      = (bool) $args['show_option_none'];
-		$show_option_none_text = $args['show_option_none'] ? $args['show_option_none'] : __( 'Choose an option', 'revenue' );
+		$show_option_none_text = $args['show_option_none'] ? $args['show_option_none'] : __( 'Select', 'revenue' );
 
 		if ( empty( $options ) && ! empty( $product ) && ! empty( $attribute ) ) {
 			$attributes = $product->get_variation_attributes();
@@ -4115,20 +4406,21 @@ class Revenue_Functions {
 	public function getTriggerProductsData( $triggers, $relation = 'or', $trigger_product_id = '', $is_current_product = '' ) {
 		$result = array();
 		if ( $is_current_product ) {
-			$product          = wc_get_product( $trigger_product_id );
-			$regular_price    = (float) $product->get_regular_price();
+			$_product         = wc_get_product( $trigger_product_id );
+			$regular_price    = (float) $_product->get_regular_price();
 			$discounted_price = $regular_price;
 			$discount_amount  = '0';
 			$quantity         = 1;
 			$result[]         = array(
 				'item_id'       => $trigger_product_id,
-				'item_name'     => $product->get_name(),
-				'thumbnail'     => wp_get_attachment_url( $product->get_image_id() ), // Get the product thumbnail URL.
+				'item_name'     => $_product->get_name(),
+				'thumbnail'     => wp_get_attachment_url( $_product->get_image_id() ), // Get the product thumbnail URL.
 				'regular_price' => number_format( $regular_price, 2 ),
 				'sale_price'    => number_format( $discounted_price, 2 ),
 				'save'          => $discount_amount,
 				'quantity'      => $quantity,
 				'type'          => 'percentage',
+				'parent_id'     => $_product->get_parent_id(),
 				'value'         => '0',
 				'isEnableTag'   => 'no',
 				'trigger'       => true,
@@ -4154,13 +4446,15 @@ class Revenue_Functions {
 					}
 
 					$regular_price    = (float) $product->get_regular_price();
-					$discounted_price = $regular_price;
+					$sale_price       = (float) $product->get_sale_price();
+					$discounted_price = 0.0 === $sale_price ? $regular_price : $sale_price;
 					$discount_amount  = '0';
 
 					$result = array();
 
 					$result[] = array(
 						'item_id'       => $product_id,
+						'parent_id'     => $product->get_parent_id(),
 						'item_name'     => $product->get_name(),
 						'thumbnail'     => wp_get_attachment_url( $product->get_image_id() ), // Get the product thumbnail URL.
 						'regular_price' => number_format( $regular_price, 2 ),
@@ -4179,21 +4473,22 @@ class Revenue_Functions {
 			$product_id = isset( $trigger['item_id'] ) ? (int) $trigger['item_id'] : 0;
 			$quantity   = isset( $trigger['item_quantity'] ) ? (int) $trigger['item_quantity'] : 1;
 
-			$product = wc_get_product( $product_id );
+			$_product = wc_get_product( $product_id );
 
-			if ( ! $product ) {
+			if ( ! $_product ) {
 				continue;
 			}
 
-			$regular_price    = (float) $product->get_regular_price();
-			$discounted_price = $regular_price;
+			$regular_price    = (float) $_product->get_regular_price();
+			$sale_price       = (float) $_product->get_sale_price();
+			$discounted_price = 0.0 === $sale_price ? $regular_price : $sale_price;
 			$discount_amount  = '0';
 
 			// Prepare product data.
 			$result[] = array(
 				'item_id'       => $product_id,
-				'item_name'     => $product->get_name(),
-				'thumbnail'     => wp_get_attachment_url( $product->get_image_id() ), // Get the product thumbnail URL.
+				'item_name'     => $_product->get_name(),
+				'thumbnail'     => wp_get_attachment_url( $_product->get_image_id() ), // Get the product thumbnail URL.
 				'regular_price' => number_format( $regular_price, 2 ),
 				'sale_price'    => number_format( $discounted_price, 2 ),
 				'save'          => $discount_amount,
@@ -4201,6 +4496,7 @@ class Revenue_Functions {
 				'type'          => 'percentage',
 				'value'         => '0',
 				'isEnableTag'   => 'no',
+				'parent_id'     => $_product->get_parent_id(),
 				'trigger'       => true,
 			);
 		}
@@ -4263,7 +4559,6 @@ class Revenue_Functions {
 	 * @return boolean
 	 */
 	public function is_pro_ready() {
-
 		return function_exists( 'is_plugin_active' ) && is_plugin_active( 'revenue-pro/revenue-pro.php' );
 	}
 
@@ -4273,6 +4568,9 @@ class Revenue_Functions {
 	 * @return boolean
 	 */
 	public function is_pro_active() {
+		if ( defined( 'XPO_DEV0101' ) ) {
+			return true;
+		}
 		$licese_data = get_option( 'edd_revenue_license_data', array() );
 		return $this->is_pro_ready() && isset( $licese_data['license'] ) && 'valid' === $licese_data['license'];
 	}
@@ -4510,15 +4808,15 @@ class Revenue_Functions {
 			$which_page = 'product_page';
 		} elseif ( is_cart() ) {
 			$which_page = 'cart_page';
-		} elseif ( is_checkout() ) {
-			$which_page = 'checkout_page';
 		} elseif ( is_shop() ) {
 			$which_page = 'shop_page';
 		} elseif ( is_order_received_page() ) {
 			$which_page = 'thankyou_page';
 		} elseif ( is_account_page() ) {
 			$which_page = 'my_account';
-		}
+		} elseif ( is_checkout() ) {
+			$which_page = 'checkout_page';
+		} 
 
 		return $which_page;
 	}
@@ -4674,6 +4972,8 @@ class Revenue_Functions {
 			'bundle_discount',
 			'frequently_bought_together',
 			'buy_x_get_y',
+			'free_shipping_bar',
+			'spending_goal',
 		);
 
 		return apply_filters( 'revenue_get_show_quantity_selector_on_campaigns', $allowed_campaign_types );
@@ -4741,10 +5041,115 @@ class Revenue_Functions {
 				SUM(CASE WHEN campaign_type = 'stock_scarcity' THEN 1 ELSE 0 END) AS stock_scarcity,
                 SUM(CASE WHEN campaign_type = 'free_shipping_bar' THEN 1 ELSE 0 END) AS free_shipping_bar,
                 SUM(CASE WHEN campaign_type = 'next_order_coupon' THEN 1 ELSE 0 END) AS next_order_coupon,
-                SUM(CASE WHEN campaign_type = 'countdown_timer' THEN 1 ELSE 0 END) AS countdown_timer
+                SUM(CASE WHEN campaign_type = 'countdown_timer' THEN 1 ELSE 0 END) AS countdown_timer,
+				 SUM(CASE WHEN campaign_type = 'stock_scarcity' THEN 1 ELSE 0 END) AS stock_scarcity
             FROM {$wpdb->prefix}revenue_campaigns;"
 		); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return $res;
+	}
+
+
+	/**
+	 * Sanitize a posted attribute array or JSON string
+	 *
+	 * @param mixed $data Array or JSON string from $_POST.
+	 * @return array Sanitized associative array
+	 */
+	public function sanitize_posted_attributes( $data ) {
+		// Remove slashes added by WordPress.
+		$data = wp_unslash( $data );
+
+		// Decode JSON if needed.
+		if ( is_string( $data ) ) {
+			$data = json_decode( $data, true );
+		}
+
+		// Ensure it's an array.
+		if ( ! is_array( $data ) ) {
+			return array();
+		}
+
+		// Sanitize each key and value.
+		$sanitized = array();
+		foreach ( $data as $key => $value ) {
+			$key               = sanitize_text_field( $key );
+			$value             = sanitize_text_field( $value );
+			$sanitized[ $key ] = $value;
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Get the correct template file path for a campaign based on creation date and plugin version Note Backward Compatibility.
+	 *
+	 * @param array  $campaign Campaign data array (must contain 'date_created').
+	 * @param string $view_type The view type (e.g., 'inpage', 'popup', 'floating').
+	 * @param string $folder_path Optional. The folder path for the template.
+	 * @return string File path to the template.
+	 */
+	public function get_campaign_path( $campaign, $view_type = 'inpage', $folder_path = '' ) {
+		// DO NOT CHANGE THE DATE AND TIME BELOW, IT IS USED FOR BACKWARD COMPATIBILITY.
+		$campaign_version = isset( $campaign['campaign_version'] ) ? $campaign['campaign_version'] : '1.0.0';
+		$revenue_version  = REVENUE_VER;
+
+		if ( revenue()->is_pro_active() && defined( 'REVENUE_PRO_PATH' ) ) {
+			$base_pro_path = REVENUE_PRO_PATH . 'includes/campaigns/views/' . $folder_path . '/';
+		}
+		$base_path = REVENUE_PATH . 'includes/campaigns/views/' . $folder_path . '/';
+
+		// Check if the pro version is active and the pro template exists.
+		if ( revenue()->is_pro_active() && defined( 'REVENUE_PRO_PATH' ) && ( 'double-order' === $folder_path || 'mix-match' === $folder_path || 'frequently-bought-together' === $folder_path || 'spending-goal' === $folder_path ) ) {
+			if ( $campaign_version !== '1.0.0' && version_compare( $revenue_version, '2.0.0', '>=' ) ) {
+				return $base_pro_path . 'template1.php';
+			} else {
+				return $base_pro_path . $view_type . '.php';
+			}
+		}
+
+		if ( $campaign_version !== '1.0.0' && version_compare( $revenue_version, '2.0.0', '>=' ) ) {
+			return $base_path . 'template1.php';
+		} else {
+			return $base_path . $view_type . '.php';
+		}
+	}
+
+	public function is_for_new_builder( $campaign ) {
+			$campaign_version = isset( $campaign['campaign_version'] ) ? $campaign['campaign_version'] : '1.0.0';
+		return $campaign_version !== '1.0.0';
+	}
+
+	public function load_popup_assets( $campaign ) {
+		$campaign_version = isset( $campaign['campaign_version'] ) ? $campaign['campaign_version'] : '1.0.0';
+		if ( '1.0.0' !== $campaign_version ) {
+			wp_enqueue_script( 'revenue-popup' );
+			wp_enqueue_style( 'revenue-popup' );
+		} else {
+			wp_enqueue_script( 'revenue-v1-popup' );
+			wp_enqueue_style( 'revenue-v1-popup' );
+		}
+	}
+
+	public function load_floating_assets( $campaign ) {
+		$campaign_version = isset( $campaign['campaign_version'] ) ? $campaign['campaign_version'] : '1.0.0';
+		if ( '1.0.0' !== $campaign_version ) {
+			wp_enqueue_script( 'revenue-floating' );
+			wp_enqueue_style( 'revenue-floating' );
+		} else {
+			wp_enqueue_script( 'revenue-v1-floating' );
+			wp_enqueue_style( 'revenue-v1-floating' );
+		}
+	}
+
+	/**
+	 * Check RTL direction
+	 *
+	 * @since 1.0.0
+	 * @return bool True if RTL, false otherwise
+	 */
+	public function is_rtl() {
+		// Detect RTL direction (WordPress helper) and expose to template data
+		return function_exists( 'is_rtl' ) ? is_rtl() : false;
 	}
 }

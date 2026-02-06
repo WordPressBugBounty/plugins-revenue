@@ -1,3 +1,6 @@
+//  NOTE: this file is currently not being used.
+//  free shipping add to cart is working from the add-to-cart.js 
+// search handleFreeShippingBarUpsellAddToCart()
 ( function ( $ ) {
 	'use strict';
 
@@ -167,20 +170,25 @@
 			} );
 
 			// Quantity controls
-			$slider.find( '.revx-quantity-minus' ).attr('data-skip-global', true).on( 'click', function () {
-				const $input = $( this ).siblings( 'input[type="number"]' );
-				const currentValue = parseInt( $input.val(), 10 );
-				if ( currentValue > 1 ) {
-					$input.val( currentValue - 1 ).trigger( 'change' );
-				}
-			} );
+			$slider
+				.find( '.revx-quantity-minus' )
+				.attr( 'data-skip-global', true )
+				.on( 'click', function () {
+					const $input = $( this ).siblings( 'input[type="number"]' );
+					const currentValue = parseInt( $input.val(), 10 );
+					if ( currentValue > 1 ) {
+						$input.val( currentValue - 1 ).trigger( 'change' );
+					}
+				} );
 
-			$slider.find('.revx-quantity-plus').attr('data-skip-global', true).on('click', function (e) {
-
-				const $input = $(this).siblings('input[type="number"]');
-				const currentValue = parseInt($input.val(), 10);
-				$input.val(currentValue + 1).trigger('change');
-			});
+			$slider
+				.find( '.revx-quantity-plus' )
+				.attr( 'data-skip-global', true )
+				.on( 'click', function ( e ) {
+					const $input = $( this ).siblings( 'input[type="number"]' );
+					const currentValue = parseInt( $input.val(), 10 );
+					$input.val( currentValue + 1 ).trigger( 'change' );
+				} );
 		}
 	}
 

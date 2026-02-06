@@ -25,6 +25,14 @@
 	flex: 1;
 }
 
+.revx-dimmed {
+	opacity: 0.5;
+	transition: 0.3s;
+}
+.revx-dimmed:hover {
+	opacity: 1;
+}
+
 /* Shake Animation */
 .revx-double-order-animation-shake {
 	/* Default delay */

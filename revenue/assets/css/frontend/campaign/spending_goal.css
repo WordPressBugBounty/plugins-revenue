@@ -1,4 +1,4 @@
-.revx-progress-bar {
+/* .revx-progress-bar {
 	z-index: 999;
 }
 
@@ -12,9 +12,9 @@
 	padding-right: 0px;
 	padding-bottom: 28px;
 
-}
+} */
 
-button.revx-spending-goal-add-cart.loading::before {
+/* button.revx-spending-goal-add-cart.loading::before {
 	content: '';
 	border: 4px solid #f3f3f3;
 	border-top-width: 4px;
@@ -27,7 +27,6 @@ button.revx-spending-goal-add-cart.loading::before {
 	animation: spin 2s linear infinite;
 	margin-right: 8px;
 	display: inline-block;
-	/* Space between spinner and text */
 }
 
 @keyframes spin {
@@ -38,9 +37,9 @@ button.revx-spending-goal-add-cart.loading::before {
 	100% {
 		transform: rotate(360deg);
 	}
-}
+} */
 
-#revx-progress-inpage[data-position=top],
+/* #revx-progress-inpage[data-position=top],
 #revx-progress-inpage[data-position=bottom] {
 	position: fixed;
 	left: 0;
@@ -56,10 +55,10 @@ button.revx-spending-goal-add-cart.loading::before {
 #revx-progress-inpage-top,
 #revx-progress-inpage-bottom {
 	margin-bottom: 0px;
-}
+} */
 
 /* Gift Items*/
-.revx-spending-goal-gift {
+/* .revx-spending-goal-gift {
 	background: #ffffff;
 	box-shadow: 0px 16px 32px -12px #585C5F1A;
 	width: 320px;
@@ -159,10 +158,10 @@ button.revx-spending-goal-add-cart.loading::before {
 .revx-spending-goal-gift__action.checked.on-cart,
 .revx-spending-goal-gift__action.minus.on-cart {
 	display: flex;
-}
+} */
 
 /* Gift Items*/
-.revx-progress-bar-animated {
+/* .revx-progress-bar-animated {
 	-webkit-animation: revx-progress-bar-stripes 1s linear infinite;
 	animation: revx-progress-bar-stripes 1s linear infinite;
 }
@@ -235,10 +234,10 @@ button.revx-spending-goal-add-cart.loading::before {
 	100% {
 		-webkit-transform: translate(0, 0);
 	}
-}
+} */
 
 /* Spending Goal Inpage */
-.revx-spending-goal-reward-message-wrapper.no-message {
+/* .revx-spending-goal-reward-message-wrapper.no-message {
 	display: none;
 }
 
@@ -316,7 +315,6 @@ button.revx-spending-goal-add-cart.loading::before {
 	display: flex;
 	align-items: center;
 	gap: 20px;
-	/* padding: 15px; */
 	max-width: 480px;
 }
 
@@ -494,9 +492,9 @@ button.revx-spending-goal-add-cart.loading::before {
 	border-radius: 4px;
 	transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 	width: 0;
-}
+} */
 
-.revx-progress-step {
+/* .revx-progress-step {
 	position: absolute;
 	top: 50%;
 	transform: translate(-50%, -50%);
@@ -541,12 +539,9 @@ button.revx-spending-goal-add-cart.loading::before {
 
 .revx-step-label {
 	position: absolute;
-	/* top: 24px; */
 	left: 50%;
 	transform: translateX(-50%);
-	/* font-size: 12px; */
 	white-space: nowrap;
-	/* color: #666; */
 	font-weight: 500;
 	line-height: 1;
 	margin-top: 8px;
@@ -559,11 +554,6 @@ button.revx-spending-goal-add-cart.loading::before {
 
 .revx-gift-tooltip {
 	position: absolute;
-	/* background: white; */
-	/* border-radius: 8px; */
-	/* box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15); */
-	/* padding: 12px; */
-	/* width: 280px; */
 	visibility: hidden;
 	opacity: 0;
 	transition: visibility 0.2s, opacity 0.2s;
@@ -571,20 +561,14 @@ button.revx-spending-goal-add-cart.loading::before {
 	pointer-events: none;
 }
 
-/* Position when tooltip is on top */
 .revx-gift-tooltip[data-position="top"] {
 	bottom: 100%;
-	/* left: 50%; */
 	transform: translateX(-50%);
-	/* margin-bottom: 10px; */
 }
 
-/* Position when tooltip is on bottom */
 .revx-gift-tooltip[data-position="bottom"] {
 	top: 100%;
-	/* left: 50%; */
 	transform: translateX(-50%);
-	/* margin-top: 10px; */
 }
 
 .revx-step-icon-container:hover .revx-gift-tooltip {
@@ -593,7 +577,6 @@ button.revx-spending-goal-add-cart.loading::before {
 	pointer-events: auto;
 }
 
-/* Arrow styling */
 .revx-gift-tooltip-arrow {
 	position: absolute;
 	width: 0;
@@ -601,19 +584,14 @@ button.revx-spending-goal-add-cart.loading::before {
 	border-style: solid;
 }
 
-/* Top position arrow */
 .revx-gift-tooltip[data-position="top"] .revx-gift-tooltip-arrow {
-	/* bottom: -8px; */
-	/* left: 50%; */
 	transform: translateX(-50%);
 	border-width: 8px 8px 0 8px;
 	border-color: white transparent transparent transparent;
 }
 
-/* Bottom position arrow */
+
 .revx-gift-tooltip[data-position="bottom"] .revx-gift-tooltip-arrow {
-	/* top: -8px; */
-	/* left: 50%; */
 	transform: translateX(-50%);
 	border-width: 0 8px 8px 8px;
 	border-color: transparent transparent white transparent;
@@ -771,14 +749,10 @@ button.revx-spending-goal-add-cart.loading::before {
 }
 
 
-/* Hellobar */
 .revx-spending-goal-top .revx-progress-bar {
 	margin-bottom: 24px;
 }
 
-/* .revx-spending-goal-top,.revx-spending-goal-bottom {
-
-} */
 
 
 .revx-drawer.top-right.has-upsell {
@@ -909,7 +883,6 @@ button.revx-spending-goal-add-cart.loading::before {
 	align-items: center;
 	width: 100%;
 	padding: 0 40px;
-	/* padding-top: 26px; */
 	max-width: 472px;
 	margin: 0 auto;
 }
@@ -959,7 +932,6 @@ button.revx-spending-goal-add-cart.loading::before {
 	opacity: 0;
 	width: 0;
 	transition: opacity 0.3s ease, visibility 0.3s ease;
-	/* overflow: hidden; */
 }
 
 .revx-circular-text {
@@ -995,11 +967,9 @@ button.revx-spending-goal-add-cart.loading::before {
 	color: #666;
 }
 
-/* Positioning logic for 4 positions */
 .revx-drawer.top-left {
 	top: 20%;
 	left: -20px;
-	/* padding-left: 20px; */
 }
 
 .revx-drawer.top-left .revx-drawer-content {
@@ -1139,12 +1109,8 @@ button.revx-spending-goal-add-cart.loading::before {
 	box-sizing: content-box;
 }
 
-/* Hide all elements with the given id and class */
-#revx-progress-inpage.revx-campaign-spending-goal {
-	/* display: none; */
-}
 
-/* Show only the first element with the id and class */
 #revx-progress-inpage.revx-campaign-spending-goal:first-of-type {
 	display: block;
 }
+*/

@@ -33,7 +33,7 @@ if ( ! isset( $current_campaign['countdown_timer_enabled'] ) || 'yes' != $curren
 ?>
 <div  id="revx-countdown-timer-<?php echo esc_attr( $current_campaign['id'] ); ?>"  class="revx-countdown-timer-container revx-align-center revx-d-none" style="<?php echo esc_attr( $container_style ); ?>">
 	<span class="revx-countdown-timer-prefix" ><?php echo esc_html( $countdown_timer_prefix ); ?></span>
-	<div class="revx-countdown-timer" style="<?php echo esc_attr( $countdown_timer ); ?>">
+	<div class="revx-countdown-timer revx-item-center" style="<?php echo esc_attr( $countdown_timer ); ?>">
 		<span class="revx-days">--</span> <span>:</span>
 		<span class="revx-hours">--</span> <span>:</span>
 		<span class="revx-minutes">--</span> <span>:</span>

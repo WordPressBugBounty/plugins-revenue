@@ -7,6 +7,8 @@
 
 namespace Revenue;
 
+use Revenue\Services\Revenue_Product_Context;
+
 /**
  * Display the price container
  *
@@ -22,7 +24,8 @@ defined( 'ABSPATH' ) || exit;
  * @var WC_Product  $offered_product product object
  */
 
-global $product;
+$product = Revenue_Product_Context::get_product_context();
+
 global $post;
 
 if(!$generated_styles || !$current_campaign) {

@@ -2,8 +2,8 @@
 /**
  * Plugin Name: WowRevenue
  * Plugin URI: https://www.wowrevenue.com/
- * Description: 🚀 Skyrocket sales and maximize store profits with WowRevenue - the #1 WooCommerce discount plugin with a fluid, user-friendly interface for creating optimized and conversion-focused upselling, cross-selling, and down-selling campaigns.
- * Version: 1.2.14
+ * Description: WowRevenue is a product bundles plugin with various discount campaigns, allowing you to create enticing offers and encourage shoppers to make more purchases. As a result, your average order value and overall revenue will be increased.
+ * Version: 2.1.3
  * Author: WowRevenue
  * Author URI: https://wowrevenue.com/
  * License: GPLv3
@@ -30,8 +30,11 @@ if ( ! defined( 'REVENUE_URL' ) ) {
 }
 
 if ( ! defined( 'REVENUE_VER' ) ) {
-	define( 'REVENUE_VER', '1.2.14' );
+	define( 'REVENUE_VER', '2.1.3' );
 }
+
+// // Auto-generate translation files from .po files
+// require_once REVENUE_PATH . 'language-tools/auto-generate-translations.php';
 
 // Include the main Revenue class.
 if ( ! class_exists( 'Revenue', false ) ) {

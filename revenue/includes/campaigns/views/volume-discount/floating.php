@@ -11,6 +11,8 @@
 
 namespace Revenue;
 
+use Revenue\Services\Revenue_Product_Context;
+
 /**
  * The Template for displaying revenue view
  *
@@ -21,7 +23,7 @@ namespace Revenue;
 defined( 'ABSPATH' ) || exit;
 
 //phpcs:disable WordPress.PHP.StrictComparisons.LooseComparison
-global $product;
+$product = Revenue_Product_Context::get_product_context();
 
 
 $offered_product = false;
@@ -86,6 +88,7 @@ if ( 'list' === $view_mode ) {
 
 			// Translators: %s is the placeholder for the offer quanity.
 			$quantity_label = ( $offer_qty > 1 ) ? __( 'Quantities', 'revenue' ) : __( 'Quantity', 'revenue' );
+			// Translators: %1$s is the quantity number, %2$s is the quantity label (e.g. 'Quantity' or 'Quantities').
 			$product_title  = sprintf( __( 'Buy %1$s %2$s', 'revenue' ), $offer_qty, $quantity_label );
 
 			if ( ! $product->is_type( 'variable' ) ) {

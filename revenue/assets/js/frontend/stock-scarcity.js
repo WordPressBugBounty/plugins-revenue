@@ -22,7 +22,7 @@ jQuery( document ).ready( function ( $ ) {
 				campaign_id: campaignId,
 			},
 			success: function ( response ) {
-				console.log( 'View count updated', response );
+				// console.log( 'View count updated', response );
 			},
 			error: function ( xhr, status, error ) {
 				console.log( 'Error:', error );

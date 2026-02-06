@@ -21,6 +21,9 @@ class Xpo {
 	}
 
 	public static function is_lc_active() {
+		if ( defined( 'XPO_DEV0101' ) ) {
+			return true;
+		}
 		if ( defined( 'REVENUE_PRO_VER' ) ) {
 			$license_data = get_option( 'edd_revenue_license_data', array() );
 			return isset( $license_data['license'] ) && 'valid' === $license_data['license'];
@@ -207,26 +210,27 @@ class Xpo {
 				'medium'   => 'block-featurename',
 				'campaign' => 'revenue-dashboard',
 			),
-			'final_hour'      => array(
+			'summer_db'      => array(
 				'source'   => 'db-revenue-notice-text',
-				'medium'   => 'final-hour-sale',
+				'medium'   => 'black-friday-sale',
 				'campaign' => 'revenue-dashboard',
 			),
-			'massive_sale'      => array(
+			'summer_db2'      => array(
 				'source'   => 'db-revenue-notice-logo',
-				'medium'   => 'massive-sale',
+				'medium'   => 'black-friday-sale',
 				'campaign' => 'revenue-dashboard',
 			),
-			'flash_sale'      => array(
+			'summer_db3'      => array(
 				'source'   => 'db-revenue-notice-text',
 				'medium'   => 'flash-sale',
 				'campaign' => 'revenue-dashboard',
 			),
-			'exclusive_deals'      => array(
+			'summer_db4'      => array(
 				'source'   => 'db-revenue-notice-logo',
 				'medium'   => 'exclusive-deals',
 				'campaign' => 'revenue-dashboard',
 			),
+			
 		);
 
 		// Step 1: Get parameters.

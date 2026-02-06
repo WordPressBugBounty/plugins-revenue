@@ -1,5 +1,236 @@
+/* eslint-disable @wordpress/no-unused-vars-before-return */
 ( function ( $ ) {
-	'use strict';
+	( 'use strict' );
+
+	const makeTemplatesVisible = () => {
+		const templates = document.querySelectorAll( '.revx-template' );
+		templates.forEach( ( template ) => {
+			template.style.visibility = 'visible';
+			template.style.opacity = '1';
+		} );
+	};
+
+	// Run on first load
+	makeTemplatesVisible();
+
+	// add events that does partial refresh of the DOM instead of full reload, to make the templates visible again
+	// Listen for cart / checkout partial refreshes
+	$( document.body ).on(
+		'updated_checkout updated_cart_totals woocommerce_update_order_review',
+		makeTemplatesVisible
+	);
+	// Listen for mini-cart updates
+	$( document.body ).on(
+		'wc_fragments_loaded wc_fragments_refreshed',
+		makeTemplatesVisible
+	);
+
+	// -----------------
+	// Plugins
+	$.fn.revxSlider = function () {
+		return this.each( function () {
+			const $container = $( this );
+			const $sliderIcons = $container.find( '.revx-slider-icons' );
+			const $items = $container.find( '.revx-grid-item' );
+			const itemCount = $items.length;
+
+			let currentPosition = 0;
+
+			function getBreakpoint( containerWidth ) {
+				if ( containerWidth <= 300 ) {
+					return 'sm';
+				}
+				if ( containerWidth <= 500 ) {
+					return 'md';
+				}
+				return 'lg';
+			}
+
+			function getVisibleItems() {
+				const containerWidth = $container.width();
+				const layout = $container.data( 'layout' ) || 'inpage';
+				const sliderColumns = $container.data( 'slider-columns' ) || {};
+				const breakpoint = getBreakpoint( containerWidth );
+
+				if (
+					sliderColumns[ layout ] &&
+					sliderColumns[ layout ][ breakpoint ]
+				) {
+					return parseInt(
+						sliderColumns[ layout ][ breakpoint ],
+						10
+					);
+				}
+
+				return 1;
+			}
+
+			function getMaxStartIndex() {
+				return itemCount - getVisibleItems();
+			}
+
+			function updateSliderPosition() {
+				$container.css(
+					'--revx-slider-translate',
+					`-${ currentPosition * 100 }%`
+				);
+			}
+
+			function handleNext() {
+				const maxStartIndex = getMaxStartIndex();
+				currentPosition =
+					currentPosition >= maxStartIndex ? 0 : currentPosition + 1;
+				updateSliderPosition();
+			}
+
+			function handlePrev() {
+				const maxStartIndex = getMaxStartIndex();
+				currentPosition =
+					currentPosition <= 0 ? maxStartIndex : currentPosition - 1;
+				updateSliderPosition();
+			}
+
+			function updateSliderVisibility() {
+				const visibleItems = getVisibleItems();
+				const isSliderNeeded = itemCount > visibleItems;
+
+				$container.toggleClass( 'has-slider', isSliderNeeded );
+
+				return isSliderNeeded;
+			}
+
+			function initializeSlider() {
+				const visibleItems = getVisibleItems();
+				const maxStartIndex = itemCount - visibleItems;
+
+				if ( currentPosition > maxStartIndex ) {
+					currentPosition = Math.max( 0, maxStartIndex );
+					updateSliderPosition();
+				}
+
+				updateSliderVisibility();
+			}
+
+			// Attach events
+			$sliderIcons
+				.find( '.next' )
+				.off( 'click' )
+				.on( 'click', handleNext );
+			$sliderIcons
+				.find( '.prev' )
+				.off( 'click' )
+				.on( 'click', handlePrev );
+
+			// Resize event
+			$( window ).on( 'resize', initializeSlider );
+
+			// Resize observer for wrapper
+			if ( typeof ResizeObserver !== 'undefined' ) {
+				const resizeObserver = new ResizeObserver( initializeSlider );
+				const wrapper = $container
+					.find( '.revx-items-wrapper' )
+					.get( 0 );
+				if ( wrapper ) {
+					resizeObserver.observe( wrapper );
+				}
+			}
+
+			// Initial setup
+			initializeSlider();
+		} );
+	};
+
+	$.fn.revxCountdownTimer = function ( options ) {
+		const settings = $.extend(
+			{
+				endTimeAttr: 'data-end-time',
+				startTimeAttr: 'data-start-time',
+				formatTimeUnit( unit ) {
+					return unit < 10 ? '0' + unit : unit;
+				},
+				onEnd( $el ) {
+					$el.html( '<span>00</span><span>:</span><span>00</span>' );
+				},
+				onBeforeStart( $el ) {
+					$el.html( '<span>00</span><span>:</span><span>00</span>' ); // You can change to "Coming Soon..." etc
+				},
+			},
+			options
+		);
+
+		function initTimer( $timer ) {
+			if ( $timer.data( 'revxCountdownInitialized' ) ) {
+				return;
+			}
+			$timer.data( 'revxCountdownInitialized', true );
+
+			const endTime = parseInt( $timer.attr( settings.endTimeAttr ), 10 );
+			const startTime =
+				parseInt( $timer.attr( settings.startTimeAttr ), 10 ) || null;
+
+			if ( isNaN( endTime ) ) {
+				settings.onEnd( $timer );
+				return;
+			}
+
+			function update() {
+				const now = Date.now();
+
+				if ( startTime && now < startTime ) {
+					settings.onBeforeStart( $timer );
+					return;
+				}
+
+				const diff = endTime - now;
+
+				if ( diff <= 0 ) {
+					clearInterval( interval );
+					settings.onEnd( $timer );
+					return;
+				}
+
+				const days = Math.floor( diff / ( 1000 * 60 * 60 * 24 ) );
+				const hours = Math.floor( ( diff / ( 1000 * 60 * 60 ) ) % 24 );
+				const minutes = Math.floor( ( diff / ( 1000 * 60 ) ) % 60 );
+				const seconds = Math.floor( ( diff / 1000 ) % 60 );
+
+				let html = '';
+
+				if ( days > 0 ) {
+					html +=
+						'<span>' +
+						settings.formatTimeUnit( days ) +
+						'</span><span>:</span>';
+				}
+				if ( days > 0 || hours > 0 ) {
+					html +=
+						'<span>' +
+						settings.formatTimeUnit( hours ) +
+						'</span><span>:</span>';
+				}
+				html +=
+					'<span>' +
+					settings.formatTimeUnit( minutes ) +
+					'</span><span>:</span>';
+				html +=
+					'<span>' + settings.formatTimeUnit( seconds ) + '</span>';
+
+				$timer.html( html );
+			}
+
+			update();
+			var interval = setInterval( update, 1000 );
+			$timer.data( 'revxCountdownInterval', interval );
+		}
+
+		// Initialize on each element
+		this.each( function () {
+			const $this = $( this );
+			initTimer( $this );
+		} );
+
+		return this;
+	};
 
 	function calculateCurrentPrice( offerData, productId, quantity ) {
 		const product = offerData[ productId ];
@@ -75,11 +306,11 @@
 			revenue_campaign?.currency_format_thousand_sep;
 		const numDecimals = revenue_campaign?.currency_format_num_decimals;
 
-		const fixedPrice = parseFloat( price ).toFixed( numDecimals );
+		const fixedPrice = parseFloat( price ).toFixed( numDecimals || 2 );
 
 		const parts = fixedPrice.split( '.' );
 		let integerPart = parts[ 0 ];
-		const decimalPart = parts[ 1 ];
+		const decimalPart = parts[ 1 ] || '00';
 
 		integerPart = integerPart.replace(
 			/\B(?=(\d{3})+(?!\d))/g,
@@ -279,6 +510,56 @@
 	}
 
 	$(
+		'.revx-volume-discount .revx-builder__quantity input[data-name=revx_quantity]'
+	).on( 'change', function () {
+		const parent = $( this ).closest( '.revx-campaign-item' );
+		const product_id = $( this )
+			.closest( '.revx-campaign-item' )
+			.data( 'product-id' );
+
+		if ( ! product_id ) {
+			return;
+		}
+
+		const quantity = $( this ).val();
+
+		parent
+			.parent()
+			.parent()
+			.find( '.revx-campaign-add-to-cart-btn' )
+			.attr( 'data-quantity', quantity );
+
+		const campaignId = $( this ).data( 'campaign-id' ); // Get data-campaign-id attribute value
+
+		let offerData = $( `input[name="revx-offer-data-${ campaignId }"]` );
+		offerData = offerData[ 0 ].value;
+		const jsonData = JSON.parse( offerData );
+
+		const regularPrice = (
+			jsonData[ product_id ].regular_price * quantity
+		).toFixed( 2 );
+		const salePrice = calculateCurrentPrice(
+			jsonData,
+			product_id,
+			quantity
+		).toFixed( 2 );
+
+		if ( salePrice != regularPrice ) {
+			$( parent )
+				.find( '.revx-campaign-item__sale-price' )
+				.html( formatPrice( salePrice ) );
+			$( parent )
+				.find( '.revx-campaign-item__regular-price' )
+				.html( formatPrice( regularPrice ) );
+		} else {
+			$( parent )
+				.find( '.revx-campaign-item__regular-price' )
+				.html( formatPrice( salePrice ) );
+		}
+	} );
+
+	// Bundle Discount
+	$(
 		'.revx-bundle-discount .revx-builder__quantity input[data-name=revx_quantity]'
 	).on( 'change', function () {
 		const parent = $( this ).closest( '.revx-campaign-container__wrapper' );
@@ -347,55 +628,7 @@
 		}
 	} );
 
-	$(
-		'.revx-volume-discount .revx-builder__quantity input[data-name=revx_quantity]'
-	).on( 'change', function () {
-		const parent = $( this ).closest( '.revx-campaign-item' );
-		const product_id = $( this )
-			.closest( '.revx-campaign-item' )
-			.data( 'product-id' );
-
-		if ( ! product_id ) {
-			return;
-		}
-
-		const quantity = $( this ).val();
-
-		parent
-			.parent()
-			.parent()
-			.find( '.revx-campaign-add-to-cart-btn' )
-			.attr( 'data-quantity', quantity );
-
-		const campaignId = $( this ).data( 'campaign-id' ); // Get data-campaign-id attribute value
-
-		let offerData = $( `input[name="revx-offer-data-${ campaignId }"]` );
-		offerData = offerData[ 0 ].value;
-		const jsonData = JSON.parse( offerData );
-
-		const regularPrice = (
-			jsonData[ product_id ].regular_price * quantity
-		).toFixed( 2 );
-		const salePrice = calculateCurrentPrice(
-			jsonData,
-			product_id,
-			quantity
-		).toFixed( 2 );
-
-		if ( salePrice != regularPrice ) {
-			$( parent )
-				.find( '.revx-campaign-item__sale-price' )
-				.html( formatPrice( salePrice ) );
-			$( parent )
-				.find( '.revx-campaign-item__regular-price' )
-				.html( formatPrice( regularPrice ) );
-		} else {
-			$( parent )
-				.find( '.revx-campaign-item__regular-price' )
-				.html( formatPrice( salePrice ) );
-		}
-	} );
-
+	// Normal Discount
 	$(
 		'.revx-normal-discount .revx-builder__quantity input[data-name=revx_quantity]'
 	).on( 'change', function () {
@@ -440,75 +673,75 @@
 		updatePriceDisplay( parent, quantity, inSP, inRP );
 
 		// if (salePrice != regularPrice) {
-		//     $(parent).find('.revx-campaign-item__sale-price').html(`${quantity} x `+formatPrice(inSP));
-		//     $(parent).find('.revx-campaign-item__regular-price').html(`${quantity} x `+formatPrice(inRP));
+		//     $(parent).find('.revx-campaign-item__sale-price').html(`${qty} x `+formatPrice(inSP));
+		//     $(parent).find('.revx-campaign-item__regular-price').html(`${qty} x `+formatPrice(inRP));
 		// } else {
-		//     $(parent).find('.revx-campaign-item__sale-price').html(`${quantity} x `+formatPrice(inRP));
+		//     $(parent).find('.revx-campaign-item__sale-price').html(`${qty} x `+formatPrice(inRP));
 		// }
 	} );
 
 	// Delegate click event for the 'minus' button
-	$( document ).on( 'click', '.revx-quantity-minus', function ( e ) {
-		e.preventDefault();
-		e.stopPropagation(); // Stop event propagation to parent elements
-		const $input = $( this ).siblings( 'input[type="number"]' );
+	// $( document ).on( 'click', '.revx-quantity-minus', function ( e ) {
+	// 	e.preventDefault();
+	// 	e.stopPropagation(); // Stop event propagation to parent elements
+	// 	const $input = $( this ).siblings( 'input[type="number"]' );
 
-		if ( $( this ).data( 'skip-global' ) ) {
-			return;
-		}
+	// 	if ( $( this ).data( 'skip-global' ) ) {
+	// 		return;
+	// 	}
 
-		if ( ! $input ) {
-			return;
-		}
-		$input.focus(); // Focus on the input field after updating its value
+	// 	if ( ! $input ) {
+	// 		return;
+	// 	}
+	// 	$input.focus(); // Focus on the input field after updating its value
 
-		const currentValue = parseInt( $input.val(), 10 );
-		const min = $input.attr( 'min' );
+	// 	const currentValue = parseInt( $input.val(), 10 );
+	// 	const min = $input.attr( 'min' );
 
-		if ( min && currentValue - 1 >= min ) {
-			if ( ! isNaN( currentValue ) && currentValue > 0 ) {
-				$input.val( currentValue - 1 );
-			}
-		}
-		// else if ( ! isNaN( currentValue ) && currentValue - 1 > 0 ) {
-		// 	$input.val( currentValue - 1 );
-		// }
+	// 	if ( min && currentValue - 1 >= min ) {
+	// 		if ( ! isNaN( currentValue ) && currentValue > 0 ) {
+	// 			$input.val( currentValue - 1 );
+	// 		}
+	// 	}
+	// 	// else if ( ! isNaN( currentValue ) && currentValue - 1 > 0 ) {
+	// 	// 	$input.val( currentValue - 1 );
+	// 	// }
 
-		$input.trigger( 'change' );
-	} );
+	// 	$input.trigger( 'change' );
+	// } );
 
-	// Delegate click event for the 'plus' button
-	$( document ).on( 'click', '.revx-quantity-plus', function ( e ) {
-		e.preventDefault();
-		e.stopPropagation(); // Stop event propagation to parent elements
+	// // Delegate click event for the 'plus' button
+	// $( document ).on( 'click', '.revx-quantity-plus', function ( e ) {
+	// 	e.preventDefault();
+	// 	e.stopPropagation(); // Stop event propagation to parent elements
 
-		// Skip if it has data-skip-global attribute
-		if ( $( this ).data( 'skip-global' ) ) {
-			return;
-		}
+	// 	// Skip if it has data-skip-global attribute
+	// 	if ( $( this ).data( 'skip-global' ) ) {
+	// 		return;
+	// 	}
 
-		const $input = $( this ).siblings( 'input[type="number"]' );
-		if ( ! $input.length ) {
-			return;
-		}
-		$input.focus(); // Focus on the input field after updating its value
+	// 	const $input = $( this ).siblings( 'input[type="number"]' );
+	// 	if ( ! $input.length ) {
+	// 		return;
+	// 	}
+	// 	$input.focus(); // Focus on the input field after updating its value
 
-		const currentValue = parseInt( $input.val(), 10 );
-		const maxValue = parseInt( $input.attr( 'max' ), 10 ); // Get the max attribute value
+	// 	const currentValue = parseInt( $input.val(), 10 );
+	// 	const maxValue = parseInt( $input.attr( 'max' ), 10 ); // Get the max attribute value
 
-		if ( ! isNaN( currentValue ) ) {
-			// Check if current value is less than the max value
-			if ( ! isNaN( maxValue ) && currentValue < maxValue ) {
-				$input.val( currentValue + 1 );
-			} else if ( isNaN( maxValue ) ) {
-				$input.val( currentValue + 1 ); // No max set, just increment
-			}
-		} else {
-			$input.val( 1 ); // Set default value if current value is not a number
-		}
+	// 	if ( ! isNaN( currentValue ) ) {
+	// 		// Check if current value is less than the max value
+	// 		if ( ! isNaN( maxValue ) && currentValue < maxValue ) {
+	// 			$input.val( currentValue + 1 );
+	// 		} else if ( isNaN( maxValue ) ) {
+	// 			$input.val( currentValue + 1 ); // No max set, just increment
+	// 		}
+	// 	} else {
+	// 		$input.val( 1 ); // Set default value if current value is not a number
+	// 	}
 
-		$input.trigger( 'change' );
-	} );
+	// 	$input.trigger( 'change' );
+	// } );
 
 	// Delegate input event for the quantity input field
 	$( document ).on(
@@ -564,41 +797,140 @@
 			';path=/';
 	}
 
-	// Mix Match
-	$( '.revx-mix-match button.revx-builder-add-btn' ).on(
+	// Mix Match campaigns single product add to cart button.
+	$( '.revx-campaign-product-card .revx-mix-match-product-btn' ).on(
 		'click',
 		function ( e ) {
 			e.preventDefault();
-			const campaign_id = $( this ).data( 'campaign-id' );
-			const product_id = $( this ).data( 'product-id' );
-			const item = $( this ).closest( '.revx-campaign-item' );
+
+			const campaignId = $( this ).data( 'campaign-id' );
+			const item = $( this ).closest( '.revx-mix_match-add-to-cart' );
+			let productId = item.data( 'product-id' );
+			const productType = item.attr( 'product_type' );
 
 			const quantity =
 				item.find( `input[data-name="revx_quantity"]` ).val() ?? 1;
 
 			const offerData = $(
-				`input[name="revx-offer-data-${ campaign_id }"]`
+				`input[name="revx-offer-data-${ campaignId }"]`
 			).val();
+			const container = $( this ).closest(
+				'.revx-campaign-product-card'
+			);
 			const jsonData = JSON.parse( offerData );
 
 			const qtyData = $(
-				`input[name="revx-qty-data-${ campaign_id }"]`
+				`input[name="revx-qty-data-${ campaignId }"]`
 			).val();
 			const jsonQtyData = JSON.parse( qtyData );
+			let parentId = null;
+			let variationProductDetails = null;
+			let variationAttributes = null;
+			let selectedData = null;
+
+			if ( productType === 'variable' ) {
+				const variationMap = item
+					.find( '[data-variation-map]' )
+					.data( 'variation-map' );
+				selectedData = getSelectedAttributes( item );
+				const odata = container.attr( 'data-variations' );
+				parentId = container.data( 'product-id' );
+				const a = JSON.parse( odata );
+
+				if ( ! selectedData ) {
+					// throw new Error( 'Selected data is undefined or null.' );
+					showToast(
+						'Please select all product attributes before adding to cart.',
+						'error',
+						3000
+					);
+					return;
+				}
+
+				// Check for empty or undefined attribute values
+				for ( const [ , value ] of Object.entries( selectedData ) ) {
+					if (
+						value === '' ||
+						value === null ||
+						value === undefined
+					) {
+						showToast(
+							`please select all the options`,
+							'error',
+							3000
+						);
+						return;
+					}
+				}
+
+				// now i need to match product id from variation map with selected data
+				let matchedVariationId = null;
+
+				const matchedVariation = variationMap.find( ( variation ) => {
+					if ( ! variation.attributes ) {
+						return false;
+					}
+					return Object.entries( selectedData ).every(
+						( [ key, val ] ) =>
+							! val ||
+							! variation.attributes[ key ] ||
+							variation.attributes[ key ] === val
+					);
+				} );
+
+				if ( matchedVariation ) {
+					matchedVariationId = matchedVariation.variation_id;
+					productId = matchedVariationId;
+				}
+
+				variationProductDetails = a.find( ( v ) => {
+					return parseInt( v.id ) === parseInt( matchedVariationId );
+				} );
+
+				variationAttributes = Object.entries( selectedData )
+					.filter( ( [ key ] ) => key.startsWith( 'attribute_' ) ) // only attributes
+					.map( ( [ , value ] ) => value ) // just take the value
+					.join( ' - ' ); // join with dash
+
+				jsonData[ matchedVariationId ] = {
+					item_id: parseInt( matchedVariationId ),
+					item_name: `${ jsonData[ parentId ]?.item_name || '' }${
+						variationAttributes ? ' - ' + variationAttributes : ''
+					}`,
+					thumbnail: variationProductDetails.image_url || '',
+					regular_price: variationProductDetails.regular_price || '',
+					sale_price: variationProductDetails.sale_price || '',
+					quantity: 1,
+					parent_id: parentId,
+				};
+			}
 
 			const data = {
-				id: product_id,
-				productName: jsonData[ product_id ].item_name,
-				regularPrice: jsonData[ product_id ].regular_price,
-				thumbnail: jsonData[ product_id ].thumbnail,
+				id: productId,
+				productName:
+					productType === 'variable'
+						? `${ jsonData[ parentId ]?.item_name || '' }${
+								variationAttributes
+									? ' - ' + variationAttributes
+									: ''
+						  }`
+						: jsonData[ productId ]?.item_name,
+				regularPrice:
+					productType === 'variable'
+						? variationProductDetails.regular_price
+						: jsonData[ productId ]?.regular_price,
+				thumbnail:
+					productType === 'variable'
+						? variationProductDetails.image_url
+						: jsonData[ productId ]?.thumbnail,
 				quantity,
 			};
 
-			const cookieName = `mix_match_${ campaign_id }`;
+			const cookieName = `mix_match_${ campaignId }`;
 			let prevData = getCookie( cookieName );
 
 			let prevSelectedItems = $(
-				`input[name="revx-selected-items-${ campaign_id }"]`
+				`input[name="revx-selected-items-${ campaignId }"]`
 			).val();
 
 			prevSelectedItems = prevSelectedItems
@@ -607,46 +939,48 @@
 
 			prevData = prevData ? JSON.parse( prevData ) : {};
 
-			if ( Object.keys( prevData ).length == 0 ) {
-				prevData = { ...prevSelectedItems };
+			// handles the case of initial render. when the required items are pre-selected and not in cookie,
+			// merge the cookie data with pre selected data and then update accordingly.
+			if ( Object.keys( prevSelectedItems ).length !== 0 ) {
+				for ( const itemId in prevSelectedItems ) {
+					if ( ! prevData[ itemId ] ) {
+						prevData[ itemId ] = prevSelectedItems[ itemId ];
+					}
+				}
 			}
+			let clonedItem;
 
-			if ( prevData[ product_id ] ) {
-				prevData[ product_id ].quantity =
-					parseInt( prevData[ product_id ].quantity ) +
+			if ( prevData[ productId ] ) {
+				prevData[ productId ].quantity =
+					parseInt( prevData[ productId ].quantity ) +
 					parseInt( quantity );
 
 				$(
-					`.revx-selected-item[data-campaign-id=${ campaign_id }][data-product-id=${ product_id }] .revx-selected-item__product-price`
-				).html(
-					`${ prevData[ product_id ].quantity } x ${ formatPrice(
-						data.regularPrice
-					) }`
-				);
+					`.revx-selected-item[data-campaign-id=${ campaignId }][data-product-id=${ productId }] .revx-selected-item__product-price .woocommerce-Price-amount`
+				).text( `${ formatPrice( data.regularPrice ) }` );
+				$(
+					`.revx-selected-item[data-campaign-id=${ campaignId }][data-product-id=${ productId }] .revx-selected-item__product-price .revx-qty`
+				).text( `(x ${ prevData[ productId ].quantity })` );
 			} else {
-				const container = $(
-					`.revx-campaign-${ campaign_id } .revx-selected-product-container`
+				const selectedContainer = $(
+					`.revx-campaign-${ campaignId } .revx-selected-container`
 				);
 
-				if ( container.hasClass( 'revx-d-none' ) ) {
-					container.removeClass( 'revx-d-none' );
-				}
-				if ( container.hasClass( 'revx-empty-selected-items' ) ) {
-					container.removeClass( 'revx-empty-selected-items' );
-				}
+				selectedContainer.removeClass( 'revx-d-none' );
+				selectedContainer.removeClass( 'revx-empty-selected-items' );
 
 				$(
-					`.revx-campaign-${ campaign_id } .revx-empty-mix-match`
+					`.revx-campaign-${ campaignId } .revx-empty-mix-match`
 				).addClass( 'revx-d-none' );
 
-				prevData[ product_id ] = data;
+				prevData[ productId ] = data;
 
 				const placeholderItem = $(
-					`.revx-selected-item.revx-d-none[data-campaign-id=${ campaign_id }]`
-				);
-				const clonedItem = placeholderItem.clone();
+					`.revx-selected-item.revx-d-none[data-campaign-id=${ campaignId }]`
+				).first(); // ensure only one placeholder.
+				clonedItem = placeholderItem.clone();
 				clonedItem
-					.find( '.revx-selected-item__product-title' )
+					.find( '.revx-selected-title' )
 					.html( data.productName );
 				clonedItem
 					.find( '.revx-campaign-item__image img' )
@@ -655,48 +989,63 @@
 					.find( '.revx-campaign-item__image img' )
 					.attr( 'alt', data.productName );
 				clonedItem
-					.find( '.revx-selected-item__product-price' )
-					.html(
-						`${ quantity } x ${ formatPrice( data.regularPrice ) }`
-					);
+					.find(
+						'.revx-selected-item__product-price .revx-price-placeholder'
+					)
+					.text( `${ formatPrice( data.regularPrice ) }` );
+				clonedItem
+					.find( '.revx-selected-item__product-price .revx-qty' )
+					.text( `(x ${ quantity })` );
 				clonedItem.removeClass( 'revx-d-none' );
-				clonedItem.attr( 'data-product-id', product_id );
+				clonedItem.attr( 'data-product-id', productId );
+				if ( productType === 'variable' ) {
+					clonedItem.attr(
+						'data-selected-attribute',
+						JSON.stringify( selectedData )
+					);
+				}
+				clonedItem.attr( 'data-parent-id', parentId );
+				clonedItem.attr( 'data-product-type', productType );
 				placeholderItem.before( clonedItem );
 			}
 
-			$( `input[name="revx-selected-items-${ campaign_id }"]` ).val(
+			$( `input[name="revx-selected-items-${ campaignId }"]` ).val(
 				JSON.stringify( prevData )
 			);
 
 			setCookie( cookieName, JSON.stringify( prevData ), 7 );
 
-			updateMixMatchHeaderAndPrices( campaign_id, prevData, jsonQtyData );
+			updateMixMatchHeaderAndPrices( campaignId, prevData, jsonQtyData );
 
 			$( this )
 				.parent()
 				.find( `input[data-name="revx_quantity"]` )
 				.val( 1 );
+			// make the reset button visible after adding any product
+			$( this )
+				.closest( '.revx-template' )
+				.find( '[data-mix-match-reset-btn]' )
+				.removeClass( 'revx-d-none' );
 		}
 	);
 
-	function removeMixMatchSelectedItem( e ) {
-		const product_id = $( this )
+	function removeMixMatchSelectedItem() {
+		const productId = $( this )
 			.closest( '[data-product-id]' )
 			.data( 'product-id' );
-		const campaign_id = $( this )
+		const campaignId = $( this )
 			.closest( '[data-campaign-id]' )
 			.data( 'campaign-id' );
 		const item = $(
-			`.revx-selected-item[data-campaign-id=${ campaign_id }][data-product-id="${ product_id }"]`
+			`.revx-selected-item[data-campaign-id=${ campaignId }][data-product-id="${ productId }"]`
 		);
 
 		item.remove();
 
-		const cookieName = `mix_match_${ campaign_id }`;
+		const cookieName = `mix_match_${ campaignId }`;
 		let prevData = getCookie( cookieName );
-
 		let prevSelectedItems = $(
-			`input[name=revx-selected-items-${ campaign_id }]`
+			`input[name=revx-selected-items-${ campaignId }]`
 		).val();
 		prevSelectedItems = prevSelectedItems
 			? JSON.parse( prevSelectedItems )
@@ -704,76 +1053,207 @@
 
 		prevData = prevData ? JSON.parse( prevData ) : {};
 
-		if ( Object.keys( prevData ).length == 0 ) {
-			prevData = prevSelectedItems;
+		// handles the case of initial render, when the required items are pre-selected,
+		// merge the cookie data with pre selected data and then update accordingly.
+		if ( Object.keys( prevSelectedItems ).length !== 0 ) {
+			for ( const itemId in prevSelectedItems ) {
+				if ( ! prevData[ itemId ] ) {
+					prevData[ itemId ] = prevSelectedItems[ itemId ];
+				}
+			}
 		}
 
-		delete prevData[ product_id ];
+		delete prevData[ productId ];
 		setCookie( cookieName, JSON.stringify( prevData ), 7 );
-		$( `input[name=revx-selected-items-${ campaign_id }]` ).val(
+		$( `input[name=revx-selected-items-${ campaignId }]` ).val(
 			JSON.stringify( prevData )
 		);
 
-		const qtyData = $( `input[name=revx-qty-data-${ campaign_id }]` ).val();
+		const qtyData = $( `input[name=revx-qty-data-${ campaignId }]` ).val();
 		const jsonQtyData = JSON.parse( qtyData );
 
-		if ( Object.keys( prevData ).length == 0 ) {
+		if ( Object.keys( prevData ).length === 0 ) {
 			$(
-				`.revx-campaign-${ campaign_id } .revx-empty-selected-products`
+				`.revx-campaign-${ campaignId } .revx-empty-selected-products`
 			).removeClass( 'revx-d-none' );
 			$(
-				`.revx-campaign-${ campaign_id } .revx-selected-product-container`
+				`.revx-campaign-${ campaignId } .revx-selected-product-container`
 			).addClass( 'revx-empty-selected-items' );
 			$(
-				`.revx-campaign-${ campaign_id } .revx-empty-mix-match`
+				`.revx-campaign-${ campaignId } .revx-empty-mix-match`
 			).removeClass( 'revx-d-none' );
+
+			$(
+				`.revx-campaign-${ campaignId } [data-mix-match-reset-btn]`
+			).addClass( 'revx-d-none' );
 		}
 
-		updateMixMatchHeaderAndPrices( campaign_id, prevData, jsonQtyData );
+		updateMixMatchHeaderAndPrices( campaignId, prevData, jsonQtyData );
 	}
 
-	$( '.revx-mix-match' ).on(
+	$( '[data-container-level="mix_match_file"]' ).on(
 		'click',
-		'.revx-remove-selected-item',
+		'.revx-selected-remove',
 		removeMixMatchSelectedItem
 	);
 
+	// refactor later to make DRY
+	function resetMixMatchSelectedItem() {
+		const campaignId = $( this )
+			.closest( '[data-campaign-id]' )
+			.data( 'campaign-id' );
+
+		const cookieName = `mix_match_${ campaignId }`;
+
+		let prevSelectedItems = $(
+			`input[name=revx-selected-items-${ campaignId }]`
+		).val();
+		prevSelectedItems = prevSelectedItems
+			? JSON.parse( prevSelectedItems )
+			: {};
+
+		for ( const itemId in prevSelectedItems ) {
+			const $item = $( this )
+				.closest( '[revx-campaign-id]' )
+				.find(
+					`.revx-selected-item[data-campaign-id=${ campaignId }][data-product-id="${ itemId }"]`
+				);
+			if ( prevSelectedItems[ itemId ].is_required === 'yes' ) {
+				prevSelectedItems[ itemId ].quantity = 1;
+				$item.find( '.revx-qty' ).text( '(x 1)' );
+			} else {
+				$item.remove();
+				delete prevSelectedItems[ itemId ];
+			}
+		}
+		setCookie( cookieName, JSON.stringify( prevSelectedItems ), 7 );
+		$( `input[name=revx-selected-items-${ campaignId }]` ).val(
+			JSON.stringify( prevSelectedItems )
+		);
+
+		const qtyData = $( `input[name=revx-qty-data-${ campaignId }]` ).val();
+		const jsonQtyData = JSON.parse( qtyData );
+
+		if ( Object.keys( prevSelectedItems ).length === 0 ) {
+			$(
+				`.revx-campaign-${ campaignId } .revx-empty-selected-products`
+			).removeClass( 'revx-d-none' );
+			$(
+				`.revx-campaign-${ campaignId } .revx-selected-product-container`
+			).addClass( 'revx-empty-selected-items' );
+			$(
+				`.revx-campaign-${ campaignId } .revx-empty-mix-match`
+			).removeClass( 'revx-d-none' );
+			$( this ).addClass( 'revx-d-none' );
+		}
+
+		updateMixMatchHeaderAndPrices(
+			campaignId,
+			prevSelectedItems,
+			jsonQtyData
+		);
+	}
+	$( '[data-container-level="mix_match_file"]' ).on(
+		'click',
+		'[data-mix-match-reset-btn]',
+		resetMixMatchSelectedItem
+	);
+
+	function setTierState( $tier, tierClass, checkboxClass, isChecked ) {
+		$tier.addClass( tierClass.add ).removeClass( tierClass.remove );
+		const $checkboxContainer = $tier.find( '.revx-checkbox-container' );
+		$checkboxContainer
+			.addClass( checkboxClass.add )
+			.removeClass( checkboxClass.remove )
+			.attr( 'data-is-checked', isChecked ? 'yes' : 'no' )
+			.css( 'display', isChecked ? '' : 'none' ); // Ensure visibility based on state
+	}
+
 	function updateMixMatchHeaderAndPrices(
-		campaign_id,
+		campaignId,
 		prevData,
 		jsonQtyData = {}
 	) {
 		const header = $(
-			`.revx-campaign-${ campaign_id } .revx-selected-product-header`
+			`.revx-campaign-${ campaignId } .revx-price-container`
 		);
-		const item_counts = Object.keys( prevData ).length;
-		const qtyData = $( `input[name=revx-qty-data-${ campaign_id }]` ).val();
+		const itemCounts = Object.keys( prevData ).length;
+		let $selectedTier = null;
+		$( '.revx-tier-button' ).each( function () {
+			// Extract the item count from the mix-match-title text
+			const titleText = $( this )
+				.find( '.revx-mix-match-title' )
+				.text()
+				.trim();
+			const itemCount = parseInt( titleText.split( ' ' )[ 0 ], 10 ); // Extract number from "X item"
+
+			if ( itemCounts >= itemCount ) {
+				$selectedTier = $( this );
+			}
+		} );
+		const selectedClass = {
+			tierClass: {
+				add: 'revx-tier-selected',
+				remove: 'revx-tier-regular',
+			},
+			checkboxClass: {
+				add: 'revx-active',
+				remove: 'revx-inactive revx-d-none',
+			},
+		};
+		const unselectedClass = {
+			tierClass: {
+				add: 'revx-tier-regular',
+				remove: 'revx-tier-selected',
+			},
+			checkboxClass: {
+				add: 'revx-inactive revx-d-none',
+				remove: 'revx-active',
+			},
+		};
+		// Update tier button styles based on selection
+		$( '.revx-tier-button' ).each( function () {
+			if ( $selectedTier && $( this ).is( $selectedTier ) ) {
+				setTierState(
+					$( this ),
+					selectedClass.tierClass,
+					selectedClass.checkboxClass,
+					true
+				);
+			} else {
+				setTierState(
+					$( this ),
+					unselectedClass.tierClass,
+					unselectedClass.checkboxClass,
+					false
+				);
+			}
+		} );
+		const qtyData = $( `input[name=revx-qty-data-${ campaignId }]` ).val();
 		jsonQtyData = qtyData ? JSON.parse( qtyData ) : [];
 
-		if ( item_counts !== 0 && header.hasClass( 'revx-d-none' ) ) {
-			header.removeClass( 'revx-d-none' );
-		} else if ( item_counts == 0 ) {
-			header.addClass( 'revx-d-none' );
-		}
+		header.toggleClass( 'revx-d-none', ! itemCounts ); // remove none if more than 0, adds none when item count is 0
+
 		// const addToCart = $(`.revx-campaign-add-to-cart-btn[data-campaign-id=${campaign_id}]`);
 		// if(item_counts==0 && !addToCart.hasClass('revx-d-none') ) {
 		//     $(`.revx-campaign-add-to-cart-btn[data-campaign-id=${campaign_id}]`).addClass('revx-d-none');
 		// } else if(item_counts>0) {
 		//     $(`.revx-campaign-add-to-cart-btn[data-campaign-id=${campaign_id}]`).removeClass('revx-d-none');
 		// }
-		header.find( '.revx-selected-product-count' ).html( item_counts );
+		header.find( '.revx-selected-product-count' ).html( itemCounts );
 
 		let totalRegularPrice = 0;
 		let totalSalePrice = 0;
-
+		let totalQuantity = 0;
 		Object.values( prevData ).forEach( ( item ) => {
 			totalRegularPrice +=
 				parseFloat( item.regularPrice ) * parseInt( item.quantity );
+			totalQuantity += parseInt( item.quantity );
 		} );
 
 		let selectedIndex = -1;
 		jsonQtyData.forEach( ( item, idx ) => {
-			if ( item_counts >= item.quantity ) {
+			if ( itemCounts >= item.quantity ) {
 				selectedIndex = idx;
 
 				switch ( item.type ) {
@@ -785,7 +1265,7 @@
 						totalSalePrice = Math.max(
 							0,
 							parseFloat( totalRegularPrice ) -
-								parseFloat( item.value * item?.quantity )
+								parseFloat( item.value * totalQuantity )
 						);
 
 						break;
@@ -793,43 +1273,38 @@
 						totalSalePrice = totalRegularPrice;
 
 						break;
-
+					case 'fixed_price':
+						totalSalePrice = item.value * totalQuantity;
+						break;
 					default:
 						break;
 				}
 			}
 		} );
-
-		$(
-			`.revx-mix-match-${ campaign_id } .revx-mixmatch-quantity div[data-index=${ selectedIndex }]`
-		).attr(
-			'style',
-			$(
-				`.revx-mix-match-${ campaign_id } .revx-mixmatch-quantity div[data-index=${ selectedIndex }]`
-			).data( 'selected-style' )
-		);
-
+		// make display none for no_discount, other cases, remove the class
+		header
+			.find( '.revx-product-old-price' )
+			.toggleClass(
+				'revx-d-none',
+				jsonQtyData[ selectedIndex ]?.type === 'no_discount' ||
+					totalSalePrice === 0
+			);
 		const that = $(
-			`.revx-campaign-${ campaign_id } .revx-mixmatch-quantity`
+			`.revx-campaign-${ campaignId } .revx-mixmatch-quantity`
 		);
 		that.each( function () {
 			const item = $( this ).find( '.revx-mixmatch-regular-quantity' );
-			const defaultStyle = item.data( 'default-style' );
-			$( item ).attr( 'style', defaultStyle );
 
 			$( item )
-				.find( '.revx-builder-checkbox' )
+				.find( '.revx-checkbox-container' )
 				.addClass( 'revx-d-none' );
 		} );
 
 		const clickedItem = that.find( `div[data-index=${ selectedIndex }]` );
-		const selectedStyle = clickedItem.data( 'selected-style' );
-		clickedItem.attr( 'style', selectedStyle );
 		$( clickedItem )
-			.find( '.revx-builder-checkbox' )
+			.find( '.revx-checkbox-container' )
 			.removeClass( 'revx-d-none' );
-
-		if ( totalSalePrice == 0 ) {
+		if ( totalSalePrice === 0 ) {
 			header
 				.find( '.revx-campaign-item__sale-price' )
 				.html( formatPrice( totalRegularPrice ) );
@@ -859,283 +1334,284 @@
 				.find( '.revx-campaign-item__sale-price' )
 				.html( formatPrice( totalSalePrice ) );
 			header
-				.find( '.revx-campaign-item__regular-price' )
+				.find( '.revx-product-old-price' )
 				.html( formatPrice( totalRegularPrice ) );
 		}
 	}
 
+	// old fbt - available for old campaigns in v1
 	// Frequently Bought Together
-
 	// Function to update the styles based on selection
-	function updateStyles( $checkbox, selected ) {
-		const selectedStyles = $checkbox.data( 'selected-style' );
-		const defaultStyles = $checkbox.data( 'default-style' );
-		if ( selected ) {
-			$checkbox.attr( 'style', selectedStyles );
-		} else {
-			$checkbox.attr( 'style', defaultStyles );
-		}
-	}
-	$( '.revx-frequently-bought-together' ).on(
-		'click',
-		'.revx-item-options .revx-item-option',
-		function ( e ) {
-			e.preventDefault();
+	// function updateStyles( $checkbox, selected ) {
+	// 	const selectedStyles = $checkbox.data( 'selected-style' );
+	// 	const defaultStyles = $checkbox.data( 'default-style' );
+	// 	if ( selected ) {
+	// 		$checkbox.attr( 'style', selectedStyles );
+	// 	} else {
+	// 		$checkbox.attr( 'style', defaultStyles );
+	// 	}
+	// }
+	// $( '.revx-frequently-bought-together' ).on(
+	// 	'click',
+	// 	'.revx-item-options .revx-item-option',
+	// 	function ( e ) {
+	// 		e.preventDefault();
 
-			const $this = $( this );
-			if ( $this.hasClass( 'revx-item-required' ) ) {
-				return;
-			}
-			const $checkbox = $this.find( '.revx-builder-checkbox' );
+	// 		const $this = $( this );
+	// 		if ( $this.hasClass( 'revx-item-required' ) ) {
+	// 			return;
+	// 		}
+	// 		const $checkbox = $this.find( '.revx-builder-checkbox' );
 
-			const parent = $this.closest( '.revx-campaign-container__wrapper' );
+	// 		const parent = $this.closest( '.revx-campaign-container__wrapper' );
 
-			const campaign_id = parent.data( 'campaign-id' );
-			const cookieName = `campaign_${ campaign_id }`;
-			let selectedProducts = getCookie( cookieName );
-			let prevSelectedItems = $(
-				`input[name=revx-fbt-selected-items-${ campaign_id }]`
-			).val();
-			prevSelectedItems = prevSelectedItems
-				? JSON.parse( prevSelectedItems )
-				: {};
-			selectedProducts = selectedProducts
-				? JSON.parse( selectedProducts )
-				: {};
-			if ( Object.keys( selectedProducts ) == 0 ) {
-				selectedProducts = { ...prevSelectedItems };
-			}
+	// 		const campaign_id = parent.data( 'campaign-id' );
+	// 		const cookieName = `campaign_${ campaign_id }`;
+	// 		let selectedProducts = getCookie( cookieName );
+	// 		let prevSelectedItems = $(
+	// 			`input[name=revx-fbt-selected-items-${ campaign_id }]`
+	// 		).val();
+	// 		prevSelectedItems = prevSelectedItems
+	// 			? JSON.parse( prevSelectedItems )
+	// 			: {};
+	// 		selectedProducts = selectedProducts
+	// 			? JSON.parse( selectedProducts )
+	// 			: {};
+	// 		if ( Object.keys( selectedProducts ) == 0 ) {
+	// 			selectedProducts = { ...prevSelectedItems };
+	// 		}
 
-			const productId = $this.data( 'product-id' );
+	// 		const productId = $this.data( 'product-id' );
 
-			// Toggle the selected state
-			if ( selectedProducts[ productId ] ) {
-				// selectedProducts = selectedProducts.filter(id => id !== productId);
-				delete selectedProducts[ productId ];
-				updateStyles( $checkbox, false );
-			} else {
-				const quantityInput =
-					$(
-						`input[name="revx-quantity-${ campaign_id }-${ productId }"]`
-					).val() ?? $this.data( 'min-quantity' );
+	// 		// Toggle the selected state
+	// 		if ( selectedProducts[ productId ] ) {
+	// 			// selectedProducts = selectedProducts.filter(id => id !== productId);
+	// 			delete selectedProducts[ productId ];
+	// 			updateStyles( $checkbox, false );
+	// 		} else {
+	// 			const quantityInput =
+	// 				$(
+	// 					`input[name="revx-quantity-${ campaign_id }-${ productId }"]`
+	// 				).val() ?? $this.data( 'min-quantity' );
 
-				selectedProducts[ productId ] = quantityInput;
-				updateStyles( $checkbox, true );
-			}
-			$( `input[name="revx-fbt-selected-items-${ campaign_id }"]` ).val(
-				JSON.stringify( selectedProducts )
-			);
+	// 			selectedProducts[ productId ] = quantityInput;
+	// 			updateStyles( $checkbox, true );
+	// 		}
+	// 		$( `input[name="revx-fbt-selected-items-${ campaign_id }"]` ).val(
+	// 			JSON.stringify( selectedProducts )
+	// 		);
 
-			// Update the cookie
-			setCookie( cookieName, JSON.stringify( selectedProducts ), 1 );
+	// 		// Update the cookie
+	// 		setCookie( cookieName, JSON.stringify( selectedProducts ), 1 );
 
-			fbtCalculation( parent, campaign_id );
-		}
-	);
+	// 		fbtCalculation( parent, campaign_id );
+	// 	}
+	// );
 
-	const fbtCalculation = ( parent, campaign_id ) => {
-		const cookieName = `campaign_${ campaign_id }`;
-		let selectedProducts = getCookie( cookieName );
-		let prevSelectedItems = $(
-			`input[name=revx-fbt-selected-items-${ campaign_id }]`
-		).val();
-		prevSelectedItems = prevSelectedItems
-			? JSON.parse( prevSelectedItems )
-			: {};
-		selectedProducts = selectedProducts
-			? JSON.parse( selectedProducts )
-			: {};
-		if ( Object.keys( selectedProducts ) == 0 ) {
-			selectedProducts = { ...prevSelectedItems };
-		}
+	// const fbtCalculation = ( parent, campaign_id ) => {
+	// 	const cookieName = `campaign_${ campaign_id }`;
+	// 	let selectedProducts = getCookie( cookieName );
+	// 	let prevSelectedItems = $(
+	// 		`input[name=revx-fbt-selected-items-${ campaign_id }]`
+	// 	).val();
+	// 	prevSelectedItems = prevSelectedItems
+	// 		? JSON.parse( prevSelectedItems )
+	// 		: {};
+	// 	selectedProducts = selectedProducts
+	// 		? JSON.parse( selectedProducts )
+	// 		: {};
+	// 	if ( Object.keys( selectedProducts ) == 0 ) {
+	// 		selectedProducts = { ...prevSelectedItems };
+	// 	}
 
-		const calculateSalePrice = ( data, qty = 1 ) => {
-			if ( ! data?.type ) {
-				return data.regular_price * qty;
-			}
-			let total = 0;
-			switch ( data.type ) {
-				case 'percentage':
-					total =
-						parseFloat( data.regular_price ) *
-						( 1 - data.value / 100 );
+	// 	const calculateSalePrice = ( data, qty = 1 ) => {
+	// 		if ( ! data?.type ) {
+	// 			return data.regular_price * qty;
+	// 		}
+	// 		let total = 0;
+	// 		switch ( data.type ) {
+	// 			case 'percentage':
+	// 				total =
+	// 					parseFloat( data.regular_price ) *
+	// 					( 1 - data.value / 100 );
 
-					break;
-				case 'amount':
-				case 'fixed_discount':
-					total = Math.max(
-						0,
-						parseFloat( data.regular_price ) -
-							parseFloat( data.value )
-					);
+	// 				break;
+	// 			case 'amount':
+	// 			case 'fixed_discount':
+	// 				total = Math.max(
+	// 					0,
+	// 					parseFloat( data.regular_price ) -
+	// 						parseFloat( data.value )
+	// 				);
 
-					break;
-				case 'fixed_price':
-					total = parseFloat( data.value );
+	// 				break;
+	// 			case 'fixed_price':
+	// 				total = parseFloat( data.value );
 
-					break;
-				case 'no_discount':
-					total = parseFloat( data.regular_price );
+	// 				break;
+	// 			case 'no_discount':
+	// 				total = parseFloat( data.regular_price );
 
-					break;
-				case 'free':
-					total = 0;
+	// 				break;
+	// 			case 'free':
+	// 				total = 0;
 
-					break;
+	// 				break;
 
-				default:
-					break;
-			}
+	// 			default:
+	// 				break;
+	// 		}
 
-			return parseFloat( total ) * parseInt( qty );
-		};
-		let offerData = $(
-			`input[name=revx-offer-data-${ campaign_id }]`
-		).val();
+	// 		return parseFloat( total ) * parseInt( qty );
+	// 	};
+	// 	let offerData = $(
+	// 		`input[name=revx-offer-data-${ campaign_id }]`
+	// 	).val();
 
-		offerData = JSON.parse( offerData );
+	// 	offerData = JSON.parse( offerData );
 
-		let totalRegularPrice = 0;
-		let totalSalePrice = 0;
+	// 	let totalRegularPrice = 0;
+	// 	let totalSalePrice = 0;
 
-		Object.keys( selectedProducts ).forEach( ( id ) => {
-			totalRegularPrice +=
-				parseFloat( offerData[ id ]?.regular_price ) *
-				parseInt( selectedProducts[ id ] );
-			totalSalePrice += parseFloat(
-				calculateSalePrice(
-					offerData[ id ],
-					parseInt( selectedProducts[ id ] )
-				)
-			);
-		} );
+	// 	Object.keys( selectedProducts ).forEach( ( id ) => {
+	// 		totalRegularPrice +=
+	// 			parseFloat( offerData[ id ]?.regular_price ) *
+	// 			parseInt( selectedProducts[ id ] );
+	// 		totalSalePrice += parseFloat(
+	// 			calculateSalePrice(
+	// 				offerData[ id ],
+	// 				parseInt( selectedProducts[ id ] )
+	// 			)
+	// 		);
+	// 	} );
 
-		if ( totalRegularPrice != totalSalePrice ) {
-			parent
-				.find(
-					`.revx-triggerProduct .revx-campaign-item__regular-price`
-				)
-				.html( formatPrice( totalRegularPrice ) );
-			parent
-				.find( `.revx-triggerProduct .revx-campaign-item__sale-price` )
-				.html( formatPrice( totalSalePrice ) );
-		} else {
-			parent
-				.find( `.revx-triggerProduct .revx-campaign-item__sale-price` )
-				.html( formatPrice( totalSalePrice ) );
-			parent
-				.find(
-					`.revx-triggerProduct .revx-campaign-item__regular-price`
-				)
-				.html( '' );
-		}
-		parent
-			.find( `.revx-triggerProduct .revx-selected-product-count` )
-			.html( Object.keys( selectedProducts ).length );
-	};
+	// 	if ( totalRegularPrice != totalSalePrice ) {
+	// 		parent
+	// 			.find(
+	// 				`.revx-triggerProduct .revx-campaign-item__regular-price`
+	// 			)
+	// 			.html( formatPrice( totalRegularPrice ) );
+	// 		parent
+	// 			.find( `.revx-triggerProduct .revx-campaign-item__sale-price` )
+	// 			.html( formatPrice( totalSalePrice ) );
+	// 	} else {
+	// 		parent
+	// 			.find( `.revx-triggerProduct .revx-campaign-item__sale-price` )
+	// 			.html( formatPrice( totalSalePrice ) );
+	// 		parent
+	// 			.find(
+	// 				`.revx-triggerProduct .revx-campaign-item__regular-price`
+	// 			)
+	// 			.html( '' );
+	// 	}
+	// 	parent
+	// 		.find( `.revx-triggerProduct .revx-selected-product-count` )
+	// 		.html( Object.keys( selectedProducts ).length );
+	// };
 
-	$( '.revx-frequently-bought-together' ).on(
-		'change',
-		'input[data-name=revx_quantity]',
-		function ( e ) {
-			e.preventDefault();
-			const parent = $( this ).closest(
-				'.revx-campaign-container__wrapper'
-			);
+	// $( '.revx-frequently-bought-together' ).on(
+	// 	'change',
+	// 	'input[data-name=revx_quantity]',
+	// 	function ( e ) {
+	// 		e.preventDefault();
+	// 		const parent = $( this ).closest(
+	// 			'.revx-campaign-container__wrapper'
+	// 		);
 
-			const quantity = $( this ).val();
+	// 		const quantity = $( this ).val();
 
-			const campaign_id = parent.data( 'campaign-id' );
+	// 		const campaign_id = parent.data( 'campaign-id' );
 
-			// addFbtRequiredProductsIfNotAdded(campaign_id,false);
-			const product_id = $( this ).data( 'product-id' );
-			const cookieName = `campaign_${ campaign_id }`;
+	// 		// addFbtRequiredProductsIfNotAdded(campaign_id,false);
+	// 		const product_id = $( this ).data( 'product-id' );
+	// 		const cookieName = `campaign_${ campaign_id }`;
 
-			let selectedProducts = getCookie( cookieName );
-			let prevSelectedItems = $(
-				`input[name=revx-fbt-selected-items-${ campaign_id }]`
-			).val();
-			prevSelectedItems = prevSelectedItems
-				? JSON.parse( prevSelectedItems )
-				: {};
-			selectedProducts = selectedProducts
-				? JSON.parse( selectedProducts )
-				: {};
-			if ( Object.keys( selectedProducts ) == 0 ) {
-				selectedProducts = { ...prevSelectedItems };
-			}
+	// 		let selectedProducts = getCookie( cookieName );
+	// 		let prevSelectedItems = $(
+	// 			`input[name=revx-fbt-selected-items-${ campaign_id }]`
+	// 		).val();
+	// 		prevSelectedItems = prevSelectedItems
+	// 			? JSON.parse( prevSelectedItems )
+	// 			: {};
+	// 		selectedProducts = selectedProducts
+	// 			? JSON.parse( selectedProducts )
+	// 			: {};
+	// 		if ( Object.keys( selectedProducts ) == 0 ) {
+	// 			selectedProducts = { ...prevSelectedItems };
+	// 		}
 
-			if ( selectedProducts[ product_id ] ) {
-				selectedProducts[ product_id ] = quantity;
+	// 		if ( selectedProducts[ product_id ] ) {
+	// 			selectedProducts[ product_id ] = quantity;
 
-				setCookie( cookieName, JSON.stringify( selectedProducts ), 1 );
-				fbtCalculation( parent, campaign_id );
-			}
+	// 			setCookie( cookieName, JSON.stringify( selectedProducts ), 1 );
+	// 			fbtCalculation( parent, campaign_id );
+	// 		}
 
-			$( `input[name=revx-fbt-selected-items-${ campaign_id }]` ).val(
-				JSON.stringify( selectedProducts )
-			);
+	// 		$( `input[name=revx-fbt-selected-items-${ campaign_id }]` ).val(
+	// 			JSON.stringify( selectedProducts )
+	// 		);
 
-			const calculateSalePrice = ( data, qty = 1 ) => {
-				if ( ! data?.type ) {
-					return data.regular_price * qty;
-				}
-				let total = 0;
-				switch ( data.type ) {
-					case 'percentage':
-						total =
-							parseFloat( data.regular_price ) *
-							( 1 - data.value / 100 );
+	// 		const calculateSalePrice = ( data, qty = 1 ) => {
+	// 			if ( ! data?.type ) {
+	// 				return data.regular_price * qty;
+	// 			}
+	// 			let total = 0;
+	// 			switch ( data.type ) {
+	// 				case 'percentage':
+	// 					total =
+	// 						parseFloat( data.regular_price ) *
+	// 						( 1 - data.value / 100 );
 
-						break;
-					case 'amount':
-					case 'fixed_discount':
-						total = Math.max(
-							0,
-							parseFloat( data.regular_price ) -
-								parseFloat( data.value )
-						);
+	// 					break;
+	// 				case 'amount':
+	// 				case 'fixed_discount':
+	// 					total = Math.max(
+	// 						0,
+	// 						parseFloat( data.regular_price ) -
+	// 							parseFloat( data.value )
+	// 					);
 
-						break;
-					case 'fixed_price':
-						total = parseFloat( data.value );
+	// 					break;
+	// 				case 'fixed_price':
+	// 					total = parseFloat( data.value );
 
-						break;
-					case 'no_discount':
-						total = parseFloat( data.regular_price );
+	// 					break;
+	// 				case 'no_discount':
+	// 					total = parseFloat( data.regular_price );
 
-						break;
-					case 'free':
-						total = 0;
+	// 					break;
+	// 				case 'free':
+	// 					total = 0;
 
-						break;
+	// 					break;
 
-					default:
-						break;
-				}
+	// 				default:
+	// 					break;
+	// 			}
 
-				return parseFloat( total ) * parseInt( qty );
-			};
-			let offerData = $( `input[name=revx-offer-data-${ campaign_id }]` );
+	// 			return parseFloat( total ) * parseInt( qty );
+	// 		};
+	// 		let offerData = $( `input[name=revx-offer-data-${ campaign_id }]` );
 
-			offerData = offerData[ 0 ].value;
-			const jsonData = JSON.parse( offerData );
+	// 		offerData = offerData[ 0 ].value;
+	// 		const jsonData = JSON.parse( offerData );
 
-			const salePrice = calculateSalePrice(
-				jsonData[ product_id ],
-				quantity
-			).toFixed( 2 );
+	// 		const salePrice = calculateSalePrice(
+	// 			jsonData[ product_id ],
+	// 			quantity
+	// 		).toFixed( 2 );
 
-			const inRP = jsonData[ product_id ].regular_price;
+	// 		const inRP = jsonData[ product_id ].regular_price;
 
-			const inSP = ( salePrice / quantity ).toFixed( 2 );
+	// 		const inSP = ( salePrice / quantity ).toFixed( 2 );
 
-			const itemParent = $( this ).closest( '.revx-campaign-item' );
+	// 		const itemParent = $( this ).closest( '.revx-campaign-item' );
 
-			updatePriceDisplay( itemParent, quantity, inSP, inRP );
-		}
-	);
+	// 		updatePriceDisplay( itemParent, quantity, inSP, inRP );
+	// 	}
+	// );
 
+	// Buy X Get Y
 	$( '.revx-buyx-gety' ).on(
 		'change',
 		'input[data-name=revx_quantity]',
@@ -1216,100 +1692,6 @@
 		}
 	);
 
-	const padWithZero = ( num ) => num.toString().padStart( 2, '0' );
-
-	// Countdown Timer-----------------
-
-	// Declaration
-
-	const countdown = () => {
-		try {
-			if ( revenue_campaign ) {
-				const countDownData = Object.keys( revenue_campaign.data );
-
-				countDownData.forEach( ( campaignID ) => {
-					const _data =
-						revenue_campaign?.data?.[ campaignID ]?.countdown_data;
-
-					const startTime = _data?.start_time
-						? new Date( _data.start_time ).getTime()
-						: null;
-					const endTime = _data?.end_time
-						? new Date( _data.end_time ).getTime()
-						: null;
-					let now = new Date().getTime();
-
-					if ( startTime && startTime > now ) {
-						return; // Skip if the campaign hasn't started yet
-					}
-
-					if ( endTime < now ) {
-						return; // Skip if the campaign has already ended
-					}
-
-					// Function to update the countdown timer
-					const updateCountdown = function () {
-						now = new Date().getTime();
-						const distance = endTime - now;
-
-						if ( distance < 0 ) {
-							clearInterval( interval );
-							$(
-								`#revx-countdown-timer-${ campaignID }`
-							).addClass( 'revx-d-none' ); // Hide the element
-							return;
-						}
-
-						// Calculate days, hours, minutes, and seconds
-						const days = Math.floor(
-							distance / ( 1000 * 60 * 60 * 24 )
-						);
-						const hours = Math.floor(
-							( distance % ( 1000 * 60 * 60 * 24 ) ) /
-								( 1000 * 60 * 60 )
-						);
-						const minutes = Math.floor(
-							( distance % ( 1000 * 60 * 60 ) ) / ( 1000 * 60 )
-						);
-						const seconds = Math.floor(
-							( distance % ( 1000 * 60 ) ) / 1000
-						);
-
-						// Update the HTML elements
-						$(
-							`#revx-countdown-timer-${ campaignID } .revx-days`
-						).text( padWithZero( days ) );
-						$(
-							`#revx-countdown-timer-${ campaignID } .revx-hours`
-						).text( padWithZero( hours ) );
-						$(
-							`#revx-countdown-timer-${ campaignID } .revx-minutes`
-						).text( padWithZero( minutes ) );
-						$(
-							`#revx-countdown-timer-${ campaignID } .revx-seconds`
-						).text( padWithZero( seconds ) );
-					};
-
-					// Call the updateCountdown function initially to set the first values
-					updateCountdown();
-
-					// Update the countdown every second
-					const interval = setInterval( updateCountdown, 1000 );
-
-					// Show the countdown timer only after the initial values are set
-					$( `#revx-countdown-timer-${ campaignID }` ).removeClass(
-						'revx-d-none'
-					);
-				} );
-			}
-		} catch ( error ) {}
-	};
-
-	// Call
-	countdown();
-
-	//--------------- Countdown Timer
-
 	// Slider -----------------------
 
 	function checkOverflow( container ) {
@@ -1331,404 +1713,404 @@
 		} );
 	}
 
-	function initializeSlider(
-		$sliderContainer,
-		$containerSelector = '.revx-inpage-container',
-		$campaign_type = ''
-	) {
-		const $container = $sliderContainer.closest( $containerSelector );
-		const containerElement = $container.get( 0 );
-		const computedStyle = getComputedStyle( containerElement );
-		const gridColumnValue = computedStyle
-			.getPropertyValue( '--revx-grid-column' )
-			.trim();
-		let itemGap = parseInt(
-			computedStyle.getPropertyValue( 'gap' ).trim()
-		);
-
-		if ( ! itemGap ) {
-			itemGap = 16;
-		}
-
-		const $slides = $sliderContainer.find( '.revx-campaign-item' );
-		const minSlideWidth = 100; // 12rem in pixels (assuming 1rem = 16px)
-
-		let containerWidth = $sliderContainer.parent().width();
-
-		if ( $campaign_type == 'mix_match' ) {
-			containerWidth = $sliderContainer
-				.closest( '.revx-slider-items-wrapper' )
-				.innerWidth();
-		}
-		if ( $campaign_type == 'bundle_discount' ) {
-			containerWidth = $sliderContainer
-				.closest( '.revx-slider-items-wrapper' )
-				.outerWidth();
-			itemGap = 0;
-		}
-		if ( $campaign_type == 'fbt' ) {
-			containerWidth = $container
-				.find( '.revx-slider-items-wrapper' )
-				.innerWidth();
-		}
-		if ( $campaign_type == 'normal_discount' ) {
-			containerWidth = $container
-				.closest( '.revx-slider-items-wrapper' )
-				.innerWidth();
-			itemGap = 0;
-		}
-
-		let slidesVisible = Math.min(
-			gridColumnValue,
-			Math.floor( containerWidth / minSlideWidth )
-		); // Calculate initial slides visible
-
-		let slideWidth = containerWidth / slidesVisible;
-		slideWidth -= itemGap;
-
-		if ( $campaign_type == 'bundle_discount' ) {
-			slideWidth -= $container
-				.find( '.revx-builder__middle_element' )
-				.width();
-		}
-
-		const totalSlides = $slides.length;
-		let slideIndex = 0;
-
-		function updateSlideWidth() {
-			containerWidth = $sliderContainer
-				.closest( '.revx-slider-items-wrapper' )
-				.innerWidth();
-
-			slidesVisible = Math.min(
-				gridColumnValue,
-				Math.floor( containerWidth / minSlideWidth )
-			); // Recalculate slides visible
-			slideWidth = containerWidth / slidesVisible;
-			slideWidth -= itemGap;
-
-			if ( $campaign_type == 'bundle_discount' ) {
-				slideWidth -= $sliderContainer
-					.find( '.revx-builder__middle_element' )
-					.width();
-			}
-
-			$slides.css( 'width', slideWidth + 'px' );
-
-			moveToSlide( slideIndex );
-		}
-
-		setTimeout( () => {
-			updateSlideWidth();
-		} );
-
-		function moveToSlide( index ) {
-			let tempWidth = slideWidth;
-			if ( $campaign_type == 'fbt' ) {
-				tempWidth += $sliderContainer
-					.find( '.revx-product-bundle' )
-					.width();
-			}
-			if ( $campaign_type == 'bundle_discount' ) {
-				tempWidth += $sliderContainer
-					.find( '.revx-builder__middle_element' )
-					.width();
-			}
-			if ( $campaign_type == 'mix_match' ) {
-				tempWidth += itemGap;
-			}
-			const offset = -tempWidth * index;
-
-			$sliderContainer.css( {
-				transition: 'transform 0.5s ease-in-out',
-				transform: `translateX(${ offset }px)`,
-			} );
-		}
-
-		function moveToNextSlide() {
-			slideIndex++;
-
-			if ( slideIndex > totalSlides - slidesVisible ) {
-				slideIndex = 0;
-			}
-
-			moveToSlide( slideIndex );
-		}
-
-		function moveToPrevSlide() {
-			slideIndex--;
-
-			if ( slideIndex < 0 ) {
-				slideIndex = totalSlides - slidesVisible;
-			}
-
-			moveToSlide( slideIndex );
-		}
-
-		$sliderContainer
-			.siblings( '.revx-builderSlider-right' )
-			.click( function () {
-				if ( ! $sliderContainer.is( ':animated' ) ) {
-					moveToNextSlide();
-				}
-			} );
-
-		$sliderContainer
-			.siblings( '.revx-builderSlider-left' )
-			.click( function () {
-				if ( ! $sliderContainer.is( ':animated' ) ) {
-					moveToPrevSlide();
-				}
-			} );
-
-		setTimeout( () => {
-			// // const initialWidth = $sliderContainer.width();
-			// $sliderContainer.width(containerWidth + 1); // Increase width by 1px
-			// $sliderContainer.width(containerWidth); // Reset to original width
-			$sliderContainer.parent().width( containerWidth ); // Reset to original width
-			$sliderContainer.parent().width( containerWidth + 1 ); // Reset to original width
-			$( window ).trigger( 'resize' ); // Trigger window resize
-		} );
-
-		$( window ).resize( function () {
-			updateSlideWidth();
-		} );
-
-		$sliderContainer
-			.closest( '.revx-inpage-container' )
-			.css( 'visibility', 'visible' );
-	}
-
-	function buxXGetYSlider() {
-		$( '.revx-inpage-container.revx-buyx-gety-grid' ).each( function () {
-			const $container = $( this ).find(
-				'.revx-campaign-container__wrapper'
-			);
-			const containerElement = $container.get( 0 );
-			const computedStyle = getComputedStyle( containerElement );
-
-			let gridColumnValue = parseInt(
-				computedStyle.getPropertyValue( '--revx-grid-column' ).trim()
-			);
-			const minSlideWidth = 132; // 12rem in pixels (assuming 1rem = 16px)
-
-			const $triggerItemContainer = $container.find(
-				'.revx-bxgy-trigger-items'
-			);
-			const $offerItemContainer = $container.find(
-				'.revx-bxgy-offer-items'
-			);
-
-			let triggerItemColumn = parseInt(
-				getComputedStyle( $triggerItemContainer.get( 0 ) )
-					.getPropertyValue( '--revx-grid-column' )
-					.trim()
-			);
-			let offerItemColumn = parseInt(
-				getComputedStyle( $offerItemContainer.get( 0 ) )
-					.getPropertyValue( '--revx-grid-column' )
-					.trim()
-			);
-
-			let containerWidth = $container.width();
-
-			const seperatorWidth = $container
-				.find( '.revx-product-bundle' )
-				.width();
-
-			containerWidth -= seperatorWidth - 16;
-
-			gridColumnValue = gridColumnValue ? gridColumnValue : 4;
-
-			gridColumnValue = Math.min(
-				gridColumnValue,
-				Math.floor( containerWidth / minSlideWidth )
-			);
-			triggerItemColumn = Math.min(
-				$triggerItemContainer.find( '.revx-campaign-item' ).length,
-				triggerItemColumn
-			);
-			offerItemColumn = Math.min(
-				$offerItemContainer.find( '.revx-campaign-item' ).length,
-				offerItemColumn
-			);
-
-			gridColumnValue = Math.min(
-				gridColumnValue,
-				triggerItemColumn + offerItemColumn
-			);
-
-			// gridColumnValue = gridColumnValue ? gridColumnValue : 4;
-
-			// Ensure the total columns for trigger and offer items do not exceed the available grid columns
-			if ( triggerItemColumn + offerItemColumn > gridColumnValue ) {
-				const excessColumns =
-					triggerItemColumn + offerItemColumn - gridColumnValue;
-
-				// Adjust columns proportionally to ensure total columns match gridColumnValue
-				const triggerAdjustment = Math.floor(
-					( triggerItemColumn /
-						( triggerItemColumn + offerItemColumn ) ) *
-						excessColumns
-				);
-				const offerAdjustment = excessColumns - triggerAdjustment;
-
-				triggerItemColumn -= triggerAdjustment;
-				offerItemColumn -= offerAdjustment;
-			}
-
-			const slideWidth = containerWidth / gridColumnValue;
-
-			initializeSubSlider(
-				$triggerItemContainer,
-				triggerItemColumn,
-				slideWidth,
-				'trigger'
-			);
-			initializeSubSlider(
-				$offerItemContainer,
-				offerItemColumn,
-				slideWidth,
-				'offer'
-			);
-
-			$( this ).css( 'visibility', 'visible' );
-		} );
-	}
-
-	function initializeSubSlider(
-		$sliderContainer,
-		itemColumn,
-		slideWidth,
-		type
-	) {
-		const $container = $sliderContainer.find( '.revx-slider-container' );
-		const itemGap = parseInt(
-			getComputedStyle( $container.get( 0 ) )
-				.getPropertyValue( 'gap' )
-				.trim()
-		);
-
-		// slideWidth -=itemGap;
-		slideWidth -= itemGap;
-		const containerWidth = itemColumn * slideWidth;
-		$sliderContainer.width( containerWidth );
-		slideWidth -= 16;
-
-		if ( type == 'offer' ) {
-			slideWidth += itemGap;
-		}
-
-		$sliderContainer = $container;
-
-		const $slides = $sliderContainer.find( '.revx-campaign-item' );
-		$slides.css( { width: slideWidth + 'px' } );
-
-		const totalSlides = $slides.length;
-		let slideIndex = 0; // Start at the first slide
-
-		function moveToSlide( index ) {
-			let tempWidth = slideWidth;
-			tempWidth += itemGap + 16;
-			tempWidth += index;
-
-			if ( itemColumn == 1 ) {
-				tempWidth += itemGap;
-			}
-
-			if ( type == 'offer' ) {
-				tempWidth -= 16;
-			}
-
-			const offset = -tempWidth * index;
-
-			$sliderContainer.css( {
-				transition: 'transform 0.5s ease-in-out',
-				transform: `translateX(${ offset }px)`,
-			} );
-		}
-
-		function moveToNextSlide() {
-			slideIndex++;
-			if ( slideIndex > totalSlides - itemColumn ) {
-				slideIndex = 0;
-			}
-			moveToSlide( slideIndex );
-		}
-
-		function moveToPrevSlide() {
-			slideIndex--;
-			if ( slideIndex < 0 ) {
-				slideIndex = totalSlides - itemColumn;
-			}
-			moveToSlide( slideIndex );
-		}
-
-		$sliderContainer
-			.siblings( '.revx-builderSlider-right' )
-			.click( function () {
-				if ( ! $sliderContainer.is( ':animated' ) ) {
-					moveToNextSlide();
-				}
-			} );
-
-		$sliderContainer
-			.siblings( '.revx-builderSlider-left' )
-			.click( function () {
-				if ( ! $sliderContainer.is( ':animated' ) ) {
-					moveToPrevSlide();
-				}
-			} );
-
-		$( window ).resize( function () {
-			moveToSlide( slideIndex );
-		} );
-
-		moveToSlide( slideIndex );
-	}
-
-	buxXGetYSlider();
-
-	$( window ).resize( function () {
-		buxXGetYSlider();
-	} );
-
-	$(
-		'.revx-inpage-container.revx-normal-discount-grid .revx-slider-container'
-	).each( function () {
-		initializeSlider(
-			$( this ),
-			'.revx-campaign-view__items',
-			'normal_discount'
-		);
-	} );
-	$(
-		'.revx-inpage-container.revx-mix-match-grid .revx-slider-container'
-	).each( function () {
-		initializeSlider(
-			$( this ),
-			'.revx-campaign-view__items',
-			'mix_match'
-		);
-	} );
-	$(
-		'.revx-inpage-container.revx-bundle-discount-grid .revx-slider-container'
-	).each( function () {
-		initializeSlider(
-			$( this ),
-			'.revx-campaign-view__items',
-			'bundle_discount'
-		);
-	} );
-	$(
-		'.revx-inpage-container.revx-frequently-bought-together-grid .revx-slider-container'
-	).each( function () {
-		initializeSlider( $( this ), '.revx-inpage-container', 'fbt' );
-	} );
-
-	$( window ).on( 'load resize', function () {
-		checkOverflow( '.revx-slider' );
-	} );
+	// function initializeSlider(
+	// 	$sliderContainer,
+	// 	$containerSelector = '.revx-inpage-container',
+	// 	$campaign_type = ''
+	// ) {
+	// 	const $container = $sliderContainer.closest( $containerSelector );
+	// 	const containerElement = $container.get( 0 );
+	// 	const computedStyle = getComputedStyle( containerElement );
+	// 	const gridColumnValue = computedStyle
+	// 		.getPropertyValue( '--revx-grid-column' )
+	// 		.trim();
+	// 	let itemGap = parseInt(
+	// 		computedStyle.getPropertyValue( 'gap' ).trim()
+	// 	);
+
+	// 	if ( ! itemGap ) {
+	// 		itemGap = 16;
+	// 	}
+
+	// 	const $slides = $sliderContainer.find( '.revx-campaign-item' );
+	// 	const minSlideWidth = 100; // 12rem in pixels (assuming 1rem = 16px)
+
+	// 	let containerWidth = $sliderContainer.parent().width();
+
+	// 	if ( $campaign_type == 'mix_match' ) {
+	// 		containerWidth = $sliderContainer
+	// 			.closest( '.revx-slider-items-wrapper' )
+	// 			.innerWidth();
+	// 	}
+	// 	if ( $campaign_type == 'bundle_discount' ) {
+	// 		containerWidth = $sliderContainer
+	// 			.closest( '.revx-slider-items-wrapper' )
+	// 			.outerWidth();
+	// 		itemGap = 0;
+	// 	}
+	// 	if ( $campaign_type == 'fbt' ) {
+	// 		containerWidth = $container
+	// 			.find( '.revx-slider-items-wrapper' )
+	// 			.innerWidth();
+	// 	}
+	// 	if ( $campaign_type == 'normal_discount' ) {
+	// 		containerWidth = $container
+	// 			.closest( '.revx-slider-items-wrapper' )
+	// 			.innerWidth();
+	// 		itemGap = 0;
+	// 	}
+
+	// 	let slidesVisible = Math.min(
+	// 		gridColumnValue,
+	// 		Math.floor( containerWidth / minSlideWidth )
+	// 	); // Calculate initial slides visible
+
+	// 	let slideWidth = containerWidth / slidesVisible;
+	// 	slideWidth -= itemGap;
+
+	// 	if ( $campaign_type == 'bundle_discount' ) {
+	// 		slideWidth -= $container
+	// 			.find( '.revx-builder__middle_element' )
+	// 			.width();
+	// 	}
+
+	// 	const totalSlides = $slides.length;
+	// 	let slideIndex = 0;
+
+	// 	function updateSlideWidth() {
+	// 		containerWidth = $sliderContainer
+	// 			.closest( '.revx-slider-items-wrapper' )
+	// 			.innerWidth();
+
+	// 		slidesVisible = Math.min(
+	// 			gridColumnValue,
+	// 			Math.floor( containerWidth / minSlideWidth )
+	// 		); // Recalculate slides visible
+	// 		slideWidth = containerWidth / slidesVisible;
+	// 		slideWidth -= itemGap;
+
+	// 		if ( $campaign_type == 'bundle_discount' ) {
+	// 			slideWidth -= $sliderContainer
+	// 				.find( '.revx-builder__middle_element' )
+	// 				.width();
+	// 		}
+
+	// 		$slides.css( 'width', slideWidth + 'px' );
+
+	// 		moveToSlide( slideIndex );
+	// 	}
+
+	// 	setTimeout( () => {
+	// 		updateSlideWidth();
+	// 	} );
+
+	// 	function moveToSlide( index ) {
+	// 		let tempWidth = slideWidth;
+	// 		if ( $campaign_type == 'fbt' ) {
+	// 			tempWidth += $sliderContainer
+	// 				.find( '.revx-product-bundle' )
+	// 				.width();
+	// 		}
+	// 		if ( $campaign_type == 'bundle_discount' ) {
+	// 			tempWidth += $sliderContainer
+	// 				.find( '.revx-builder__middle_element' )
+	// 				.width();
+	// 		}
+	// 		if ( $campaign_type == 'mix_match' ) {
+	// 			tempWidth += itemGap;
+	// 		}
+	// 		const offset = -tempWidth * index;
+
+	// 		$sliderContainer.css( {
+	// 			transition: 'transform 0.5s ease-in-out',
+	// 			transform: `translateX(${ offset }px)`,
+	// 		} );
+	// 	}
+
+	// 	function moveToNextSlide() {
+	// 		slideIndex++;
+
+	// 		if ( slideIndex > totalSlides - slidesVisible ) {
+	// 			slideIndex = 0;
+	// 		}
+
+	// 		moveToSlide( slideIndex );
+	// 	}
+
+	// 	function moveToPrevSlide() {
+	// 		slideIndex--;
+
+	// 		if ( slideIndex < 0 ) {
+	// 			slideIndex = totalSlides - slidesVisible;
+	// 		}
+
+	// 		moveToSlide( slideIndex );
+	// 	}
+
+	// 	$sliderContainer
+	// 		.siblings( '.revx-builderSlider-right' )
+	// 		.click( function () {
+	// 			if ( ! $sliderContainer.is( ':animated' ) ) {
+	// 				moveToNextSlide();
+	// 			}
+	// 		} );
+
+	// 	$sliderContainer
+	// 		.siblings( '.revx-builderSlider-left' )
+	// 		.click( function () {
+	// 			if ( ! $sliderContainer.is( ':animated' ) ) {
+	// 				moveToPrevSlide();
+	// 			}
+	// 		} );
+
+	// 	setTimeout( () => {
+	// 		// // const initialWidth = $sliderContainer.width();
+	// 		// $sliderContainer.width(containerWidth + 1); // Increase width by 1px
+	// 		// $sliderContainer.width(containerWidth); // Reset to original width
+	// 		$sliderContainer.parent().width( containerWidth ); // Reset to original width
+	// 		$sliderContainer.parent().width( containerWidth + 1 ); // Reset to original width
+	// 		$( window ).trigger( 'resize' ); // Trigger window resize
+	// 	} );
+
+	// 	$( window ).resize( function () {
+	// 		updateSlideWidth();
+	// 	} );
+
+	// 	$sliderContainer
+	// 		.closest( '.revx-inpage-container' )
+	// 		.css( 'visibility', 'visible' );
+	// }
+
+	// function buxXGetYSlider() {
+	// 	$( '.revx-inpage-container.revx-buyx-gety-grid' ).each( function () {
+	// 		const $container = $( this ).find(
+	// 			'.revx-campaign-container__wrapper'
+	// 		);
+	// 		const containerElement = $container.get( 0 );
+	// 		const computedStyle = getComputedStyle( containerElement );
+
+	// 		let gridColumnValue = parseInt(
+	// 			computedStyle.getPropertyValue( '--revx-grid-column' ).trim()
+	// 		);
+	// 		const minSlideWidth = 132; // 12rem in pixels (assuming 1rem = 16px)
+
+	// 		const $triggerItemContainer = $container.find(
+	// 			'.revx-bxgy-trigger-items'
+	// 		);
+	// 		const $offerItemContainer = $container.find(
+	// 			'.revx-bxgy-offer-items'
+	// 		);
+
+	// 		let triggerItemColumn = parseInt(
+	// 			getComputedStyle( $triggerItemContainer.get( 0 ) )
+	// 				.getPropertyValue( '--revx-grid-column' )
+	// 				.trim()
+	// 		);
+	// 		let offerItemColumn = parseInt(
+	// 			getComputedStyle( $offerItemContainer.get( 0 ) )
+	// 				.getPropertyValue( '--revx-grid-column' )
+	// 				.trim()
+	// 		);
+
+	// 		let containerWidth = $container.width();
+
+	// 		const seperatorWidth = $container
+	// 			.find( '.revx-product-bundle' )
+	// 			.width();
+
+	// 		containerWidth -= seperatorWidth - 16;
+
+	// 		gridColumnValue = gridColumnValue ? gridColumnValue : 4;
+
+	// 		gridColumnValue = Math.min(
+	// 			gridColumnValue,
+	// 			Math.floor( containerWidth / minSlideWidth )
+	// 		);
+	// 		triggerItemColumn = Math.min(
+	// 			$triggerItemContainer.find( '.revx-campaign-item' ).length,
+	// 			triggerItemColumn
+	// 		);
+	// 		offerItemColumn = Math.min(
+	// 			$offerItemContainer.find( '.revx-campaign-item' ).length,
+	// 			offerItemColumn
+	// 		);
+
+	// 		gridColumnValue = Math.min(
+	// 			gridColumnValue,
+	// 			triggerItemColumn + offerItemColumn
+	// 		);
+
+	// 		// gridColumnValue = gridColumnValue ? gridColumnValue : 4;
+
+	// 		// Ensure the total columns for trigger and offer items do not exceed the available grid columns
+	// 		if ( triggerItemColumn + offerItemColumn > gridColumnValue ) {
+	// 			const excessColumns =
+	// 				triggerItemColumn + offerItemColumn - gridColumnValue;
+
+	// 			// Adjust columns proportionally to ensure total columns match gridColumnValue
+	// 			const triggerAdjustment = Math.floor(
+	// 				( triggerItemColumn /
+	// 					( triggerItemColumn + offerItemColumn ) ) *
+	// 					excessColumns
+	// 			);
+	// 			const offerAdjustment = excessColumns - triggerAdjustment;
+
+	// 			triggerItemColumn -= triggerAdjustment;
+	// 			offerItemColumn -= offerAdjustment;
+	// 		}
+
+	// 		const slideWidth = containerWidth / gridColumnValue;
+
+	// 		initializeSubSlider(
+	// 			$triggerItemContainer,
+	// 			triggerItemColumn,
+	// 			slideWidth,
+	// 			'trigger'
+	// 		);
+	// 		initializeSubSlider(
+	// 			$offerItemContainer,
+	// 			offerItemColumn,
+	// 			slideWidth,
+	// 			'offer'
+	// 		);
+
+	// 		$( this ).css( 'visibility', 'visible' );
+	// 	} );
+	// }
+
+	// function initializeSubSlider(
+	// 	$sliderContainer,
+	// 	itemColumn,
+	// 	slideWidth,
+	// 	type
+	// ) {
+	// 	const $container = $sliderContainer.find( '.revx-slider-container' );
+	// 	const itemGap = parseInt(
+	// 		getComputedStyle( $container.get( 0 ) )
+	// 			.getPropertyValue( 'gap' )
+	// 			.trim()
+	// 	);
+
+	// 	// slideWidth -=itemGap;
+	// 	slideWidth -= itemGap;
+	// 	const containerWidth = itemColumn * slideWidth;
+	// 	$sliderContainer.width( containerWidth );
+	// 	slideWidth -= 16;
+
+	// 	if ( type == 'offer' ) {
+	// 		slideWidth += itemGap;
+	// 	}
+
+	// 	$sliderContainer = $container;
+
+	// 	const $slides = $sliderContainer.find( '.revx-campaign-item' );
+	// 	$slides.css( { width: slideWidth + 'px' } );
+
+	// 	const totalSlides = $slides.length;
+	// 	let slideIndex = 0; // Start at the first slide
+
+	// 	function moveToSlide( index ) {
+	// 		let tempWidth = slideWidth;
+	// 		tempWidth += itemGap + 16;
+	// 		tempWidth += index;
+
+	// 		if ( itemColumn == 1 ) {
+	// 			tempWidth += itemGap;
+	// 		}
+
+	// 		if ( type == 'offer' ) {
+	// 			tempWidth -= 16;
+	// 		}
+
+	// 		const offset = -tempWidth * index;
+
+	// 		$sliderContainer.css( {
+	// 			transition: 'transform 0.5s ease-in-out',
+	// 			transform: `translateX(${ offset }px)`,
+	// 		} );
+	// 	}
+
+	// 	function moveToNextSlide() {
+	// 		slideIndex++;
+	// 		if ( slideIndex > totalSlides - itemColumn ) {
+	// 			slideIndex = 0;
+	// 		}
+	// 		moveToSlide( slideIndex );
+	// 	}
+
+	// 	function moveToPrevSlide() {
+	// 		slideIndex--;
+	// 		if ( slideIndex < 0 ) {
+	// 			slideIndex = totalSlides - itemColumn;
+	// 		}
+	// 		moveToSlide( slideIndex );
+	// 	}
+
+	// 	$sliderContainer
+	// 		.siblings( '.revx-builderSlider-right' )
+	// 		.click( function () {
+	// 			if ( ! $sliderContainer.is( ':animated' ) ) {
+	// 				moveToNextSlide();
+	// 			}
+	// 		} );
+
+	// 	$sliderContainer
+	// 		.siblings( '.revx-builderSlider-left' )
+	// 		.click( function () {
+	// 			if ( ! $sliderContainer.is( ':animated' ) ) {
+	// 				moveToPrevSlide();
+	// 			}
+	// 		} );
+
+	// 	$( window ).resize( function () {
+	// 		moveToSlide( slideIndex );
+	// 	} );
+
+	// 	moveToSlide( slideIndex );
+	// }
+
+	// buxXGetYSlider();
+
+	// $( window ).resize( function () {
+	// 	buxXGetYSlider();
+	// } );
+
+	// $(
+	// 	'.revx-inpage-container.revx-normal-discount-grid .revx-slider-container'
+	// ).each( function () {
+	// 	initializeSlider(
+	// 		$( this ),
+	// 		'.revx-campaign-view__items',
+	// 		'normal_discount'
+	// 	);
+	// } );
+	// $(
+	// 	'.revx-inpage-container.revx-mix-match-grid .revx-slider-container'
+	// ).each( function () {
+	// 	initializeSlider(
+	// 		$( this ),
+	// 		'.revx-campaign-view__items',
+	// 		'mix_match'
+	// 	);
+	// } );
+	// $(
+	// 	'.revx-inpage-container.revx-bundle-discount-grid .revx-slider-container'
+	// ).each( function () {
+	// 	initializeSlider(
+	// 		$( this ),
+	// 		'.revx-campaign-view__items',
+	// 		'bundle_discount'
+	// 	);
+	// } );
+	// $(
+	// 	'.revx-inpage-container.revx-frequently-bought-together-grid .revx-slider-container'
+	// ).each( function () {
+	// 	initializeSlider( $( this ), '.revx-inpage-container', 'fbt' );
+	// } );
+
+	// $( window ).on( 'load resize', function () {
+	// 	checkOverflow( '.revx-slider' );
+	// } );
 
 	// ---------------- Slider
 
@@ -1766,648 +2148,6 @@
 	} );
 
 	$( '.revx-ticket-type' ).trigger( 'change' );
-
-	// Double Order
-
-	const double_order_countdown = () => {
-		try {
-			// Find all countdown timer containers
-			$( '.revx-double-order-countdown-timer-container' ).each(
-				function () {
-					const timer = $( this );
-					const duration = parseInt(
-						timer.data( 'countdown-duration' ),
-						10
-					);
-
-					if ( isNaN( duration ) || duration <= 0 ) {
-						console.error( 'Invalid countdown duration' );
-						return;
-					}
-
-					// Set the initial end time
-					const endTime = Date.now() + duration * 1000;
-
-					// Function to update the countdown timer
-					const updateCountdown = function () {
-						const now = Date.now();
-						const distance = endTime - now;
-
-						if ( distance <= 0 ) {
-							clearInterval( interval );
-							timer
-								.closest(
-									'.revx-double-order-countdown-timer-container'
-								)
-								.addClass( 'revx-d-none' );
-							timer.parent().addClass( 'revx-d-none' );
-							return;
-						}
-
-						// Calculate days, hours, minutes, and seconds
-						const days = Math.floor(
-							distance / ( 1000 * 60 * 60 * 24 )
-						);
-						const hours = Math.floor(
-							( distance % ( 1000 * 60 * 60 * 24 ) ) /
-								( 1000 * 60 * 60 )
-						);
-						const minutes = Math.floor(
-							( distance % ( 1000 * 60 * 60 ) ) / ( 1000 * 60 )
-						);
-						const seconds = Math.floor(
-							( distance % ( 1000 * 60 ) ) / 1000
-						);
-
-						// Update the HTML elements
-						timer.find( '.revx-days' ).text( padWithZero( days ) );
-						timer
-							.find( '.revx-hours' )
-							.text( padWithZero( hours ) );
-						timer
-							.find( '.revx-minutes' )
-							.text( padWithZero( minutes ) );
-						if ( minutes <= 0 ) {
-							timer.find( '.revx-minutes' ).hide();
-							timer.find( '.revx-minutes-label' ).hide();
-						}
-						timer
-							.find( '.revx-seconds' )
-							.text( padWithZero( seconds ) );
-					};
-
-					// Add leading zero if needed
-					const padWithZero = function ( num ) {
-						return num < 10 ? `0${ num }` : num;
-					};
-
-					// Update the countdown every second
-					updateCountdown();
-					const interval = setInterval( updateCountdown, 1000 );
-
-					// Make the timer visible
-					timer.removeClass( 'revx-d-none' );
-				}
-			);
-		} catch ( error ) {
-			console.error( 'Error initializing countdown timers:', error );
-		}
-	};
-
-	// Call
-	double_order_countdown();
-
-	function runDoubleOrder() {
-		let currentlyCheckedIndex = null;
-
-		// Handle click on label
-		$( document ).on(
-			'click',
-			'.revx-double-order-checkbox-label',
-			function ( e ) {
-				e.stopPropagation();
-				if (
-					e.target === this ||
-					! $( e.target ).hasClass( 'revx-double-order-checkbox' )
-				) {
-					const $checkbox = $( this ).find(
-						'.revx-double-order-checkbox'
-					);
-
-					doubleOrderToggleCheckbox( $checkbox );
-				}
-			}
-		);
-
-		function initializeDoubleOrderCheckboxes() {
-			const $selectedCheckbox = $(
-				'.revx-double-order-checkbox[data-is-checked="yes"]'
-			);
-
-			if ( $selectedCheckbox.length ) {
-				const index = $selectedCheckbox.data( 'index' );
-				currentlyCheckedIndex = index;
-
-				// Apply selected style
-				$selectedCheckbox.attr(
-					'style',
-					$selectedCheckbox.data( 'selected-style' )
-				);
-
-				// Set success message for selected item
-				$selectedCheckbox
-					.closest( '.revx-products-lists' )
-					.find( '.revx-products-list-header > div' )
-					.text(
-						$selectedCheckbox
-							.closest( '.revx-products-lists' )
-							.find( '.revx-products-list-header > div' )
-							.data( 'success-message' )
-					);
-
-				// Apply opacity effects to items before selected
-				$( '.revx-products-lists' ).each( function () {
-					const listIndex = $( this ).data( 'index' );
-					if ( listIndex < index ) {
-						$( this )
-							.css( 'opacity', '0.5' )
-							.hover(
-								function () {
-									$( this ).css( 'opacity', '1' );
-								},
-								function () {
-									$( this ).css( 'opacity', '0.5' );
-								}
-							);
-					}
-				} );
-
-				// Show/hide appropriate elements
-				$( '.revx-products-lists' ).addClass( 'hidden' );
-
-				// Show current index
-				$(
-					`.revx-products-lists[data-index="${ index }"]`
-				).removeClass( 'hidden' );
-
-				// Show all elements above current index
-				$( `.revx-products-lists` )
-					.filter( ( _, el ) => $( el ).data( 'index' ) < index )
-					.removeClass( 'hidden' );
-
-				// Show the immediate below index element
-				const nextIndex = index + 1;
-				$(
-					`.revx-products-lists[data-index="${ nextIndex }"]`
-				).removeClass( 'hidden' );
-			} else {
-				// If no checkbox is selected, show only the first element
-				$( '.revx-products-lists' ).addClass( 'hidden' );
-				$( `.revx-products-lists[data-index="0"]` ).removeClass(
-					'hidden'
-				);
-			}
-		}
-
-		initializeDoubleOrderCheckboxes();
-
-		// Main toggle function remains the same but without the initial currentlyCheckedIndex check
-		function doubleOrderToggleCheckbox( $checkbox ) {
-			const index = $checkbox.data( 'index' );
-			const isChecked = $checkbox.data( 'is-checked' );
-			const $allHeaders = $( '.revx-products-lists' ).find(
-				'.revx-products-list-header > div'
-			);
-			const $allLists = $( '.revx-products-lists' );
-
-			// Function to reset all opacities
-			const resetOpacities = () => {
-				$allLists.css( 'opacity', '' );
-				$allLists.off( 'mouseenter mouseleave' );
-			};
-
-			// Function to apply opacity effects
-			const applyOpacityEffects = ( selectedIndex ) => {
-				$allLists.each( function () {
-					const listIndex = $( this ).data( 'index' );
-					if ( listIndex < selectedIndex ) {
-						$( this )
-							.css( 'opacity', '0.5' )
-							.hover(
-								function () {
-									$( this ).css( 'opacity', '1' );
-								},
-								function () {
-									$( this ).css( 'opacity', '0.5' );
-								}
-							);
-					} else {
-						$( this ).css( 'opacity', '1' );
-						$( this ).off( 'mouseenter mouseleave' );
-					}
-				} );
-			};
-
-			if ( isChecked === 'yes' ) {
-				// If already checked, uncheck it
-				$checkbox.attr( 'style', $checkbox.data( 'default-style' ) );
-				$checkbox
-					.data( 'is-checked', 'no' )
-					.attr( 'data-is-checked', 'no' );
-				currentlyCheckedIndex = null;
-
-				// Reset all headers to default message
-				$allHeaders.each( function () {
-					$( this ).text( $( this ).data( 'default-message' ) );
-				} );
-
-				// Reset all opacities
-				resetOpacities();
-			} else if ( currentlyCheckedIndex === index ) {
-				// If clicking the same checkbox, uncheck it
-				$checkbox.attr( 'style', $checkbox.data( 'default-style' ) );
-				$checkbox
-					.data( 'is-checked', 'no' )
-					.attr( 'data-is-checked', 'no' );
-				currentlyCheckedIndex = null;
-
-				// Reset all headers to default message
-				$allHeaders.each( function () {
-					$( this ).text( $( this ).data( 'default-message' ) );
-				} );
-
-				// Reset all opacities
-				resetOpacities();
-			} else {
-				// Uncheck previously checked checkbox if exists
-				if ( currentlyCheckedIndex !== null ) {
-					const $prevCheckbox = $(
-						`.revx-double-order-checkbox[data-index="${ currentlyCheckedIndex }"]`
-					);
-					$prevCheckbox
-						.attr( 'style', $checkbox.data( 'default-style' ) )
-						.data( 'is-checked', 'no' )
-						.attr( 'data-is-checked', 'no' );
-				}
-
-				// Check the clicked checkbox
-				$checkbox
-					.attr( 'style', $checkbox.data( 'selected-style' ) )
-					.data( 'is-checked', 'yes' )
-					.attr( 'data-is-checked', 'yes' );
-				currentlyCheckedIndex = index;
-
-				// Reset all headers to default message first
-				$allHeaders.each( function () {
-					$( this ).text( $( this ).data( 'default-message' ) );
-				} );
-
-				// Set success message only for the checked item's header
-				$checkbox
-					.closest( '.revx-products-lists' )
-					.find( '.revx-products-list-header > div' )
-					.text(
-						$checkbox
-							.closest( '.revx-products-lists' )
-							.find( '.revx-products-list-header > div' )
-							.data( 'success-message' )
-					);
-
-				// Apply opacity effects
-				applyOpacityEffects( currentlyCheckedIndex );
-			}
-
-			// Hide all elements first
-			$allLists.addClass( 'hidden' );
-
-			if ( currentlyCheckedIndex !== null ) {
-				// Show current index
-				$(
-					`.revx-products-lists[data-index="${ currentlyCheckedIndex }"]`
-				).removeClass( 'hidden' );
-
-				// Show all elements above current index
-				$( `.revx-products-lists` )
-					.filter(
-						( _, el ) =>
-							$( el ).data( 'index' ) < currentlyCheckedIndex
-					)
-					.removeClass( 'hidden' );
-
-				// Show the immediate below index element
-				const nextIndex = currentlyCheckedIndex + 1;
-				$(
-					`.revx-products-lists[data-index="${ nextIndex }"]`
-				).removeClass( 'hidden' );
-			} else {
-				// If no checkbox is selected, show the first element
-				$( `.revx-products-lists[data-index="0"]` ).removeClass(
-					'hidden'
-				);
-			}
-
-			const currentStateData = {
-				index: currentlyCheckedIndex,
-				multiplier:
-					currentlyCheckedIndex !== null
-						? $checkbox.data( 'multiplier' )
-						: null,
-				value:
-					currentlyCheckedIndex !== null
-						? $checkbox.data( 'value' )
-						: null,
-				campaign_id: $checkbox.data( 'campaign-id' ),
-			};
-
-			$( document ).trigger(
-				'revenue_double_order_checkbox_state_change',
-				currentStateData
-			);
-		}
-	}
-
-	function runGroupedOrder() {
-		let currentlyCheckedGroup = null;
-		const selectedProducts = new Set();
-
-		// Initialize state based on any pre-checked items
-		function initializeState() {
-			const selectedCheckbox = $(
-				'.revx-double-order-checkbox-specific[data-is-checked="yes"]'
-			);
-
-			if ( selectedCheckbox.length ) {
-				currentlyCheckedGroup = selectedCheckbox
-					.first()
-					.closest( '.revx-products-lists-specific' )
-					.data( 'index' );
-
-				selectedCheckbox.each( function () {
-					const $checkbox = $( this );
-					selectedProducts.add( $checkbox.data( 'product-id' ) );
-					$checkbox.attr(
-						'style',
-						$checkbox.data( 'selected-style' )
-					);
-				} );
-
-				updateGroupVisibility();
-				updateOpacityStyles();
-				triggerStateChangeEvent( selectedCheckbox.first() );
-			}
-		}
-
-		// Handle click on specific checkboxes
-		$( document ).on(
-			'click',
-			'.revx-double-order-checkbox-specific',
-			function ( e ) {
-				e.stopPropagation();
-				groupedOrderToggleCheckbox( $( this ) );
-			}
-		);
-
-		// Add hover handlers for opacity
-		$( document )
-			.on( 'mouseenter', '.revx-products-lists-specific', function () {
-				$( this ).css( 'opacity', '1' );
-			} )
-			.on( 'mouseleave', '.revx-products-lists-specific', function () {
-				updateOpacityStyles();
-			} );
-
-		function groupedOrderToggleCheckbox( $checkbox ) {
-			const groupIndex = $checkbox
-				.closest( '.revx-products-lists-specific' )
-				.data( 'index' );
-			const productId = $checkbox.data( 'product-id' );
-
-			if (
-				currentlyCheckedGroup === null ||
-				currentlyCheckedGroup === groupIndex
-			) {
-				if ( isCheckboxSelected( $checkbox ) ) {
-					$checkbox.attr(
-						'style',
-						$checkbox.data( 'default-style' )
-					);
-					$checkbox.data( 'is-checked', 'no' );
-					selectedProducts.delete( productId );
-
-					if ( selectedProducts.size === 0 ) {
-						currentlyCheckedGroup = null;
-					}
-				} else {
-					$checkbox.attr(
-						'style',
-						$checkbox.data( 'selected-style' )
-					);
-					$checkbox.data( 'is-checked', 'yes' );
-					selectedProducts.add( productId );
-					currentlyCheckedGroup = groupIndex;
-				}
-			} else {
-				$(
-					`.revx-products-lists-specific[data-index="${ currentlyCheckedGroup }"] .revx-double-order-checkbox-specific`
-				).each( function () {
-					const $cb = $( this );
-					$cb.attr( 'style', $cb.data( 'default-style' ) );
-					$cb.data( 'is-checked', 'no' );
-				} );
-
-				selectedProducts.clear();
-				currentlyCheckedGroup = groupIndex;
-
-				$checkbox.attr( 'style', $checkbox.data( 'selected-style' ) );
-				$checkbox.data( 'is-checked', 'yes' );
-				selectedProducts.add( productId );
-			}
-
-			updateGroupVisibility();
-			updateOpacityStyles();
-			triggerStateChangeEvent( $checkbox );
-		}
-
-		function isCheckboxSelected( $checkbox ) {
-			return $checkbox.data( 'is-checked' ) === 'yes';
-		}
-
-		function updateGroupVisibility() {
-			$( '.revx-products-lists-specific' ).addClass( 'hidden' );
-
-			if ( currentlyCheckedGroup !== null ) {
-				$( '.revx-products-lists-specific' ).each( function () {
-					const groupIndex = $( this ).data( 'index' );
-					if ( groupIndex <= currentlyCheckedGroup + 1 ) {
-						$( this ).removeClass( 'hidden' );
-					}
-				} );
-			} else {
-				$(
-					'.revx-products-lists-specific[data-index="0"]'
-				).removeClass( 'hidden' );
-			}
-		}
-
-		function updateOpacityStyles() {
-			if ( currentlyCheckedGroup !== null ) {
-				$( '.revx-products-lists-specific' ).each( function () {
-					const groupIndex = parseInt( $( this ).data( 'index' ) );
-					if ( groupIndex < currentlyCheckedGroup ) {
-						$( this ).css( 'opacity', '0.5' );
-					} else {
-						$( this ).css( 'opacity', '1' );
-					}
-				} );
-			} else {
-				$( '.revx-products-lists-specific' ).css( 'opacity', '1' );
-			}
-		}
-
-		function triggerStateChangeEvent( $checkbox ) {
-			const stateData = {
-				groupIndex: currentlyCheckedGroup,
-				selectedProducts: Array.from( selectedProducts ),
-				multiplier:
-					currentlyCheckedGroup !== null
-						? $checkbox.data( 'multiplier' )
-						: null,
-				value:
-					currentlyCheckedGroup !== null
-						? $checkbox.data( 'value' )
-						: null,
-				campaign_id: $checkbox.data( 'campaign-id' ),
-			};
-
-			$( document ).trigger(
-				'revenue_grouped_order_checkbox_state_change',
-				stateData
-			);
-		}
-
-		// Initialize the component
-		initializeState();
-	}
-	runDoubleOrder();
-	runGroupedOrder();
-
-	function postRevenueOrderData( action, data, callback ) {
-		$.post(
-			revenue_campaign.ajax,
-			{
-				action: 'revenue_double_order_multiplier',
-				...data,
-				_wpnonce: revenue_campaign.nonce,
-			},
-			function () {
-				if ( typeof callback === 'function' ) {
-					callback();
-				}
-			}
-		);
-	}
-
-	$( document ).on(
-		'revenue_double_order_checkbox_state_change',
-		function ( e, stateData ) {
-			const data = {
-				multiplier: stateData.multiplier,
-				is_checked: stateData.index !== null ? 'yes' : 'no',
-				campaign_id: stateData.campaign_id,
-				index: stateData.index,
-				product_id: null, // No specific product for double order
-			};
-
-			postRevenueOrderData(
-				'revenue_double_order_multiplier',
-				data,
-				function () {
-					$( 'body' ).trigger( 'update_checkout' );
-				}
-			);
-		}
-	);
-
-	// Hook for grouped order checkbox state change
-	$( document ).on(
-		'revenue_grouped_order_checkbox_state_change',
-		function ( e, stateData ) {
-			const data = {
-				multiplier: stateData.multiplier,
-				is_checked: stateData.groupIndex !== null ? 'yes' : 'no',
-				campaign_id: stateData.campaign_id,
-				index: stateData.groupIndex,
-				product_ids: stateData.selectedProducts,
-			};
-
-			postRevenueOrderData(
-				'revenue_double_order_multiplier',
-				data,
-				function () {
-					$( 'body' ).trigger( 'update_checkout' );
-				}
-			);
-		}
-	);
-
-	$( '.revx-double-order-container' ).each( function () {
-		const container = $( this );
-		const delayBetween =
-			parseFloat(
-				getComputedStyle( this ).getPropertyValue(
-					'--revx-double-order-animation-delay-between'
-				)
-			) * 1000;
-
-		if ( ! delayBetween ) {
-			return;
-		}
-
-		const activeTime =
-			parseFloat(
-				getComputedStyle( this ).getPropertyValue(
-					'--animation-active-time'
-				)
-			) * 1000;
-
-		container
-			.find(
-				'.revx-double-order-animation-shake,.revx-double-order-animation-pulse, .revx-double-order-animation-tada, .revx-double-order-animation-bounce, .revx-double-order-animation-swing'
-			)
-			.each( function () {
-				const element = $( this );
-
-				function triggerAnimation() {
-					const animationName = element
-						.attr( 'class' )
-						.split( ' ' )
-						.find( ( cls ) =>
-							cls.startsWith( 'revx-double-order-animation-' )
-						);
-					element.css(
-						'animation',
-						`${ animationName } ${ activeTime }ms ease-in-out`
-					);
-					setTimeout( () => {
-						element.css( 'animation', 'none' );
-					}, activeTime );
-				}
-
-				setInterval( triggerAnimation, activeTime + delayBetween );
-			} );
-	} );
-
-	function deduplicateCampaigns() {
-		// Keep track of campaign IDs we've seen
-		const seenCampaigns = new Set();
-
-		// Find all campaign containers
-		$( '.revx-campaign-container' ).each( function () {
-			// Get campaign ID from class that matches revx-campaign-{number}
-			const campaignClass = $( this )
-				.attr( 'class' )
-				.split( ' ' )
-				.find( ( className ) => /revx-campaign-\d+/.test( className ) );
-
-			if ( campaignClass ) {
-				const campaignId = campaignClass.replace(
-					'revx-campaign-',
-					''
-				);
-
-				// If we've seen this campaign ID before, hide the container
-				if ( seenCampaigns.has( campaignId ) ) {
-					$( this ).hide();
-				} else {
-					// First time seeing this campaign ID
-					seenCampaigns.add( campaignId );
-					$( this ).show();
-				}
-			}
-		} );
-	}
-
-	$( document ).ready( deduplicateCampaigns );
 
 	// Tooltip - Spending Goal
 	function updateTooltipPosition( $container ) {
@@ -2474,9 +2214,114 @@
 		}, 250 );
 	} );
 
+	function updateGiftPosition( $container ) {
+		const $gift = $container.find( '.revx-gift-container' );
+		const $giftWrapper = $container.find( '.revx-spending-gift' );
+		if ( ! $gift.length ) {
+			return;
+		}
+		// remove the class before. otherwise top calculation is wrong.
+		$gift.removeClass( 'revx-d-none' );
+
+		const iconRect = $container[ 0 ].getBoundingClientRect(); // relative to viewport
+		const giftRect = $gift[ 0 ].getBoundingClientRect();
+
+		const giftWidth = giftRect?.width;
+		const iconWidth = iconRect?.width;
+		const windowWidth = window.innerWidth;
+		const giftCenterToLeft = Math.abs( giftWidth - iconWidth ) / 2;
+
+		const isAbove = iconRect?.top > giftRect?.height + 10;
+		const isRightSpace = iconRect?.left + giftCenterToLeft < windowWidth;
+		const isLeftSpace = iconRect?.left - giftCenterToLeft >= 0;
+
+		const top = isAbove
+			? ( giftRect?.height + 8 ) * -1
+			: iconRect?.height + 8;
+
+		let left = 0;
+		if ( ! isLeftSpace && isRightSpace ) {
+			left = -20; // small offset from left edge
+		} else if ( isLeftSpace && ! isRightSpace ) {
+			left = iconWidth - giftWidth;
+		} else {
+			// for space both left/right OR no space left/right keep center.
+			left = giftCenterToLeft * -1;
+		}
+
+		$gift.css( {
+			position: 'fixed',
+			top: `${ top }px`,
+			left: `${ left }px`,
+			zIndex: 999999,
+			visibility: 'visible',
+			opacity: 1,
+		} );
+		$giftWrapper.css( {
+			transformOrigin: `${ isAbove ? 'bottom' : 'top' } ${
+				! isLeftSpace && isRightSpace
+					? 'left'
+					: isLeftSpace && ! isRightSpace
+					? 'right'
+					: 'center'
+			}`,
+		} );
+	}
+
+	// Stock Scarcity
+	$( '.revx-flip-wrapper' ).each( function () {
+		const $this = $( this ); // Define $this as the current .revx-flip-wrapper element
+		const flipTextHeight = $this.find( '.revx-flip-text' ).outerHeight();
+		$this.css( 'min-height', flipTextHeight + 'px' );
+	} );
+
+	let giftHideTimer;
+	$( '.revx-progress-step-icon-container' )
+		.on( 'mouseenter', function () {
+			clearTimeout( giftHideTimer ); // prevent hiding
+			updateGiftPosition( $( this ) );
+		} )
+		.on( 'mouseleave', function () {
+			const $this = $( this );
+			giftHideTimer = setTimeout( () => {
+				$this
+					.find( '.revx-gift-container' )
+					.addClass( 'revx-d-none' )
+					.css( {
+						visibility: 'hidden',
+						opacity: 0,
+						left: '-250px', // to handle the overflow x case
+						top: 'unset',
+					} );
+			}, 200 ); // adjust delay as needed
+		} );
+
+	$( '.revx-gift-container' )
+		.on( 'mouseenter', function () {
+			clearTimeout( giftHideTimer ); // prevent hiding
+		} )
+		.on( 'mouseleave', function () {
+			$( this ).addClass( 'revx-d-none' ).css( {
+				visibility: 'hidden',
+				opacity: 0,
+				left: 'unset',
+				top: 'unset',
+			} );
+		} );
+
+	// Reposition gift on resize or scroll
+	$( window ).on( 'resize scroll', function () {
+		$( '.revx-progress-step-icon-container:hover' ).each( function () {
+			updateGiftPosition( $( this ) );
+		} );
+	} );
+
 	function adjustContentMarginTop() {
-		const helloBar = $( '.revx-spending-goal-top' ).length
-			? $( '.revx-spending-goal-top' )
+		// const helloBar = $( '.revx-spending-goal-top' ).length
+		// 	? $( '.revx-spending-goal-top' )
+		// 	: $( '.revx-campaign-fsb-top' );
+		const helloBar = $( '.revx-campaign-top' ).length
+			? $( '.revx-campaign-top' )
 			: $( '.revx-campaign-fsb-top' );
 
 		// Check if hello bar exists
@@ -2491,14 +2336,14 @@
 			$( 'body' ).css( 'margin-top', helloBarHeight );
 
 			// Remove margin-bottom as it's causing double spacing
-			helloBar.css( 'margin-top', -helloBarHeight );
+			// helloBar.css( 'margin-top', -helloBarHeight );
 		}
 	}
 
 	adjustContentMarginTop();
 	function adjustContentMarginBottom() {
-		const helloBar = $( '.revx-spending-goal-bottom' ).length
-			? $( '.revx-spending-goal-bottom' )
+		const helloBar = $( '.revx-campaign-bottom' ).length
+			? $( '.revx-campaign-bottom' )
 			: $( '.revx-campaign-fsb-bottom' );
 
 		// Check if hello bar exists
@@ -2530,21 +2375,15 @@
 		// Determine toast class and icon based on type
 		const toastClasses = {
 			success: 'revx-toaster__success',
+			warning: 'revx-toaster__warning',
 			error: 'revx-toaster__error',
 		};
 
-		const icons = {
-			success: `
+		const icon = `
 				<svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="none" viewBox="0 0 16 16" class="revx-toaster__close-icon revx-toaster__icon">
 					<path stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" d="m12 4-8 8M4 4l8 8"></path>
 				</svg>
-			`,
-			error: `
-				<svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="none" viewBox="0 0 16 16" class="revx-toaster__close-icon revx-toaster__icon">
-					<path stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" d="m12 4-8 8M4 4l8 8"></path>
-				</svg>
-			`,
-		};
+			`;
 
 		// Create a new toast element as a jQuery object
 		const $toast = $( `
@@ -2553,7 +2392,7 @@
 					${ message }
 				</div>
 				<div class="revx-paragraph--xs revx-align-center">
-					${ icons[ type ] }
+					${ icon }
 				</div>
 			</div>
 		` );
@@ -2582,8 +2421,103 @@
 		}, duration );
 	}
 
-	// Hide Campaign on Close Button Click
+	const $drawerContainer = $( '.revx-drawer-container' ).first();
+	if ( $drawerContainer.length ) {
+		// Clone the entire container including content
+		// const $drawerContent = $drawerContainer.find( '.revx-drawer-content' );
+		// $drawerContent.each( function () {
+		// 	this.style.setProperty( 'max-width', '0vh', 'important' );
+		// 	this.style.setProperty( 'padding', '0vh', 'important' );
+		// } );
 
+		const $clone = $drawerContainer.clone( true, true );
+		const $cloneContent = $clone.find( '.revx-drawer-content' );
+		// Remove max-width and padding limits on drawer-content inside clone
+		$cloneContent.each( function () {
+			this.style.setProperty( 'max-width', 'none', 'important' );
+			this.style.setProperty(
+				'padding-top',
+				'var(--revx-drawer-padding-top)',
+				'important'
+			);
+			this.style.setProperty(
+				'padding-right',
+				'var(--revx-drawer-padding-right)',
+				'important'
+			);
+			this.style.setProperty(
+				'padding-bottom',
+				'var(--revx-drawer-padding-bottom)',
+				'important'
+			);
+			this.style.setProperty(
+				'padding-left',
+				'var(--revx-drawer-padding-left)',
+				'important'
+			);
+			// this.style.setProperty( 'position', 'static', 'important' );
+		} );
+		// $cloneContent.find( '*' ).each( function () {
+		// 	this.style.setProperty( 'position', 'static', 'important' );
+		// } );
+
+		$clone.css( {
+			display: 'flex',
+			position: 'absolute',
+			top: '-9999px',
+			left: '-9999px',
+			visibility: 'hidden',
+			bottom: 'unset',
+			right: 'unset',
+		} );
+		// Append clone to body so you can see it on top
+		$( 'body' ).append( $clone );
+		const cloneHeight = $clone.innerHeight();
+		// const cloneHeight = $clone.outerHeight( true );
+		$drawerContainer.each( function () {
+			this.style.setProperty( 'height', cloneHeight + 'px', 'important' );
+			this.style.setProperty( 'display', 'flex', 'important' );
+		} );
+	}
+
+	// Open campaign drawer
+	$( document ).on( 'click', '.revx-drawer-opener', function () {
+		const $container = $( this ).closest( '.revx-drawer-container' );
+		const $drawerContent = $container.find( '.revx-drawer-content' );
+
+		// $drawerContent.each( function () {
+		// 	this.style.setProperty( 'transition', 'all 0.2s', 'important' );
+		// } );
+		$drawerContent.addClass( 'revx-transition' );
+
+		if ( $container.hasClass( 'revx-active' ) ) {
+			$container.removeClass( 'revx-active' );
+			$container.css( { overflow: 'hidden' } );
+			// $drawerContent.each( function () {
+			// 	this.style.setProperty( 'max-width', '0vh', 'important' );
+			// 	this.style.setProperty( 'padding', '0vh', 'important' );
+			// } );
+		} else {
+			$container.addClass( 'revx-active' );
+			$container.css( { overflow: 'visible' } );
+			// $drawerContent.each( function () {
+			// 	this.style.removeProperty( 'max-width' );
+			// 	this.style.removeProperty( 'padding' );
+			// } );
+		}
+	} );
+	// Close campaign drawer
+	$( document ).on( 'click', '.revx-drawer-closer', function () {
+		const $container = $( this ).closest( '.revx-drawer-container' );
+		// const $drawerContent = $container.find( '.revx-drawer-content' );
+		$container.removeClass( 'revx-active' );
+		// $drawerContent.each( function () {
+		// 	this.style.setProperty( 'max-width', '0vh', 'important' );
+		// 	this.style.setProperty( 'padding', '0vh', 'important' );
+		// } );
+	} );
+
+	// Hide Campaign on Close Button Click
 	$( document ).on( 'click', '.revx-campaign-close', function () {
 		const campaignID = $( this ).data( 'campaign-id' );
 		$( `.revx-campaign-${ campaignID }` ).hide();
@@ -2594,14 +2528,19 @@
 	// Next Order Coupon Copy Clip-Borad
 	$( '.revx-coupon-copy-btn' ).on( 'click', function () {
 		const $btn = $( this );
-		const $content = $btn.closest( '.revx-Coupon-button' );
-		const text = $content
-			.clone() // Clone to avoid modifying original
-			.children() // Remove children (like .revx-coupon-copy-btn)
-			.remove()
-			.end() // Go back to cloned parent
-			.text()
-			.trim(); // Get just the raw text
+
+		// // const $content = $btn.closest( '.revx-Coupon-button' );
+		// const text = $content
+		// 	.clone() // Clone to avoid modifying original
+		// 	.children() // Remove children (like .revx-coupon-copy-btn)
+		// 	.remove()
+		// 	.end() // Go back to cloned parent
+		// 	.text()
+		// 	.trim(); // Get just the raw text
+
+		const $content = $btn.siblings( '.revx-coupon-value' );
+		const text = $content.text().trim();
+
 		// Fallback for browsers that do not support navigator.clipboard
 		const tempInput = $( '<input>' );
 		$( 'body' ).append( tempInput );
@@ -2609,14 +2548,14 @@
 		try {
 			document.execCommand( 'copy' );
 			// $btn.text( 'Copied!' );
-			$( '.revx-Coupon-button' ).css( 'background-color', '#008000' );
-			$( '.revx-Coupon-button' ).css( {
+			$( '.revx-coupon-value' ).css( 'background-color', '#008000' );
+			$( '.revx-coupon-value' ).css( {
 				transition: 'background-color 0.4s',
 			} );
 
 			setTimeout(
 				() =>
-					$( '.revx-Coupon-button' ).css(
+					$( '.revx-coupon-value' ).css(
 						'background-color',
 						'unset'
 					),
@@ -2635,9 +2574,82 @@
 		formatPrice,
 		updatePriceDisplay,
 		updateMixMatchHeaderAndPrices,
-		fbtCalculation,
-		updateStyles,
+		// fbtCalculation,
+		// updateStyles,
 		showToast,
 	};
 	// eslint-disable-next-line no-undef
+
+	$( '.revx-slider-wrapper' ).each( function () {
+		if ( ! $( this ).data( 'slider-initialized' ) ) {
+			$( this ).revxSlider();
+			$( this ).data( 'slider-initialized', true );
+		}
+	} );
+
+	// Auto initialize on page load
+	// function initTimers( $context ) {
+	// 	$context.find( '.revx-countdown-timer' ).revxCountdownTimer();
+	// }
+
+	// $( document ).ready( function () {
+	// 	initTimers( $( document ) );
+
+	// 	// MutationObserver for dynamically added timers
+	// 	const observer = new MutationObserver( function ( mutations ) {
+	// 		mutations.forEach( function ( mutation ) {
+	// 			$( mutation.addedNodes ).each( function () {
+	// 				if ( this.nodeType === 1 ) {
+	// 					const $el = $( this );
+	// 					if ( $el.is( '.revx-countdown-timer' ) ) {
+	// 						$el.revxCountdownTimer();
+	// 					} else {
+	// 						initTimers( $el );
+	// 					}
+	// 				}
+	// 			} );
+	// 		} );
+	// 	} );
+
+	// 	observer.observe( document.body, {
+	// 		childList: true,
+	// 		subtree: true,
+	// 	} );
+	// } );
+
+	function getSelectedAttributes( $form ) {
+		const selectedData = {};
+		$form.find( 'select[name^="attribute_"]' ).each( function () {
+			const key = $( this ).attr( 'name' );
+			selectedData[ key ] = $( this ).val() || '';
+		} );
+		return selectedData;
+	}
+
+	// Update data-selected-value when any attribute dropdown changes
+	$( '.product' ).on( 'change', 'select[name^="attribute_"]', function () {
+		const $form = $( this ).closest( '.product' );
+		const selectedData = getSelectedAttributes( $form );
+		// Update the data-selected-value attribute
+		$form.attr( 'data-selected-value', JSON.stringify( selectedData ) );
+	} );
 } )( jQuery );
+
+// move jquery code from the template1 volume discount selection.
+jQuery( function ( $ ) {
+	$( document ).on( 'click', '.revx-volume-discount-item', function () {
+		const $radio = $( this ).find( '.revx-radio-wrapper' );
+		const $attribute = $( this ).find( '.revx-volume-attributes' );
+
+		// deactivate every other option
+		$( '.revx-radio-wrapper, .revx-volume-attributes' )
+			.removeClass( 'revx-active' )
+			.addClass( 'revx-inactive' );
+
+		// activate the clicked one
+		$radio
+			.add( $attribute )
+			.addClass( 'revx-active' )
+			.removeClass( 'revx-inactive' );
+	} );
+} );

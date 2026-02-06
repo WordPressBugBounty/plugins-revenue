@@ -1,3 +1,7 @@
+/* global revenue_campaign Revenue jQuery */
+// the below line ignores revenue_campaign not camel case warning
+/* eslint-disable camelcase */
+
 ( function ( $ ) {
 	'use strict';
 
@@ -273,10 +277,10 @@
 	}
 
 	// Main Progress Class
-	class RevenueProgress {
+	class RevenueFreeShippingProgress {
 		constructor( options ) {
 			this.defaults = {
-				containerId: '#revx-progress-drawer',
+				container: null,
 				offersFieldName: 'revenue_free_shipping_offer',
 				ajaxUrl: '',
 				debugMode: false,
@@ -284,8 +288,8 @@
 				type: 'drawer', // 'drawer' or 'inpage'
 			};
 
-			this.settings = $.extend( {}, this.defaults, options );
-			this.container = $( this.settings.containerId );
+			this.settings = $.extend( {}, this.defaults, options ); // merges 2 objecct: options and defaults.
+			this.container = $( this.settings.container ); // container is a jquery object of the wrapper passed in options
 			this.state = {
 				isOpen: false,
 				currentProgress: 0,
@@ -305,7 +309,7 @@
 
 		initializeOffers() {
 			try {
-				const offersField = $(
+				const offersField = this.container.find(
 					`input[name="${ this.settings.offersFieldName }"]`
 				);
 				this.state.cartTotal = this.container.data( 'cart-total' );
@@ -325,6 +329,7 @@
 
 		init() {
 			if ( ! this.validateSetup() ) {
+				console.error( 'Revenue X: Initialization failed due to invalid setup' );
 				return;
 			}
 
@@ -350,15 +355,19 @@
 				content: this.container.find(
 					this.settings.type === 'drawer'
 						? '.revx-drawer-content'
-						: '.revx-progress-content'
+						: '.revx-progress-content, .revx-slider-wrapper'
 				),
-				progressBar: this.container.find( '.revx-progress-fill' ),
+				progressBar: this.container.find(
+					'.revx-progress-fill, .revx-stock-bar'
+				),
 				closeBtn: this.container.find( '.revx-close-btn' ),
 				circularProgress: this.container.find(
 					'.revx-progress-active'
 				),
 				circularText: this.container.find( '.revx-circular-text' ),
-				message: this.container.find( '.revx-message' ),
+				message: this.container.find(
+					'.revx-message, [data-smart-tag="fsbHeading"]'
+				),
 				steps: this.container.find( '.revx-progress-step' ),
 				finalMessage: this.container.data( 'final-message' ),
 			};
@@ -438,52 +447,6 @@
 			}
 
 			this.state.isUpdating = true;
-			// $.ajax( {
-			// 	url: '/wp-admin/admin-ajax.php', // WooCommerce AJAX endpoint
-			// 	method: 'POST',
-			// 	data: {
-			// 		action: 'woocommerce_get_cart_totals', // The action WooCommerce will respond to
-			// 	},
-			// 	success( response ) {
-			// 		// If the request is successful, handle the response
-			// 		console.log( 'Cart Total: ' + response.cart_total );
-			// 		console.log( 'Subtotal: ' + response.cart_subtotal );
-			// 	},
-			// 	error( jqXHR, textStatus, errorThrown ) {
-			// 		// If the request fails, log the error
-			// 		console.log(
-			// 			'Request failed: ' + textStatus + ', ' + errorThrown
-			// 		);
-			// 	},
-			// } );
-			// $.ajax( {
-			// 	url: this.settings.ajaxUrl,
-			// 	type: 'POST',
-			// 	data: { action: 'revenue_get_cart_total' },
-			// 	success: ( response ) => {
-			// 		if ( response.success ) {
-			// 			let newCartTotal = 0;
-			// 			if ( 'total' === this.state.basedOn ) {
-			// 				newCartTotal = parseFloat(
-			// 					response.data.cart_total
-			// 				);
-			// 			} else {
-			// 				newCartTotal = parseFloat( response.data.subtotal );
-			// 			}
-
-			// 			if ( newCartTotal !== this.state.cartTotal ) {
-			// 				this.state.cartTotal = newCartTotal;
-			// 				this.updateProgress( newCartTotal );
-			// 			}
-			// 		}
-			// 	},
-			// 	error: ( xhr, status, error ) => {
-			// 		console.error( 'Revenue X: AJAX error:', error );
-			// 	},
-			// 	complete: () => {
-			// 		this.state.isUpdating = false;
-			// 	},
-			// } );
 		}
 
 		updateProgress( cartTotal ) {
@@ -519,10 +482,9 @@
 					.css( 'stroke-dasharray', circumference )
 					.css( 'stroke-dashoffset', offset );
 				this.elements.circularText.text(
-					`${ Math.round( progress ) }%`
+					`${ progress.toFixed( 2 ) }%`
 				);
 			}
-
 			this.updateStepStates( cartTotal );
 			this.updateMessages( cartTotal );
 		}
@@ -556,13 +518,12 @@
 
 				accumulatedGoal += parseFloat( offer.required_goal );
 				const remainingAmount = Math.abs( accumulatedGoal - cartTotal );
-
 				const rewardType = offer?.reward_type;
 				let afterMessage = offer?.after_message;
 				const discountValue = offer?.discount_value;
 
 				switch ( rewardType ) {
-					case 'discount':
+					case 'discount': {
 						const discountType = offer?.discount_type;
 						if ( 'percentage' === discountType ) {
 							afterMessage = afterMessage.replace(
@@ -579,7 +540,7 @@
 						}
 
 						break;
-
+					}
 					default:
 						break;
 				}
@@ -674,13 +635,13 @@
 	}
 
 	// Plugin registration
-	$.fn.revenueProgress = function ( options ) {
+	$.fn.revenueFreeShippingProgress = function ( options ) {
 		return this.each( function () {
-			if ( ! $.data( this, 'revenueProgress' ) ) {
+			if ( ! $.data( this, 'revenueFreeShippingProgress' ) ) {
 				$.data(
 					this,
-					'revenueProgress',
-					new RevenueProgress( options )
+					'revenueFreeShippingProgress',
+					new RevenueFreeShippingProgress( options )
 				);
 			}
 		} );
@@ -688,17 +649,15 @@
 
 	// Initialize the plugin
 	$( document ).ready( function () {
-		// Initialize drawer if present
-		$( '#revx-progress-drawer' ).revenueProgress( {
-			ajaxUrl: revenue_campaign.ajax,
-			type: 'drawer',
-		} );
-
-		// Initialize in-page if present
-		$( '#revx-progress-inpage' ).revenueProgress( {
-			ajaxUrl: revenue_campaign.ajax,
-			containerId: '#revx-progress-inpage',
-			type: 'inpage',
+		// Initialize free shipping bar if present, only select the top level container
+		$(
+			'.revx-template [data-campaign-type="free_shipping_bar"][data-container-level="top"]'
+		).each( function () {
+			$( this ).revenueFreeShippingProgress( {
+				ajaxUrl: revenue_campaign.ajax,
+				container: $( this ),
+				type: $( this ).data( 'position' ), // drawer or inpage now
+			} );
 		} );
 	} );
 } )( jQuery );

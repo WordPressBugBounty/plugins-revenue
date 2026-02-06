@@ -230,66 +230,76 @@ class Revenue_Analytics_REST_Controller extends WP_REST_Controller {
 		}
 
 		// Fetch and process data.
-		$current_period_results  = $this->fetch_and_process_data( $request, $date_start, $date_end, $data_keys, $have_order_stats_keys, $have_campaign_stats_keys, $is_datewise );
-	
+		$current_period_results = $this->fetch_and_process_data( $request, $date_start, $date_end, $data_keys, $have_order_stats_keys, $have_campaign_stats_keys, $is_datewise );
+
 		$previous_period_results = $this->fetch_and_process_data( $request, $previous_date_start, $previous_date_end, $data_keys, $have_order_stats_keys, $have_campaign_stats_keys, $is_datewise );
 
-
-
 		if ( ! isset( $current_period_results['total'] ) ) {
-			$current_period_results['total'] = 0;
+			$current_period_results['total'] = array();
 		}
 		if ( ! isset( $previous_period_results['total'] ) ) {
-			$previous_period_results['total'] = 0;
+			$previous_period_results['total'] = array();
 		}
 
-		if(defined('WPXPO_DEMO') && WPXPO_DEMO) {
+		// Ensure required total keys exist but do not inject dummy/random values.
+		if ( defined( 'WPXPO_DEMO' ) && WPXPO_DEMO ) {
 
-			if(!isset($current_period_results['total']['total_sales'])) {
-				$current_period_results['total']['total_sales']=0;
+			if ( ! isset( $current_period_results['total']['total_sales'] ) ) {
+				$current_period_results['total']['total_sales'] = 0;
 			}
-			if(!isset($current_period_results['total']['average_order_value'])) {
-				$current_period_results['total']['average_order_value']=0;
+			if ( ! isset( $current_period_results['total']['average_order_value'] ) ) {
+				$current_period_results['total']['average_order_value'] = 0;
 			}
-			if(!isset($current_period_results['total']['add_to_cart_count'])) {
-				$current_period_results['total']['add_to_cart_count']=0;
+			if ( ! isset( $current_period_results['total']['add_to_cart_count'] ) ) {
+				$current_period_results['total']['add_to_cart_count'] = 0;
 			}
-			if(!isset($current_period_results['total']['impression_count'])) {
-				$current_period_results['total']['impression_count']=0;
+			if ( ! isset( $current_period_results['total']['impression_count'] ) ) {
+				$current_period_results['total']['impression_count'] = 0;
 			}
-			if(!isset($current_period_results['total']['conversion_rate'])) {
-				$current_period_results['total']['conversion_rate']=0;
+			if ( ! isset( $current_period_results['total']['conversion_rate'] ) ) {
+				$current_period_results['total']['conversion_rate'] = 0;
 			}
-			if(!isset($current_period_results['total']['orders_count'])) {
-				$current_period_results['total']['orders_count']=0;
-			}
-
-			if(!isset($previous_period_results['total']['total_sales'])) {
-				$previous_period_results['total']['total_sales']=0;
-			}
-			if(!isset($previous_period_results['total']['average_order_value'])) {
-				$previous_period_results['total']['average_order_value']=0;
-			}
-			if(!isset($previous_period_results['total']['add_to_cart_count'])) {
-				$previous_period_results['total']['add_to_cart_count']=0;
-			}
-			if(!isset($previous_period_results['total']['impression_count'])) {
-				$previous_period_results['total']['impression_count']=0;
-			}
-			if(!isset($previous_period_results['total']['conversion_rate'])) {
-				$previous_period_results['total']['conversion_rate']=0;
-			}
-			if(!isset($previous_period_results['total']['orders_count'])) {
-				$previous_period_results['total']['orders_count']=0;
+			if ( ! isset( $current_period_results['total']['orders_count'] ) ) {
+				$current_period_results['total']['orders_count'] = 0;
 			}
 
-			$this->populateRandomValues($current_period_results);
-			$this->populateRandomValues($previous_period_results);
-
+			if ( ! isset( $previous_period_results['total']['total_sales'] ) ) {
+				$previous_period_results['total']['total_sales'] = 0;
+			}
+			if ( ! isset( $previous_period_results['total']['average_order_value'] ) ) {
+				$previous_period_results['total']['average_order_value'] = 0;
+			}
+			if ( ! isset( $previous_period_results['total']['add_to_cart_count'] ) ) {
+				$previous_period_results['total']['add_to_cart_count'] = 0;
+			}
+			if ( ! isset( $previous_period_results['total']['impression_count'] ) ) {
+				$previous_period_results['total']['impression_count'] = 0;
+			}
+			if ( ! isset( $previous_period_results['total']['conversion_rate'] ) ) {
+				$previous_period_results['total']['conversion_rate'] = 0;
+			}
+			if ( ! isset( $previous_period_results['total']['orders_count'] ) ) {
+				$previous_period_results['total']['orders_count'] = 0;
+			}
 		}
 
-		$current_period_results  = apply_filters('revenue_get_current_period_total_stats', $current_period_results, $date_start->format('Y-m-d'), $date_end->format('Y-m-d'));
-		$previous_period_results = apply_filters('revenue_get_previous_period_total_stats', $previous_period_results, $previous_date_start->format('Y-m-d'), $previous_date_end->format('Y-m-d'));
+		// Determine if the data is real; if not, mark as dummy but do not inject random values.
+		$has_real_data = false;
+		if ( is_array( $current_period_results['total'] ) ) {
+			foreach ( $current_period_results['total'] as $key => $value ) {
+				if ( is_numeric( $value ) && $value > 0 ) {
+					$has_real_data = true;
+					break;
+				}
+			}
+		}
+
+		if ( ! $has_real_data ) {
+			$current_period_results['is_dummy'] = true;
+		}
+
+		$current_period_results  = apply_filters( 'revenue_get_current_period_total_stats', $current_period_results, $date_start->format( 'Y-m-d' ), $date_end->format( 'Y-m-d' ) );
+		$previous_period_results = apply_filters( 'revenue_get_previous_period_total_stats', $previous_period_results, $previous_date_start->format( 'Y-m-d' ), $previous_date_end->format( 'Y-m-d' ) );
 		// Calculate percentage growth or decline
 		$growth_data = revenue()->calculate_growth( $current_period_results['total'], $previous_period_results['total'], $data_keys );
 
@@ -300,16 +310,7 @@ class Revenue_Analytics_REST_Controller extends WP_REST_Controller {
 		return rest_ensure_response( $current_period_results );
 	}
 
-	public function populateRandomValues(&$array) {
-		foreach ($array as $key => &$value) {
-			if (is_array($value)) {
-				$this->populateRandomValues($value); // Recursive call for nested arrays
-			} else {
-				// Populate with random values between 1 and 100
-				$value = wp_rand(500, 10000);
-			}
-		}
-	}
+	// Removed populateRandomValues helper to avoid injecting dummy/random data.
 
 	/**
 	 * Retrieves and processes conversion statistics for the specified date range and preset period.
@@ -397,33 +398,33 @@ class Revenue_Analytics_REST_Controller extends WP_REST_Controller {
 		$current_period_results  = $this->fetch_and_process_data( $request, $date_start, $date_end, $data_keys, $have_order_stats_keys, $have_campaign_stats_keys, $is_datewise );
 		$previous_period_results = $this->fetch_and_process_data( $request, $previous_date_start, $previous_date_end, $data_keys, $have_order_stats_keys, $have_campaign_stats_keys, $is_datewise );
 
-        if(defined('WPXPO_DEMO') && WPXPO_DEMO) {
+		if ( defined( 'WPXPO_DEMO' ) && WPXPO_DEMO ) {
 
-            foreach (revenue()->get_campaign_types() as $campaign_type => $value) {
-                $current_period_results[$campaign_type] = [
-                    'date' => gmdate("Y-m-d"),
-                    'type' => $campaign_type,
-                    'add_to_cart_count' => wp_rand(50, 1000),
-                    'impression_count' => wp_rand(50, 1000),
-                    'conversion_rate' => wp_rand(50, 100),
-                    'total_sales' => wp_rand(50, 1000),
-                    'orders_count' => wp_rand(50, 1000),
-                    'average_order_value' => wp_rand(50, 1000),
-                    'contribute' => wp_rand(20, 100),
-                ];
-                $previous_period_results[$campaign_type] = [
-                    'date' => gmdate("Y-m-d"),
-                    'type' => $campaign_type,
-                    'add_to_cart_count' => wp_rand(50, 1000),
-                    'impression_count' => wp_rand(50, 1000),
-                    'conversion_rate' => wp_rand(50, 100),
-                    'total_sales' => wp_rand(50, 1000),
-                    'orders_count' => wp_rand(50, 1000),
-                    'average_order_value' => wp_rand(50, 1000),
-                    'contribute' => wp_rand(20, 100),
-                ];
-            }
-        }
+			foreach ( revenue()->get_campaign_types() as $campaign_type => $value ) {
+				$current_period_results[ $campaign_type ]  = array(
+					'date'                => gmdate( 'Y-m-d' ),
+					'type'                => $campaign_type,
+					'add_to_cart_count'   => wp_rand( 50, 1000 ),
+					'impression_count'    => wp_rand( 50, 1000 ),
+					'conversion_rate'     => wp_rand( 50, 100 ),
+					'total_sales'         => wp_rand( 50, 1000 ),
+					'orders_count'        => wp_rand( 50, 1000 ),
+					'average_order_value' => wp_rand( 50, 1000 ),
+					'contribute'          => wp_rand( 20, 100 ),
+				);
+				$previous_period_results[ $campaign_type ] = array(
+					'date'                => gmdate( 'Y-m-d' ),
+					'type'                => $campaign_type,
+					'add_to_cart_count'   => wp_rand( 50, 1000 ),
+					'impression_count'    => wp_rand( 50, 1000 ),
+					'conversion_rate'     => wp_rand( 50, 100 ),
+					'total_sales'         => wp_rand( 50, 1000 ),
+					'orders_count'        => wp_rand( 50, 1000 ),
+					'average_order_value' => wp_rand( 50, 1000 ),
+					'contribute'          => wp_rand( 20, 100 ),
+				);
+			}
+		}
 
 		foreach ( $current_period_results as $type => $value ) {
 			$previous_period_res                       = isset( $previous_period_res[ $type ] ) ? $previous_period_res[ $type ] : array();
@@ -433,6 +434,22 @@ class Revenue_Analytics_REST_Controller extends WP_REST_Controller {
 			if ( '0.00' === $current_period_results[ $type ]['contribute'] ) {
 				unset( $current_period_results[ $type ] );
 			}
+		}
+
+		// If demo mode or no real results, mark each item as dummy so frontend can detect it
+		$is_demo_response = ( defined( 'WPXPO_DEMO' ) && WPXPO_DEMO ) || empty( $current_period_results );
+		if ( $is_demo_response ) {
+			foreach ( $current_period_results as $k => $v ) {
+				if ( is_array( $current_period_results[ $k ] ) ) {
+					$current_period_results[ $k ]['is_dummy'] = true;
+				} elseif ( is_object( $current_period_results[ $k ] ) ) {
+					$current_period_results[ $k ]->is_dummy = true;
+				}
+			}
+		}
+
+		if ( $is_demo_response ) {
+			return rest_ensure_response( array( 'data' => $current_period_results, 'is_dummy' => true ) );
 		}
 
 		return rest_ensure_response( $current_period_results );
@@ -507,24 +524,24 @@ class Revenue_Analytics_REST_Controller extends WP_REST_Controller {
 					COUNT(DISTINCT order_stats.order_id) AS orders_count,
 					SUM(COALESCE(order_stats.total_sales, 0)) AS total_sales,
 					COUNT(*) OVER() AS total_count
-				FROM
+					FROM
 					{$wpdb->prefix}revenue_campaigns AS campaigns
-				LEFT JOIN (
-					$order_meta_select
-					WHERE
-						meta_key = '_revx_campaign_id'
-						AND meta_value IS NOT NULL
-				) AS orders ON campaigns.id = orders.campaign_id
-				LEFT JOIN {$wpdb->prefix}wc_order_stats AS order_stats ON
-					order_stats.order_id = orders.order_id
-				GROUP BY
-					campaigns.id, DATE(order_stats.date_created)
-				ORDER BY
-					total_sales DESC
-				LIMIT %d OFFSET %d;
-			";
+					LEFT JOIN (
+						$order_meta_select
+						WHERE
+							meta_key = '_revx_campaign_id'
+							AND meta_value IS NOT NULL
+					) AS orders ON campaigns.id = orders.campaign_id
+					LEFT JOIN {$wpdb->prefix}wc_order_stats AS order_stats ON
+						order_stats.order_id = orders.order_id
+					GROUP BY
+						campaigns.id, DATE(order_stats.date_created)
+					ORDER BY
+						total_sales DESC
+					LIMIT %d OFFSET %d;
+				";
 
-		// Prepare the query with the limits.
+		// Prepare the query with the date range and limits.
 		$prepared_sql = $wpdb->prepare( $sql, $per_page, $offset ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 		// Execute the query.
@@ -586,7 +603,7 @@ class Revenue_Analytics_REST_Controller extends WP_REST_Controller {
 				$data[ $campaign_id ]['triggers']              = $trigger_items;
 				$data[ $campaign_id ]['campaign_trigger_type'] = 'category';
 			} else {
-				$trigger_items                          = $_campaign['campaign_trigger_items'];
+				$trigger_items                                 = $_campaign['campaign_trigger_items'];
 				$data[ $campaign_id ]['triggers']              = $trigger_items;
 				$data[ $campaign_id ]['campaign_trigger_type'] = $_campaign['campaign_trigger_type'];
 			}
@@ -596,12 +613,28 @@ class Revenue_Analytics_REST_Controller extends WP_REST_Controller {
 			$data[ $id ]['trend'] = $this->calculateCampaignTrend( $stat['graph'] );
 		}
 
-		return rest_ensure_response(
-			array(
-				'paginations' => $paginations,
-				'data'        => array_values( $data ),
-			)
+		// If demo mode or no real results, mark each item as dummy so frontend components can detect it
+		$is_demo_response = ( defined( 'WPXPO_DEMO' ) && WPXPO_DEMO ) || empty( $data );
+		if ( $is_demo_response ) {
+			foreach ( $data as $id => $stat ) {
+				if ( is_array( $data[ $id ] ) ) {
+					$data[ $id ]['is_dummy'] = true;
+				} elseif ( is_object( $data[ $id ] ) ) {
+					$data[ $id ]->is_dummy = true;
+				}
+			}
+		}
+
+		$response = array(
+			'paginations' => $paginations,
+			'data'        => array_values( $data ),
 		);
+
+		if ( $is_demo_response ) {
+			$response['is_dummy'] = true;
+		}
+
+		return rest_ensure_response( $response );
 	}
 
 
@@ -797,7 +830,24 @@ class Revenue_Analytics_REST_Controller extends WP_REST_Controller {
 			$growth_trends[] = $trend;
 		}
 
-		return rest_ensure_response( $growth_trends );
+		// If demo mode or no real results, mark each item as dummy so frontend components can detect it
+		$is_demo_response = ( defined( 'WPXPO_DEMO' ) && WPXPO_DEMO ) || empty( $growth_trends );
+		if ( $is_demo_response ) {
+			foreach ( $growth_trends as $k => $g ) {
+				if ( is_array( $growth_trends[ $k ] ) ) {
+					$growth_trends[ $k ]['is_dummy'] = true;
+				} elseif ( is_object( $growth_trends[ $k ] ) ) {
+					$growth_trends[ $k ]->is_dummy = true;
+				}
+			}
+		}
+
+		$response_wrapper = array( 'data' => $growth_trends );
+		if ( $is_demo_response ) {
+			$response_wrapper['is_dummy'] = true;
+		}
+
+		return rest_ensure_response( $response_wrapper );
 	}
 
 	/**
@@ -896,7 +946,25 @@ class Revenue_Analytics_REST_Controller extends WP_REST_Controller {
 			}
 		}
 
-		return rest_ensure_response( $results );
+		// If demo mode or no real results, mark each item as dummy so frontend components can detect it
+		$is_demo_response = ( defined( 'WPXPO_DEMO' ) && WPXPO_DEMO ) || empty( $results );
+		if ( $is_demo_response ) {
+			foreach ( $results as $key => $item ) {
+				if ( is_object( $results[ $key ] ) ) {
+					$results[ $key ]->is_dummy = true;
+				} elseif ( is_array( $results[ $key ] ) ) {
+					$results[ $key ]['is_dummy'] = true;
+				}
+			}
+		}
+
+		// Return consistent wrapper so frontend can read `is_dummy` when present.
+		$response_wrapper = array( 'data' => $results );
+		if ( $is_demo_response ) {
+			$response_wrapper['is_dummy'] = true;
+		}
+
+		return rest_ensure_response( $response_wrapper );
 	}
 
 	/**
@@ -1274,6 +1342,42 @@ class Revenue_Analytics_REST_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Get date range from preset value.
+	 *
+	 * @param string $preset The preset value (today, last_week, last_month).
+	 *
+	 * @return array An array containing 'start' and 'end' DateTime objects.
+	 */
+	private function get_date_range_from_preset( $preset ) {
+		$date_end   = new DateTime();
+		$date_start = new DateTime();
+
+		switch ( $preset ) {
+			case 'today':
+				$date_start->setTime( 0, 0, 0 );
+				$date_end->setTime( 23, 59, 59 );
+				break;
+			case 'last_week':
+				$date_start->modify( '-7 days' )->setTime( 0, 0, 0 );
+				$date_end->setTime( 23, 59, 59 );
+				break;
+			case 'last_month':
+				$date_start->modify( '-30 days' )->setTime( 0, 0, 0 );
+				$date_end->setTime( 23, 59, 59 );
+				break;
+			default:
+				$date_start->setTime( 0, 0, 0 );
+				$date_end->setTime( 23, 59, 59 );
+				break;
+		}
+
+		return array(
+			'start' => $date_start,
+			'end'   => $date_end,
+		);
+	}
+
+	/**
 	 * Retrieves campaign statistics data based on the provided request parameters and date range.
 	 *
 	 * This method verifies the nonce for security, processes the request to determine the required statistics,
@@ -1337,16 +1441,34 @@ class Revenue_Analytics_REST_Controller extends WP_REST_Controller {
 		// Fetch and process data.
 		$current_period_results = $this->fetch_and_process_data( $request, $date_start, $date_end, $data_keys, $have_order_stats_keys, $have_campaign_stats_keys, $is_datewise );
 
-		foreach ($current_period_results as $date => $data) {
-			$current_period_results[$date] = [
-				'total_sales' => wp_rand(20,1000),
-				'rejection_count' => wp_rand(1,100),
-				'add_to_cart_count' => wp_rand(50,100),
-				'impression_count' => wp_rand(500,1000),
-				'conversion_rate' => wp_rand(1,100),
-				'orders_count' => wp_rand(20,100),
-				'date' => $date
-			];
+		// Check if we have real data across ALL time periods (today, last_week, last_month)
+		$has_real_data_globally = false;
+		$periods_to_check       = array( 'today', 'last_week', 'last_month' );
+
+		foreach ( $periods_to_check as $period_preset ) {
+			$period_range = $this->get_date_range_from_preset( $period_preset );
+			$period_start = $period_range['start'];
+			$period_end   = $period_range['end'];
+
+			$period_results = $this->fetch_and_process_data( $request, $period_start, $period_end, $data_keys, $have_order_stats_keys, $have_campaign_stats_keys, $is_datewise );
+
+			foreach ( $period_results as $date => $data ) {
+				if ( isset( $data['total_sales'] ) && $data['total_sales'] > 0 ) {
+					$has_real_data_globally = true;
+					break 2;
+				}
+				if ( isset( $data['orders_count'] ) && $data['orders_count'] > 0 ) {
+					$has_real_data_globally = true;
+					break 2;
+				}
+			}
+		}
+
+		// If no real data across ALL periods, do not inject dummy/random values.
+		// Mark the results as dummy so the frontend can act accordingly, but
+		// leave actual data as-is (may be empty or zero values).
+		if ( ! $has_real_data_globally ) {
+			$current_period_results['is_dummy'] = true;
 		}
 
 		return rest_ensure_response( $current_period_results );

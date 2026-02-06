@@ -1,17 +1,17 @@
 <?php //phpcs:ignore Generic.Files.LineEndings.InvalidEOLChar
 /**
- * Revenue Campaign: Stock Scarcity
- *
  * @package Revenue
  */
 
 namespace Revenue;
 
+use Revenue\Services\Revenue_Product_Context;
+
 //phpcs:disable WordPress.PHP.StrictInArray.MissingTrueStrict, WordPress.PHP.StrictComparisons.LooseComparison
 
 
 /**
- * Revenue Campaign: Normal Discount
+ * WowRevenue Campaign: Stock Scarcity
  *
  * @hooked on init
  */
@@ -59,16 +59,16 @@ class Revenue_Stock_Scarcity {
 	 */
 	public function enqueue_single_product_view_script() {
 		if ( is_product() ) {
-			wp_enqueue_script( 'single-product-view', plugin_dir_url( __FILE__ ) . 'ajax-single-product-view.js', array( 'jquery' ), null, true );
-			wp_localize_script(
-				'single-product-view',
-				'single_product_data',
-				array(
-					'ajax_url'    => admin_url( 'admin-ajax.php' ),
-					'product_id'  => 0,
-					'campaign_id' => 0,
-				)
-			);
+			// wp_enqueue_script( 'single-product-view', plugin_dir_url( __FILE__ ) . 'ajax-single-product-view.js', array( 'jquery' ), null, true );
+			// wp_localize_script(
+			// 	'single-product-view',
+			// 	'single_product_data',
+			// 	array(
+			// 		'ajax_url'    => admin_url( 'admin-ajax.php' ),
+			// 		'product_id'  => 0,
+			// 		'campaign_id' => 0,
+			// 	)
+			// );
 		}
 	}
 
@@ -159,8 +159,8 @@ class Revenue_Stock_Scarcity {
 
 			if ( ! empty( $campaigns ) ) {
 				foreach ( $campaigns as $key => $campaign ) {
-					$cart_item_data['revx_campaign_id']   = $campaign['id'];
-					$cart_item_data['revx_campaign_type'] = $campaign['campaign_type'];
+					$cart_item_data['revx_campaign_id_stock_scarcity']   = $campaign['id'];
+					$cart_item_data['revx_campaign_type_stock_scarcity'] = $campaign['campaign_type'];
 					revenue()->increment_campaign_add_to_cart_count( $campaign['id'] );
 					break; // Stop after setting campaign data for one position.
 				}
@@ -195,7 +195,15 @@ class Revenue_Stock_Scarcity {
 
 				// Loop through each position and fetch campaigns.
 				foreach ( $positions as $position ) {
-					$campaigns = revenue()->get_available_campaigns( $product_id, 'product_page', 'inpage', $position, false, false, 'stock_scarcity' );
+					$campaigns = revenue()->get_available_campaigns(
+						$product_id,
+						'product_page',
+						'inpage',
+						$position,
+						false,
+						false,
+						'stock_scarcity'
+					);
 
 					if ( ! empty( $campaigns ) ) {
 						add_filter( 'woocommerce_get_stock_html', fn( $html, $product ) => '', 10, 2 );
@@ -219,14 +227,12 @@ class Revenue_Stock_Scarcity {
 	 */
 	public function output_inpage_views( $campaigns, $data ) {
 		foreach ( $campaigns as $campaign ) {
-
 			$this->campaigns['inpage'][ $data['position'] ][] = $campaign;
-
-			$this->current_position = $data['position'];
-			do_action( 'revenue_campaign_stock_scarcity_inpage_before_render_content' );
-			$this->render_views( $data );
-			do_action( 'revenue_campaign_stock_scarcity_inpage_after_render_content' );
 		}
+		$this->current_position = $data['position'];
+		do_action( 'revenue_campaign_stock_scarcity_inpage_before_render_content' );
+		$this->render_views( $data );
+		do_action( 'revenue_campaign_stock_scarcity_inpage_after_render_content' );
 	}
 
 	/**
@@ -245,35 +251,30 @@ class Revenue_Stock_Scarcity {
 	 * @return void
 	 */
 	public function render_views( $data = array() ) {
-
-		global $product;
 		if ( ! empty( $this->campaigns['inpage'][ $this->current_position ] ) ) {
 			$campaigns = $this->campaigns['inpage'][ $this->current_position ];
-			wp_enqueue_script( 'revenue-campaign-stock-scarcity' );
-			wp_enqueue_style( 'revenue-campaign-stock-scarcity' );
-			wp_enqueue_script( 'single-product-view' );
-			foreach ( $campaigns as $campaign ) {
-				revenue()->update_campaign_impression( $campaign['id'], $product->get_id() );
-				$output = '';
 
-				$file_path = apply_filters( 'revenue_campaign_view_path', REVENUE_PATH . 'includes/campaigns/views/stock-scarcity/inpage.php', 'stock_scarcity', 'inpage', $campaign );
-				ob_start();
-				?>
-				<article class="upsells">
-				<?php
-				if ( file_exists( $file_path ) ) {
-					extract($data); //phpcs:ignore
-					include $file_path;
-				}
-				?>
-				</article>
-				<?php
+			$campaign = $campaigns[0];
 
-				$output .= ob_get_clean();
+			if ( revenue()->is_for_new_builder( $campaign ) ) {
+				wp_enqueue_script( 'revenue-campaign-stock-scarcity' );
+				wp_enqueue_style( 'revenue-campaign-stock-scarcity' );
+				wp_enqueue_script( 'single-product-view' );
+			} else {
+				wp_enqueue_script( 'revenue-v1-campaign-stock-scarcity' );
+				wp_enqueue_style( 'revenue-v1-campaign-stock-scarcity' );
 			}
+			revenue()->update_campaign_impression( $campaign['id'] );
+			$output = '';
 
-			if ( $output ) {
-				echo wp_kses( $output, revenue()->get_allowed_tag() );
+			$file_path = revenue()->get_campaign_path( $campaign, 'inpage', 'stock-scarcity' );
+
+			// Existing Filepath:  REVENUE_PATH . 'includes/campaigns/views/stock-scarcity/template1.php'.
+			$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'stock_scarcity', 'inpage', $campaign );
+			if ( file_exists( $file_path ) ) {
+				do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
+				extract($data); //phpcs:ignore
+				include $file_path;
 			}
 		}
 	}
@@ -286,7 +287,7 @@ class Revenue_Stock_Scarcity {
 	 * @return array
 	 */
 	public function stock_scarcity_hidden_data( $campaign = array() ) {
-		global $product;
+		$product = Revenue_Product_Context::get_product_context();
 		$stock_quantity = null;
 		if ( $product && is_a( $product, 'WC_Product' ) ) {
 			$stock_quantity = $product->get_stock_quantity();
@@ -356,7 +357,12 @@ class Revenue_Stock_Scarcity {
 			$product_id
 		);
 
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// The query is already prepared via $wpdb->prepare() above.
+		// Direct database call is necessary for accessing WooCommerce analytics table.
+		// Caching is not needed as this is real-time data.
 		return (int) $wpdb->get_var( $query );
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 	}
 
 
@@ -373,15 +379,13 @@ class Revenue_Stock_Scarcity {
 	 * @return void
 	 */
 	public function render_shortcode( $campaign, $data = array() ) {
-		global $product;
-
+		if ( is_array( $campaign ) ) {
+			revenue()->update_campaign_impression( $campaign['id'] );
+		} else {
+			return;
+		}
 		if ( is_product() ) {
 
-			if ( $product && $product instanceof \WC_Product && is_array( $campaign ) ) {
-				revenue()->update_campaign_impression( $campaign['id'], $product->get_id() );
-			} else {
-				return;
-			}
 
 			$this->run_shortcode(
 				$campaign,
@@ -394,34 +398,36 @@ class Revenue_Stock_Scarcity {
 		} elseif ( is_cart() ) {
 			$which_page = 'cart_page';
 
-			foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-				$product    = $cart_item['data'];
-				$product_id = $cart_item['product_id'];
-
-				$this->run_shortcode(
-					$campaign,
-					array(
-						'display_type' => 'inpage',
-						'position'     => '',
-						'placement'    => 'cart_page',
-					)
-				);
+			if ( WC()->cart && ! WC()->cart->is_empty() ) {
+				foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+					Revenue_Product_Context::set_product_context( $cart_item['product_id'] );
+					$this->run_shortcode(
+						$campaign,
+						array(
+							'display_type' => 'inpage',
+							'position'     => '',
+							'placement'    => 'cart_page',
+						)
+					);
+					Revenue_Product_Context::clear_product_context();
+				}
 			}
 		} elseif ( is_shop() ) {
 			$which_page = 'shop_page';
 		} elseif ( is_checkout() ) {
-			foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-				$product    = $cart_item['data'];
-				$product_id = $cart_item['product_id'];
-
-				$this->run_shortcode(
-					$campaign,
-					array(
-						'display_type' => 'inpage',
-						'position'     => '',
-						'placement'    => 'checkout_page',
-					)
-				);
+			if ( WC()->cart && ! WC()->cart->is_empty() ) {
+				foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+					Revenue_Product_Context::set_product_context( $cart_item['product_id'] );
+					$this->run_shortcode(
+						$campaign,
+						array(
+							'display_type' => 'inpage',
+							'position'     => '',
+							'placement'    => 'checkout_page',
+						)
+					);
+					Revenue_Product_Context::clear_product_context();
+				}
 			}
 		}
 	}
@@ -434,14 +440,38 @@ class Revenue_Stock_Scarcity {
 	 * @return mixed
 	 */
 	public function run_shortcode( $campaign, $data = array() ) {
-		wp_enqueue_style( 'revenue-campaign' );
-		wp_enqueue_style( 'revenue-utility' );
-		wp_enqueue_style( 'revenue-responsive' );
-		wp_enqueue_style( 'revenue-campaign-buyx_gety' );
-		wp_enqueue_style( 'revenue-campaign-double_order' );
-		wp_enqueue_style( 'revenue-campaign-fbt' );
-		wp_enqueue_style( 'revenue-campaign-mix_match' );
-		wp_enqueue_script( 'revenue-campaign' );
+		if(revenue()->is_for_new_builder( $campaign )) {
+			wp_enqueue_style( 'revenue-campaign' );
+			wp_enqueue_style( 'revenue-campaign-buyx_gety' );
+			wp_enqueue_style( 'revenue-campaign-volume' );
+			wp_enqueue_style( 'revenue-campaign-double_order' );
+			wp_enqueue_style( 'revenue-campaign-fbt' );
+			wp_enqueue_style( 'revenue-campaign-mix_match' );
+			wp_enqueue_style( 'revenue-utility' );
+			wp_enqueue_style( 'revenue-responsive' );
+			wp_enqueue_script( 'revenue-campaign' );
+			wp_enqueue_script( 'revenue-slider' );
+			wp_enqueue_script( 'revenue-add-to-cart' );
+			wp_enqueue_script( 'revenue-variation-product-selection' );
+			wp_enqueue_script( 'revenue-checkbox-handler' );
+			wp_enqueue_script( 'revenue-double-order' );
+			wp_enqueue_script( 'revenue-campaign-total' );
+			wp_enqueue_script( 'revenue-countdown' );
+			wp_enqueue_script( 'revenue-animated-add-to-cart' );
+			wp_enqueue_style( 'revenue-animated-add-to-cart' );
+		} else {
+			wp_enqueue_style( 'revenue-v1-campaign' );
+			wp_enqueue_style( 'revenue-v1-campaign-buyx_gety' );
+			wp_enqueue_style( 'revenue-v1-campaign-double_order' );
+			wp_enqueue_style( 'revenue-v1-campaign-fbt' );
+			wp_enqueue_style( 'revenue-v1-campaign-mix_match' );
+			wp_enqueue_style( 'revenue-v1-utility' );
+			wp_enqueue_style( 'revenue-v1-responsive' );
+			wp_enqueue_script( 'revenue-v1-campaign' );
+			wp_enqueue_script( 'revenue-v1-add-to-cart' );
+			wp_enqueue_script( 'revenue-v1-animated-add-to-cart' );
+			wp_enqueue_style( 'revenue-v1-animated-add-to-cart' );
+		}
 
 		$file_path_prefix = apply_filters( 'revenue_campaign_file_path', REVENUE_PATH, $campaign['campaign_type'], $campaign );
 
@@ -454,42 +484,26 @@ class Revenue_Stock_Scarcity {
 			switch ( $campaign['campaign_display_style'] ) {
 				case 'inpage':
 				case 'multiple':
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/inpage.php";
+					$file_path = revenue()->get_campaign_path( $campaign, 'inpage', $campaign_type );
+					// $file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/inpage.php";
 					break;
 				case 'popup':
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/popup.php";
+					$file_path = revenue()->get_campaign_path( $campaign, 'popup', $campaign_type );
 					break;
 				case 'floating':
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/floating.php";
+					$file_path = revenue()->get_campaign_path( $campaign, 'floating', $campaign_type );
 					break;
 				default:
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/inpage.php";
+					$file_path = revenue()->get_campaign_path( $campaign, 'inpage', $campaign_type );
 					break;
 			}
 		}
 
 		$file_path = apply_filters( 'revenue_campaign_shortcode_file_path', $file_path, $campaign );
-		$file_path = false;
-		if ( isset( $campaign['campaign_display_style'] ) ) {
-			switch ( $campaign['campaign_display_style'] ) {
-				case 'inpage':
-				case 'multiple':
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/inpage.php";
-					break;
-				case 'popup':
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/popup.php";
-					break;
-				case 'floating':
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/floating.php";
-					break;
-				default:
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/inpage.php";
-					break;
-			}
-		}
 
 		ob_start();
 		if ( file_exists( $file_path ) ) {
+			do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
 			extract($data); //phpcs:ignore
 			?>
 				<div class="revenue-campaign-shortcode">

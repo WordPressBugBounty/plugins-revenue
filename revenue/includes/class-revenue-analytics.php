@@ -135,6 +135,7 @@ class Revenue_Analytics {
 				),
 				ARRAY_A
 			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 			wp_cache_set( $cache_key, $existing_record, 'campaign_analytics' );
 		} else {

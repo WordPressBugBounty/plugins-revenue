@@ -120,7 +120,7 @@ jQuery(document).ready(function ($) {
 			},
 			success(response) {
 				// Handle the success case
-				console.log('Success:', response);
+				// console.log('Success:', response);
 				// You can add additional actions based on the response here
 			},
 			error(jqXHR, textStatus, errorThrown) {

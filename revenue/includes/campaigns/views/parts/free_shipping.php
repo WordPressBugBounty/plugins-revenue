@@ -35,7 +35,7 @@ if ( ! isset( $current_campaign['free_shipping_enabled'] ) || 'yes' != $current_
 	return;
 }
 ?>
-<div class="revx-free-shipping revx-align-center" style="<?php echo esc_attr( $container_tyle ); ?>">
+<div class="revx-free-shipping revx-align-center" style="<?php echo esc_attr( $container_tyle ); ?> width: 100%;">
 	<div class="revx-free-shipping-icon" style="<?php echo esc_attr( $icon_style ); ?>">
 		<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none" viewBox="0 0 20 20">
 			<path stroke="var(--revx-icon-color)" strokeLinecap="round" strokeWidth="1.5" d="M10 17.5a7.5 7.5 0 1 0-5.303-2.197"></path>

@@ -11,6 +11,8 @@
 
 namespace Revenue;
 
+use Revenue\Services\Revenue_Product_Context;
+
 /**
  * The Template for displaying revenue view
  *
@@ -20,10 +22,11 @@ namespace Revenue;
 
 defined( 'ABSPATH' ) || exit;
 
+$product = Revenue_Product_Context::get_product_context();
+
 $offered_product = false;
 $regular_price   = false;
 $offered_price   = false;
-global $product;
 
 $output_content = '';
 

@@ -54,12 +54,12 @@ if ( is_cart() && isset( $campaign['placement_settings']['cart_page'] ) && ! emp
 	$campaign_subheading = $campaign['banner_subheading'] ?? 'Limited-time deals on our top gadgets!';
 	if ( 'after_shop_loop_item_title' === $this->current_position || 'shop_loop_item_title' === $this->current_position ) {
 		?>
-				<div class="rvex-shop-count-down" style="<?php echo $shop_heading_style; ?>">00H : 00M : 00S</div>
+				<div class="rvex-shop-count-down" style="<?php echo esc_attr( $shop_heading_style ); ?>">00H : 00M : 00S</div>
 				<!-- check time progress bar enable rvexShopCountdown -->
 		<?php
 		if ( 'yes' === $campaign['countdown_timer_shop_progress_bar'] ) {
 			?>
-					<div class="rvex-progress-container" style="<?php echo $progress_bar_style; ?> margin-top: 8px; width: 100%; max-width: 380px; height: 8px; background-color:var(--revx-empty-color); border-radius: 4px; position: relative;">
+					<div class="rvex-progress-container" style="<?php echo esc_attr( $progress_bar_style ); ?> margin-top: 8px; width: 100%; max-width: 380px; height: 8px; background-color:var(--revx-empty-color); border-radius: 4px; position: relative;">
 					<div class="rvex-progress-bar" style="width: 0%; height: 8px; background: var(--revx-filled-color, #6E3FF3); border-radius: 4px; transition: width 0.5s;"></div>
 					
 
@@ -69,7 +69,7 @@ if ( is_cart() && isset( $campaign['placement_settings']['cart_page'] ) && ! emp
 		}
 		return;
 		?>
-		
+
 		<?php
 
 	}
@@ -109,12 +109,12 @@ if ( is_cart() && isset( $campaign['placement_settings']['cart_page'] ) && ! emp
 			<?php
 } elseif ( is_shop() && isset( $campaign['placement_settings']['shop_page'] ) && ! empty( $campaign['placement_settings']['shop_page'] ) && 'yes' === $campaign['placement_settings']['shop_page']['status'] ) {
 	?>
-				<div class="rvex-shop-count-down" style="<?php echo $shop_heading_style; ?>">00H : 00M : 00S</div>
+				<div class="rvex-shop-count-down" style="<?php echo esc_attr( $shop_heading_style ); ?>">00H : 00M : 00S</div>
 				<!-- check time progress bar enable rvexShopCountdown -->
 		<?php
 		if ( 'yes' === $campaign['countdown_timer_shop_progress_bar'] ) {
 			?>
-					<div class="rvex-progress-container" style="<?php echo $progress_bar_style; ?> margin-top: 8px; width: 100%; max-width: 380px; height: 8px; background-color:var(--revx-empty-color); border-radius: 4px; position: relative;">
+					<div class="rvex-progress-container" style="<?php echo esc_attr( $progress_bar_style ); ?> margin-top: 8px; width: 100%; max-width: 380px; height: 8px; background-color:var(--revx-empty-color); border-radius: 4px; position: relative;">
 					<div class="rvex-progress-bar" style="width: 0%; height: 8px; background: var(--revx-filled-color, #6E3FF3); border-radius: 4px; transition: width 0.5s;"></div>
 					
 

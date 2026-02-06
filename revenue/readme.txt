@@ -1,31 +1,31 @@
-===  Upsell with Product Bundles, Quantity/Bulk Discount, Buy X Get Y – WowRevenue ===
+===  WowRevenue - Product Bundles & Bulk Discounts ===
 Contributors: wpxpo, anik4e, jakirhasan
-Tags: upsell, woocommerce upsell, bought together, bulk discount, product bundles
-Requires at least: 5.0    
-Tested up to: 6.8
-Requires PHP: 7.3
-Stable tag: 1.2.14
+Tags: product bundles, bogo, bulk discount, bought together, upsells  
+Requires at least: 6.8
+Tested up to: 6.9
+Requires PHP: 7.4
+Stable tag: 2.1.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Create upsell campaigns with product bundles, mix & match product bundles, bulk discount, quantity discount, and buy x get y discount.
+WowRevenue is a combination of product bundles and discount campaigns, including bulk discounts, buy x get y discounts, and more.
 
 == Description ==
 
-🥇 **First-ever** WordPress plugin for increasing **average order💲value.**
+💲 **Increase AOV** with product bundles & **discount campaigns.**
 📈 **Boost** your **revenue** without increasing the **marketing cost.**
 💕 A plugin by **WPXPO**, that empowers **60K+ businesses!**
 📞 Dedicated support team with **4.9/5** customer satisfaction on [**Trustpilot**](https://uk.trustpilot.com/review/wpxpo.com)!
 
 😲 [**Free Demo**](https://try.wowrevenue.com/) | 🔥 [**WowRevenue Pro**](https://www.wowrevenue.com/) | 📃 [**Documentation**](https://www.wowrevenue.com/docs/)
 
-### WowRevenue - The Ultimate Plugin to Skyrocket Sales, and Order Value!
+### WowRevenue - Increase your Order Value with Product Bundles & Strategic Discount Campaigns
 
 WowRevenue is a proven solution specially crafted to boost the WooCommerce store’s revenue by increasing the average order value. Its effective marketing campaigns help you start upselling and cross-selling instantly. As a result, you can enjoy better revenue without increasing the number of customers. So you don’t need to spend more on customer acquisition.
 
 [youtube https://www.youtube.com/watch?v=PwiB8hmvVAY]
 
-✅ Dynamic Discounts Rules 
+✅ Dynamic Discounts Rules  
 ✅ Product Bundles
 ✅ Mix and Match Bundles
 ✅ Quantity/Volume Discount
@@ -70,8 +70,6 @@ You can offer slow-moving items for free or at a low price by using the Buy X Ge
 ✔ Buy X Get Y Free 
 ✔ Buy One Get One
 ✔ Buy 2 Get 1 Free
-
-[youtube https://www.youtube.com/watch?v=b-cnufUh3Ao]
 
 **BOGO**
 
@@ -156,15 +154,13 @@ With WowRevenue, you have full control over how you create and launch campaigns 
 
 We have more useful plugins for WooCommerce and WordPress users. Take a look at them:
 
-💝 [**WowStore**](https://wordpress.org/plugins/product-blocks/): The ultimate solution for building and managing eCommerce sites. Packed with features to enhance conversions and boost sales, it streamlines your store’s performance.
+💝 [**WowStore**](https://wordpress.org/plugins/product-blocks/): An all-in-one solution to build gorgeous-looking and professional WooCommerce stores with various conversion-focused features.
 
-📦 [**WholesaleX**](https://wordpress.org/plugins/wholesalex/): An all-in-one wholesaling solution for WooCommerce, with features for B2B and B2C hybrid stores. Manage retail and wholesale effortlessly with advanced tools.
+📦 [**WholesaleX**](https://wordpress.org/plugins/wholesalex/): A collection of dynamic features for setting advanced pricing and discounts based on user roles. You can use it for creating complete B2B or B2B+B2C hybrid stores.
 
-🧲 [**WowOptin**](https://wordpress.org/plugins/optin/): A cutting-edge plugin for creating opt-ins and popups to capture leads and drive sales. It’s Canva-like builder ensures quick, customized designs to meet your goals.
+🧲 [**WowOptin**](https://wordpress.org/plugins/optin/): The next-generation opt-in plugin for collecting leads, increasing sales, and boosting conversions. It is powered by a canvas-like opt-in builder and advanced placement & targeting options.
 
-📃 [**PostX**](https://wordpress.org/plugins/ultimate-post/): The top plugin for creating news, magazine, or blog sites. With PostX, build professional websites in three easy steps, enjoying complete customization freedom.
-
-➕ [**WowAddons**](https://wordpress.org/plugins/product-addons/): The most advanced product addons plugin for WooCommerce that helps you add extra fields & options to product pages with ease.
+📃 [**PostX**](https://wordpress.org/plugins/ultimate-post/): PostX is a News Magazine plugin powered by a dynamic site builder for Gutenberg. With its rich library of Templates, you can build any kind of News, Magazine, or Blogging site with three simple steps.
 
 = Author =
 Developed by [WPXPO](https://www.wpxpo.com). [Contribute to Revenue on Bitbucket](https://bitbucket.org/wpstabon/revenue/src/main/) and join the party.
@@ -231,20 +227,124 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 
 == Changelog ==
 
+= 2.1.3 – 03 February 2026 =
+* Fix: Corrected Volume Discount “Total saved” text — it now displays the proper saved amount.
+
+= 2.1.2 – 02 February 2026 =
+* New: Added a global base price filter to determine the price used before discount calculation for campaign types - Normal Discount, Bundle Discount, Volume Discount, Buy X Get Y, Free Shipping.
+* Improvement: Discount calculation now supports both regular price and sale price as the base price through the new filter logic.
+* Improvement: Display prices and save badges now respect the filtered base price across all supported campaigns.
+* Fix: Improved consistency between frontend displayed prices and cart/checkout calculated prices when custom base pricing is applied via extensions.
+
+= 2.1.1 – 28 January 2026 =
+* New: Added support for multiple variations in campaigns — total quantity and price now correctly calculate when multiple variations of the same product are in the cart.
+* Improvement: Enhanced shortcode rendering to properly detect the correct product context on all pages.
+* Fix: Corrected dynamic price updates for variable products in campaigns, ensuring accurate totals when selecting variations.  
+* Fix: Resolved default attribute and variation selection issues.  
+* Fix: Fixed frontend price mismatches — regular and offer prices now display correctly for all quantities.  
+* Fix: Corrected bundle discount handling for the same variation added from different offers — existing product quantities now increase instead of being ignored.
+
+= 2.1.0 – 04 January 2026 = 
+* Improvement: Optimized product selection logic to prevent redundant API calls.
+
+= 2.0.10 – 29 December 2025 = 
+* Fix: Resolved an issue where initial builder data was missing for Volume Discount and Mix & Match campaigns.
+* Fix: Addressed a deprecated SVG rendering notice.
+* Improvement: Improved the positioning and behavior of front-end popups and floating displays.
+* Improvement: Enhanced the builder settings panel with an improved UI/UX.
+
+= 2.0.9 – 22 December 2025 =
+* Fix: Corrected decimal precision issues in pricing and discounts to ensure proper rounding and display in mini carts.  
+* Fix: Resolved automatic campaign update issues caused by multi-render scenarios.  
+* Fix: Prevented unnecessary “unsaved changes” warnings when opening and closing campaigns without making edits. 
+* Improvement: Simplified campaign editor state tracking for better performance and reliability.  
+* Improvement: Improved toolbar value tracking — changes in templates and builder elements are now accurately detected.   
+
+= 2.0.8 – 03 December 2025 =
+* Improvement: Enhanced global style handling — updated logic to ensure styles apply correctly and independently.  
+* Improvement: Added toast notification when styles are applied successfully.  
+* Improvement: General stability improvements using guard clauses for cleaner processing.  
+* Improvement: Increased z-index of frontend toasters to prevent them from being hidden under the navbar.  
+* Fix: Resolved warning in product search (admin) caused by object-to-string conversion.  
+* Fix: Prevented multi-render issue in campaign layouts; only unique campaigns now appear when multiple campaigns exist on a single product.
+* Fix: Corrected style syncing issue by cloning objects before processing to avoid reference conflicts.
+
+= 2.0.7 – 27 November 2025 =
+* Improvement: Improved global saved styles functionality.
+* Improvement: Enhanced RTL support and responsiveness.
+* Improvement: Removed default height in the Campaign Builder.
+* Improvement: Refactored codebase for better maintainability.
+* Improvement: Improved shortcode compatibility — campaigns now display correctly when inserted via shortcode.
+* Fix: Fixed issue where volume discount skip caused the “Add to Cart” button to malfunction.
+* Fix: Resolved free shipping bar styling issue affecting the entire site drawer.
+* Fix: Fixed countdown timer and stock scarcity conflicts with other campaign types.
+* Fix: Corrected stock scarcity progress bar visibility issue on the Woodmart theme shop page.
+
+= 2.0.6 – 19 November 2025 =
+* New: Added full RTL (Right-to-Left) layout support.
+* New: Enhanced responsiveness across the builder and all other pages.
+* Fix: Resolved the opacity slider issue in the color picker.
+* Fix: Fixed checkbox and tier styling issues, including conflicts with “Most Popular” tags.
+* Improvement: Improved touch event handling for better mobile interaction.
+* Improvement: Improved price updates and dynamic interactions for campaign popups and floating views.
+* Improvement: Better theme compatibility — refined styles to work smoothly with popular themes including the Twenty Twenty-Five theme.
+
+= 2.0.5 – 16 November 2025 =
+* Fix: Resolved the issue occurring in the Buy X Get Y campaign.
+* Fix: Corrected multiple campaign rendering issues on the cart page.
+* Improvement: Ensured campaign heading toggle works consistently across all campaigns.
+* Improvement: Updated campaign heading on/off functionality for improved usability.
+
+= 2.0.4 – 13 November 2025 =
+* Improvement: Updated Free Shipping Upsell product display — now shows both regular (strikethrough) and discounted prices in the cart.
+* Improvement: Refactored Free Shipping campaign code for cleaner and more maintainable structure.
+
+= 2.0.3 – 11 November 2025 =
+* Fix: Added mini cart support for upsell offer product pricing.
+* Improvement: Resolved data escaping issue.
+
+= 2.0.2 – 02 November 2025 =
+* Fix: Resolved variation selection issue for variable products.
+* Fix: Corrected variation handling when trigger products are filtered by category.
+* Improvement: Enhanced bundle pricing logic to update total price and savings badge text dynamically.
+* Improvement: Readme Content Updated.
+
+= 2.0.1 – 29 October 2025 =
+* Fix: Synced variation values in variable products to match WooCommerce variable product data.
+* Fix: Corrected regular and sale price handling for “Frequently Bought Together” variation products.
+* Fix: Improved toggle styling logic — added a custom class for active/inactive button states, removed unnecessary focus styles, and integrated showTemplateSelection state into the builder header.
+* Improvement: Enhanced builder dropdown functionality by resolving outside click event handling.
+* Improvement: Updated Contents in builder.
+
+= 2.0.0 – 20 October 2025 =
+* New: Grid and List for better discount showcasing. 
+* New: Builder restructure and redesign.
+* New: Overall plugin performance optimization.
+* New: Template system created and added for all campaigns.
+* New: New discount styling system for discount campaigns. 
+* New: Preset color palette added as style settings. 
+* New: New templates can be created and saved for discount campaigns.
+* New: Device-wise typography setup.
+* New: Device-wise campaign appearance customization.
+* New: Campaign visibility options added for different devices (Laptop, Tablet, Mobile).
+* New: Campaign Grid option for product visibility. 
+* New: Added Variable Product Support.
+* New: Given Support for in-page, floating, and pop-up design dynamically.
+
 = 1.2.14 – 30 September 2025 =
-* Fixed – Resolved conflict issues in Bundle Discount when the same product was included multiple times.
-* Fixed – Corrected coupon creation permission issue.
+* Fix: Resolved conflict issues in Bundle Discount when the same product was included multiple times.
+* Fix: Corrected coupon creation permission issue.
 
 = 1.2.13 – 15 September 2025 =
-* Improvement – Added full translation support for the Add to Cart button on the frontend.
-* Improvement – Improved performance and efficiency of campaign graph queries.
+* Improvement: Added full translation support for the Add to Cart button on the frontend.
+* Improvement: Improved performance and efficiency of campaign graph queries.
 
 = 1.2.12 – 18 August 2025 =
-* Fix – Resolved hidden issue with Builder Editing component.
+* Fix: Resolved hidden issue with Builder Editing component.
 
 = 1.2.11 – 10 August 2025 =
-* Fix – Resolved user input issue in bundle discount.
-* Improvement – Optimized defaults and applied min/max limits to discount values.
+* Fix: Resolved user input issue in bundle discount.
+* Improvement: Optimized defaults and applied min/max limits to discount values.
 
 = 1.2.10 – 06 August 2025 =
 * Fix: Enabled required product issue in Mix and Match campaign.

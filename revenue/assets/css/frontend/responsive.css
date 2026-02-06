@@ -87,7 +87,8 @@
         margin-bottom: 8px !important;
     }
     .revx-fbt-options.revx-campaign-text-content .revx-product-title {
-        font-size: 12px !important;
+        /* font-size: 12px !important; */
+        font-size: 14px !important;
         margin: 0 !important;
     }
     .revx-campaign-text-content .revx-campaign-item__prices {
@@ -105,11 +106,13 @@
         font-size: 14px !important;
     }
     .revx-volume-title {
-        font-size: 12px !important;
+        /* font-size: 12px !important; */
+        font-size: 14px !important;
     }
     .revx-campaign-text-content .revx-campaign-item__prices strike,
     .revx-campaign-text-content .revx-campaign-item__prices div {
-        font-size: 12px !important;
+        /* font-size: 12px !important; */
+        font-size: 14px !important;
         font-weight: 600;
         line-height: 1 !important;
     }
@@ -138,13 +141,13 @@
         flex-direction: row !important;
     } */
 
-    .revx-builder__quantity {
+        /* .revx-builder__quantity {
         height: 30px !important;
         margin: 0 !important;
     }
     .revx-builder__quantity input {
         font-size: 12px !important;
-    }
+    */
     .revx-mix-match .revx-builder__quantity,
     .revx-frequently-bought-together .revx-builder__quantity {
         margin: 12px 0 0 !important;

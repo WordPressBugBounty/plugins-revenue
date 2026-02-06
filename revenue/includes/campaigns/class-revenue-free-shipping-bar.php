@@ -3,10 +3,11 @@
 namespace Revenue;
 
 use Revenue;
+use Revenue\Services\Revenue_Product_Context;
 use WC_Shipping_Free_Shipping;
 
 /**
- * RevenueX Campaign: Product Mix Match
+ * WowRevenue Campaign: Free Shipping
  *
  * @hooked on init
  */
@@ -65,6 +66,9 @@ class Revenue_Free_Shipping_Bar {
 		add_filter( 'woocommerce_package_rates', array( $this, 'modify_shipping_rates' ), 100, 2 );
 
 		add_action( 'revenue_campaign_free_shipping_bar_before_calculate_cart_totals', array( $this, 'apply_upsell_product_discount' ), 10, 2 );
+
+		// to modify and show regular price with striketrhough, then discounted price for better visual.
+		add_filter( 'revenue_campaign_free_shipping_bar_cart_item_price', array( $this, 'cart_item_price' ), 99999, 3 );
 	}
 
 
@@ -100,20 +104,34 @@ class Revenue_Free_Shipping_Bar {
 	}
 
 	/**
-	 * Apply Upsell Product Discounts
+	 * Get Discounted Price
 	 *
-	 * @param array      $cart_item Cart Item.
+	 * @param array $cart_item Cart Item.
 	 * @param int|string $campaign_id Campaign ID.
-	 * @return void
+	 * 
+	 * @return float
 	 */
-	public function apply_upsell_product_discount( $cart_item, $campaign_id ) {
+	public function get_discounted_price( $cart_item, $campaign_id ) {
 		$data = revenue()->get_campaign_meta( $campaign_id, 'upsell_products', true );
 
-		$offered_product_id = isset( $cart_item['variation_id'] ) && $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+		$offered_product_id = isset( $cart_item['variation_id'] ) &&
+								$cart_item['variation_id']
+									? $cart_item['variation_id']
+									: $cart_item['product_id'];
 
 		if ( ! is_array( $data ) ) {
 			$data = array();
 		}
+
+		$is_found = false;
+
+		$regular_price = $cart_item['data']->get_regular_price( 'edit' );
+		$sale_price    = $cart_item['data']->get_sale_price( 'edit' );
+
+		// Extension Filter: Sale Price Addon.
+		$filtered_price = apply_filters( 'revenue_base_price_for_discount_filter', $regular_price, $sale_price );
+		// based on extension filter use sale price or regular price for calculation.
+		$offered_price = $filtered_price;
 
 		foreach ( $data as $pd ) {
 			// Ensure 'products' is an array of product IDs.
@@ -123,44 +141,65 @@ class Revenue_Free_Shipping_Bar {
 
 			// Process each product ID.
 			foreach ( $pd['products'] as $item_data ) {
-
-				$regular_price    = (float) $item_data['regular_price'];
-				$quantity         = isset( $pd['quantity'] ) ? (int) $pd['quantity'] : 0;
-				$discounted_price = $regular_price;
-				$discount_amount  = isset( $pd['value'] ) ? (float) $pd['value'] : 0;
-
-				// Calculate discounted price based on pd type.
-				if ( isset( $pd['type'] ) ) {
-					switch ( $pd['type'] ) {
-						case 'percentage':
-							$discount_value   = $discount_amount;
-							$discount_amount  = number_format( ( $regular_price * $discount_value ) / 100, 2 );
-							$discounted_price = number_format( $regular_price - $discount_amount, 2 );
-							break;
-
-						case 'fixed_discount':
-							$discount_amount  = number_format( $discount_amount, 2 );
-							$discounted_price = number_format( $regular_price - $discount_amount, 2 );
-							break;
-
-						case 'free':
-							$discounted_price = '0.00';
-							$discount_amount  = '100%';
-							break;
-
-						case 'no_discount':
-							$discount_amount  = '0';
-							$discounted_price = number_format( $regular_price, 2 );
-							break;
-					}
-				}
-
 				if ( intval( $offered_product_id ) === intval( $item_data['item_id'] ) ) {
-					$cart_item['data']->set_price( max( 0, $discounted_price * $quantity ) );
+					// Calculate discounted price based on upsell offer type and value.
+					$offered_price = revenue()->calculate_campaign_offered_price(
+						$pd['type'],
+						isset( $pd['value'] ) ? (float) $pd['value'] : 0,
+						$filtered_price,
+					);
+					$is_found      = true;
+					break;
 				}
+			}
+			if ( $is_found ) {
+				break;
 			}
 		}
 
+		return apply_filters(
+			'revenue_campaign_free_shipping_bar_discount_price',
+			$offered_price,
+			$offered_product_id
+		);
+	}
+
+	/**
+	 * Cart Item Price
+	 * 
+	 * Hooked to: revenue_campaign_free_shipping_bar_cart_item_price
+	 *
+	 * @param string $price Item Price.
+	 * @param array  $cart_item Cart Item.
+	 * @param int|string $campaign_id Campaign ID.
+	 * 
+	 * @return string
+	 */
+	public function cart_item_price( $price, $cart_item, $campaign_id ) {
+		if ( 'free_shipping_bar' === $cart_item['revx_campaign_type'] ) {
+			$price = $this->get_discounted_price( $cart_item, $campaign_id );
+			if ( $cart_item['data']->get_regular_price() != $price ) {
+				return '<del>' . wc_price( $cart_item['data']->get_regular_price() ) . '</del> ' . wc_price( $price );
+			}
+
+			$price = wc_price( $price );
+		}
+
+		return $price;
+	}
+
+	/**
+	 * Apply Upsell Product Discounts
+	 *
+	 * Hooked to: revenue_campaign_free_shipping_bar_before_calculate_cart_totals
+	 *
+	 * @param array      $cart_item Cart item array.
+	 * @param int|string $campaign_id Campaign ID.
+	 * @return void
+	 */
+	public function apply_upsell_product_discount( $cart_item, $campaign_id ) {
+		$discounted_price = $this->get_discounted_price( $cart_item, $campaign_id );
+		$cart_item['data']->set_price( max( 0, $discounted_price ) );
 	}
 
 	/**
@@ -180,7 +219,7 @@ class Revenue_Free_Shipping_Bar {
 
 		foreach ( $this->all_campaigns as $campaign ) {
 			if ( $is_free_shipping ) {
-				continue;
+				break;
 			}
 			$offers = $campaign['offers'];
 
@@ -224,13 +263,12 @@ class Revenue_Free_Shipping_Bar {
 		$cart_subtotal = 0;
 
 		// if ( wc_prices_include_tax() ) {
-		// 	$cart_total = WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax();
+		// $cart_total = WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax();
 		// } else {
-		// 	$cart_total = WC()->cart->get_cart_contents_total();
+		// $cart_total = WC()->cart->get_cart_contents_total();
 		// }
 
 		$cart_total = WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax();
-
 
 		if ( WC()->cart->display_prices_including_tax() ) {
 			$cart_subtotal = WC()->cart->get_subtotal() + WC()->cart->get_subtotal_tax();
@@ -264,12 +302,10 @@ class Revenue_Free_Shipping_Bar {
 
 		foreach ( $campaigns as $campaign ) {
 			$this->campaigns['inpage'][ $data['position'] ][] = $campaign;
-
-			$this->all_campaigns[ $campaign['id'] ] = $campaign;
-
-			$this->current_position = $data['position'];
-			$this->render_views( $data,'inpage' );
+			$this->all_campaigns[ $campaign['id'] ]           = $campaign;
 		}
+		$this->current_position = $data['position'];
+		$this->render_views( $data, 'inpage' );
 	}
 
 	/**
@@ -284,25 +320,19 @@ class Revenue_Free_Shipping_Bar {
 		foreach ( $campaigns as $campaign ) {
 
 			$placement_settings_all = $campaign['placement_settings'];
-			$is_all_page_enabled = isset($placement_settings_all['all_page']['status'])? 'yes' ==$placement_settings_all['all_page']['status'] : false;
-			$is_all_page_drawer = isset($placement_settings_all['all_page']['display_style'])? 'drawer' ==$placement_settings_all['all_page']['display_style'] : false;
+			$is_all_page_enabled    = isset( $placement_settings_all['all_page']['status'] ) ? 'yes' == $placement_settings_all['all_page']['status'] : false;
+			$is_all_page_drawer     = isset( $placement_settings_all['all_page']['display_style'] ) ? 'drawer' == $placement_settings_all['all_page']['display_style'] : false;
 
-		
-
-			$current_page = revenue()->get_current_page();
+			$current_page       = revenue()->get_current_page();
 			$placement_settings = revenue()->get_placement_settings( $campaign['id'] );
 
-			if('drawer' === $placement_settings['display_style'] || ($is_all_page_drawer && $is_all_page_enabled)) {
+			if ( 'drawer' === $placement_settings['display_style'] || ( $is_all_page_drawer && $is_all_page_enabled ) ) {
 				$this->campaigns['drawer'][ $data['position'] ][] = $campaign;
 				$this->all_campaigns[ $campaign['id'] ]           = $campaign;
-
-				$this->current_position = $data['position'];
-				
-				$this->render_views( $data , 'drawer');
 			}
-
-			
 		}
+		$this->current_position = $data['position'];
+		$this->render_views( $data, 'drawer' );
 	}
 
 	/**
@@ -313,15 +343,13 @@ class Revenue_Free_Shipping_Bar {
 	 * @return void
 	 */
 	public function output_top_views( $campaigns, $data = array() ) {
-
 		foreach ( $campaigns as $campaign ) {
 			$this->campaigns['hellobar']['top'][]   = $campaign;
 			$this->all_campaigns[ $campaign['id'] ] = $campaign;
-
-			$data['position']       = 'top';
-			$this->current_position = $data['position'];
-			$this->render_views( $data , 'top');
 		}
+		$data['position']       = 'top';
+		$this->current_position = $data['position'];
+		$this->render_views( $data, 'top' );
 	}
 
 	/**
@@ -332,36 +360,20 @@ class Revenue_Free_Shipping_Bar {
 	 * @return void
 	 */
 	public function output_bottom_views( $campaigns, $data = array() ) {
-
 		foreach ( $campaigns as $campaign ) {
 			$placement_settings_all = $campaign['placement_settings'];
-			$is_all_page_enabled = isset($placement_settings_all['all_page']['status'])? 'yes' ==$placement_settings_all['all_page']['status'] : false;
-			// $is_all_page_drawer = isset($placement_settings_all['all_page']['display_style'])? 'drawer' ==$placement_settings_all['all_page']['display_style'] : false;
-
-			// print_r('<pre>'); print_r($placement_settings_all['all_page']); print_r('</pre>');
-
-			if($placement_settings_all['all_page']['status'] == 'yes' && $placement_settings_all['all_page']['display_style'] == 'bottom') {
+			$is_all_page_enabled    = isset( $placement_settings_all['all_page']['status'] ) ? 'yes' == $placement_settings_all['all_page']['status'] : false;
+			
+			if ( $is_all_page_enabled && $placement_settings_all['all_page']['display_style'] == 'bottom' ) {
 				$this->campaigns['hellobar']['bottom'][] = $campaign;
 				$this->all_campaigns[ $campaign['id'] ]  = $campaign;
-
-				$data['position']                        = 'bottom';
-				$data['drawer_position'] = '';
-				$this->current_position = $data['position'];
-
-				
-				$this->render_views( $data,'bottom' );
 			}
-			
-
-		
-
-			// $this->campaigns['hellobar']['bottom'][] = $campaign;
-			// $data['position']                        = 'bottom';
-			// $this->all_campaigns[ $campaign['id'] ]  = $campaign;
-
-			// $this->current_position = $data['position'];
-			// $this->render_views( $data );
 		}
+		$data['position']        = 'bottom';
+		$data['drawer_position'] = '';
+		$this->current_position  = $data['position'];
+
+		$this->render_views( $data, 'bottom' );
 	}
 
 	/**
@@ -370,10 +382,9 @@ class Revenue_Free_Shipping_Bar {
 	 * @param array $data Data.
 	 * @return void
 	 */
-	public function render_views( $data = array(), $render_for='' ) {
+	public function render_views( $data = array(), $render_for = '' ) {
 		global $current_campaign;
 
-		wp_enqueue_style( 'revenue-campaign-fsb' );
 
 		$data = wp_parse_args(
 			$data,
@@ -382,30 +393,57 @@ class Revenue_Free_Shipping_Bar {
 			)
 		);
 
-		wp_enqueue_script( 'revenue-upsell-slider' );
-		wp_enqueue_script( 'revenue-free-shipping-bar' );
+		// if(revenue()->is_for_new_builder($campaign)) {
+		// 	wp_enqueue_style( 'revenue-campaign-fsb' );
+		// 	wp_enqueue_script( 'revenue-upsell-slider' );
+		// 	wp_enqueue_script( 'revenue-free-shipping-bar' );
+		// } else {
+		// 	wp_enqueue_style( 'revenue-v1-campaign-fsb' );
+		// 	wp_enqueue_script( 'revenue-v1-upsell-slider' );
+		// 	wp_enqueue_script( 'revenue-v1-free-shipping-bar' );
+		// }
 
-		if ( ! empty( $this->campaigns['inpage'][ $this->current_position ] ) && 'inpage' === $render_for ) {
+		// wp_enqueue_style( 'revenue-campaign-fsb' );
+		// wp_enqueue_script( 'revenue-upsell-slider' );
+		// wp_enqueue_script( 'revenue-free-shipping-bar' );
+
+		if ( ! empty( $this->campaigns['inpage'][ $this->current_position ] ) ) {
 			$output    = '';
 			$campaigns = $this->campaigns['inpage'][ $this->current_position ];
 
 			foreach ( $campaigns as $campaign ) {
+				// Prevent duplicate rendering of the same campaign in the same position.
+				$campaign_key = 'inpage_' . $this->current_position . '_' . $campaign['id'];
+				if ( isset( self::$rendered_campaigns[ $campaign_key ] ) ) {
+					continue;
+				}
+				self::$rendered_campaigns[ $campaign_key ] = true;
+
 				$current_campaign = $campaign;
+
+				if(revenue()->is_for_new_builder($campaign)) {
+					wp_enqueue_style( 'revenue-campaign-fsb' );
+					wp_enqueue_script( 'revenue-upsell-slider' );
+					wp_enqueue_script( 'revenue-free-shipping-bar' );
+				} else {
+					wp_enqueue_style( 'revenue-v1-campaign-fsb' );
+					wp_enqueue_script( 'revenue-v1-upsell-slider' );
+					wp_enqueue_script( 'revenue-v1-free-shipping-bar' );
+				}
 
 				revenue()->update_campaign_impression( $campaign['id'] );
 
-				$file_path = REVENUE_PATH . 'includes/campaigns/views/free-shipping-bar/inpage.php';
+				// $file_path = REVENUE_PATH . 'includes/campaigns/views/free-shipping-bar/template1.php';
+				$file_path = revenue()->get_campaign_path( $campaign, 'inpage', 'free-shipping-bar' );
 
 				$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'free_shipping_bar', 'inpage', $campaign );
 
-				$data['position'] = 'inpage';
-
 				ob_start();
 				if ( file_exists( $file_path ) ) {
-					extract( $data );
+					do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
+					extract( $data ); //phpcs:ignore
 					include $file_path;
 				}
-
 				$output .= ob_get_clean();
 			}
 
@@ -415,31 +453,45 @@ class Revenue_Free_Shipping_Bar {
 		}
 
 		if ( ! empty( $this->campaigns['drawer'] ) && 'drawer' === $render_for ) {
-			
 
 			$output    = '';
 			$campaigns = $this->campaigns['drawer']['top_left'];
 
-			
 			foreach ( $campaigns as $campaign ) {
+				// Prevent duplicate rendering of the same drawer campaign.
+				$campaign_key = 'drawer_' . $campaign['id'];
+				if ( isset( self::$rendered_campaigns[ $campaign_key ] ) ) {
+					continue;
+				}
+				self::$rendered_campaigns[ $campaign_key ] = true;
+
 				$current_campaign = $campaign;
-				
+
+				if(revenue()->is_for_new_builder($campaign)) {
+					wp_enqueue_style( 'revenue-campaign-fsb' );
+					wp_enqueue_script( 'revenue-upsell-slider' );
+					wp_enqueue_script( 'revenue-free-shipping-bar' );
+				} else {
+					wp_enqueue_style( 'revenue-v1-campaign-fsb' );
+					wp_enqueue_script( 'revenue-v1-upsell-slider' );
+					wp_enqueue_script( 'revenue-v1-free-shipping-bar' );
+				}
 
 				$placement_settings = revenue()->get_placement_settings( $campaign['id'] );
 
 				$current_page = revenue()->get_current_page();
 
 				if ( $current_page && ! empty( $placement_settings ) ) {
-					
 
 					$data['position'] = $placement_settings['drawer_position'];
 
-					$file_path = REVENUE_PATH . 'includes/campaigns/views/free-shipping-bar/drawer.php';
+					$file_path = revenue()->get_campaign_path( $campaign, 'drawer', 'free-shipping-bar' );
 
 					$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'free_shipping_bar', 'drawer', $campaign );
 
 					ob_start();
 					if ( file_exists( $file_path ) ) {
+						do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
 						extract( $data );
 						include $file_path;
 					}
@@ -450,12 +502,13 @@ class Revenue_Free_Shipping_Bar {
 
 						if ( 'yes' === $value['status'] && ( $page === $current_page || $page == 'all_page' ) ) {
 							$data['position'] = $value['drawer_position'];
-							$file_path        = REVENUE_PATH . 'includes/campaigns/views/free-shipping-bar/drawer.php';
 
+							$file_path = revenue()->get_campaign_path( $campaign, 'drawer', 'free-shipping-bar' );
 							$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'free_shipping_bar', 'drawer', $campaign );
 
 							ob_start();
 							if ( file_exists( $file_path ) ) {
+								do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
 								extract( $data );
 								include $file_path;
 							}
@@ -482,16 +535,34 @@ class Revenue_Free_Shipping_Bar {
 				$campaigns = $this->campaigns['hellobar']['top'];
 
 				foreach ( $campaigns as $campaign ) {
+					// Prevent duplicate rendering of the same top hellobar campaign.
+					$campaign_key = 'hellobar_top_' . $campaign['id'];
+					if ( isset( self::$rendered_campaigns[ $campaign_key ] ) ) {
+						continue;
+					}
+					self::$rendered_campaigns[ $campaign_key ] = true;
+
 					$current_campaign = $campaign;
+
+					if(revenue()->is_for_new_builder($campaign)) {
+						wp_enqueue_style( 'revenue-campaign-fsb' );
+						wp_enqueue_script( 'revenue-upsell-slider' );
+						wp_enqueue_script( 'revenue-free-shipping-bar' );
+					} else {
+						wp_enqueue_style( 'revenue-v1-campaign-fsb' );
+						wp_enqueue_script( 'revenue-v1-upsell-slider' );
+						wp_enqueue_script( 'revenue-v1-free-shipping-bar' );
+					}
 
 					$placement_settings = revenue()->get_placement_settings( $campaign['id'] );
 
-					$file_path = REVENUE_PATH . 'includes/campaigns/views/free-shipping-bar/hellobar.php';
+					$file_path = revenue()->get_campaign_path( $campaign, 'hellobar', 'free-shipping-bar' );
 
 					$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'free_shipping_bar', 'hellobar', $campaign );
 
 					ob_start();
 					if ( file_exists( $file_path ) ) {
+						do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
 						extract( $data );
 						include $file_path;
 					}
@@ -499,10 +570,10 @@ class Revenue_Free_Shipping_Bar {
 					$output .= ob_get_clean();
 
 					revenue()->update_campaign_impression( $campaign['id'] );
+				}
 
-					if ( $output ) {
-						echo $output; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					}
+				if ( $output ) {
+					echo $output; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}
 			}
 
@@ -512,16 +583,34 @@ class Revenue_Free_Shipping_Bar {
 				$campaigns = $this->campaigns['hellobar']['bottom'];
 
 				foreach ( $campaigns as $campaign ) {
+					// Prevent duplicate rendering of the same bottom hellobar campaign.
+					$campaign_key = 'hellobar_bottom_' . $campaign['id'];
+					if ( isset( self::$rendered_campaigns[ $campaign_key ] ) ) {
+						continue;
+					}
+					self::$rendered_campaigns[ $campaign_key ] = true;
+
 					$current_campaign = $campaign;
+
+					if(revenue()->is_for_new_builder($campaign)) {
+						wp_enqueue_style( 'revenue-campaign-fsb' );
+						wp_enqueue_script( 'revenue-upsell-slider' );
+						wp_enqueue_script( 'revenue-free-shipping-bar' );
+					} else {
+						wp_enqueue_style( 'revenue-v1-campaign-fsb' );
+						wp_enqueue_script( 'revenue-v1-upsell-slider' );
+						wp_enqueue_script( 'revenue-v1-free-shipping-bar' );
+					}
 
 					$placement_settings = revenue()->get_placement_settings( $campaign['id'] );
 
-					$file_path = REVENUE_PATH . 'includes/campaigns/views/free-shipping-bar/hellobar.php';
+					$file_path = revenue()->get_campaign_path( $campaign, 'hellobar', 'free-shipping-bar' );
 
-					$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'spending_goal', 'hellobar', $campaign );
+					$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'free_shipping_bar', 'hellobar', $campaign );
 
 					ob_start();
 					if ( file_exists( $file_path ) ) {
+						do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
 						extract( $data );
 						include $file_path;
 					}
@@ -554,15 +643,13 @@ class Revenue_Free_Shipping_Bar {
 	 * @return void
 	 */
 	public function render_shortcode( $campaign, $data = array() ) {
-		global $product;
-
+		if ( is_array( $campaign ) ) {
+			revenue()->update_campaign_impression( $campaign['id']);
+		} else {
+			return;
+		}
 		if ( is_product() ) {
 
-			if ( $product && $product instanceof \WC_Product && is_array( $campaign ) ) {
-				revenue()->update_campaign_impression( $campaign['id'], $product->get_id() );
-			} else {
-				return;
-			}
 
 			$this->run_shortcode(
 				$campaign,
@@ -574,38 +661,38 @@ class Revenue_Free_Shipping_Bar {
 			);
 		} elseif ( is_cart() ) {
 			$which_page = 'cart_page';
-
-			foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-				$product    = $cart_item['data'];
-				$product_id = $cart_item['product_id'];
-
-				$this->run_shortcode(
-					$campaign,
-					array(
-						'display_type' => 'inpage',
-						'position'     => '',
-						'placement'    => 'cart_page',
-					)
-				);
+			if ( WC()->cart && ! WC()->cart->is_empty() ) {
+				foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+					Revenue_Product_Context::set_product_context( $cart_item['product_id'] );
+					$this->run_shortcode(
+						$campaign,
+						array(
+							'display_type' => 'inpage',
+							'position'     => '',
+							'placement'    => 'cart_page',
+						)
+					);
+					Revenue_Product_Context::clear_product_context();
+				}
 			}
 		} elseif ( is_shop() ) {
 			$which_page = 'shop_page';
 		} elseif ( is_checkout() ) {
-			foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-				$product    = $cart_item['data'];
-				$product_id = $cart_item['product_id'];
-
-				$this->run_shortcode(
-					$campaign,
-					array(
-						'display_type' => 'inpage',
-						'position'     => '',
-						'placement'    => 'checkout_page',
-					)
-				);
+			if ( WC()->cart && ! WC()->cart->is_empty() ) {
+				foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+					Revenue_Product_Context::set_product_context( $cart_item['product_id'] );
+					$this->run_shortcode(
+						$campaign,
+						array(
+							'display_type' => 'inpage',
+							'position'     => '',
+							'placement'    => 'checkout_page',
+						)
+					);
+					Revenue_Product_Context::clear_product_context();
+				}
 			}
 		}
-
 	}
 
 	/**
@@ -616,62 +703,79 @@ class Revenue_Free_Shipping_Bar {
 	 * @return mixed
 	 */
 	public function run_shortcode( $campaign, $data = array() ) {
-		wp_enqueue_style( 'revenue-campaign' );
-		wp_enqueue_style( 'revenue-utility' );
-		wp_enqueue_style( 'revenue-responsive' );
-		wp_enqueue_style( 'revenue-campaign-buyx_gety' );
-		wp_enqueue_style( 'revenue-campaign-double_order' );
-		wp_enqueue_style( 'revenue-campaign-fbt' );
-		wp_enqueue_style( 'revenue-campaign-mix_match' );
-		wp_enqueue_script( 'revenue-campaign' );
+		// wp_enqueue_style( 'revenue-campaign' );
+		// wp_enqueue_style( 'revenue-utility' );
+		// wp_enqueue_style( 'revenue-responsive' );
+		// wp_enqueue_style( 'revenue-campaign-buyx_gety' );
+		// wp_enqueue_style( 'revenue-campaign-double_order' );
+		// wp_enqueue_style( 'revenue-campaign-fbt' );
+		// wp_enqueue_style( 'revenue-campaign-mix_match' );
+		// wp_enqueue_script( 'revenue-campaign' );
+
+		if(revenue()->is_for_new_builder( $campaign )) {
+			wp_enqueue_style( 'revenue-campaign' );
+			wp_enqueue_style( 'revenue-campaign-buyx_gety' );
+			wp_enqueue_style( 'revenue-campaign-volume' );
+			wp_enqueue_style( 'revenue-campaign-double_order' );
+			wp_enqueue_style( 'revenue-campaign-fbt' );
+			wp_enqueue_style( 'revenue-campaign-mix_match' );
+			wp_enqueue_style( 'revenue-utility' );
+			wp_enqueue_style( 'revenue-responsive' );
+			wp_enqueue_script( 'revenue-campaign' );
+			wp_enqueue_script( 'revenue-slider' );
+			wp_enqueue_script( 'revenue-add-to-cart' );
+			wp_enqueue_script( 'revenue-variation-product-selection' );
+			wp_enqueue_script( 'revenue-checkbox-handler' );
+			wp_enqueue_script( 'revenue-double-order' );
+			wp_enqueue_script( 'revenue-campaign-total' );
+			wp_enqueue_script( 'revenue-countdown' );
+			wp_enqueue_script( 'revenue-animated-add-to-cart' );
+			wp_enqueue_style( 'revenue-animated-add-to-cart' );
+		} else {
+			wp_enqueue_style( 'revenue-v1-campaign' );
+			wp_enqueue_style( 'revenue-v1-campaign-buyx_gety' );
+			wp_enqueue_style( 'revenue-v1-campaign-double_order' );
+			wp_enqueue_style( 'revenue-v1-campaign-fbt' );
+			wp_enqueue_style( 'revenue-v1-campaign-mix_match' );
+			wp_enqueue_style( 'revenue-v1-utility' );
+			wp_enqueue_style( 'revenue-v1-responsive' );
+			wp_enqueue_script( 'revenue-v1-campaign' );
+			wp_enqueue_script( 'revenue-v1-add-to-cart' );
+			wp_enqueue_script( 'revenue-v1-animated-add-to-cart' );
+			wp_enqueue_style( 'revenue-v1-animated-add-to-cart' );
+		}
 
 		$file_path_prefix = apply_filters( 'revenue_campaign_file_path', REVENUE_PATH, $campaign['campaign_type'], $campaign );
 
 		// Replace underscores with hyphens in the campaign type.
-		$campaign_type = isset( $campaign['campaign_type'] ) ? str_replace( '_', '-', $campaign['campaign_type'] ) : 'normal-discount';
+		$campaign_type = isset( $campaign['campaign_type'] ) ? str_replace( '_', '-', $campaign['campaign_type'] ) : 'free-shipping-bar';
 
 		$file_path = false;
 		if ( isset( $campaign['campaign_display_style'] ) ) {
-
 			switch ( $campaign['campaign_display_style'] ) {
 				case 'inpage':
 				case 'multiple':
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/inpage.php";
+					$file_path = revenue()->get_campaign_path( $campaign, 'inpage', $campaign_type );
+
+					// $file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/inpage.php";
 					break;
 				case 'popup':
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/popup.php";
+					$file_path = revenue()->get_campaign_path( $campaign, 'popup', $campaign_type );
 					break;
 				case 'floating':
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/floating.php";
+					$file_path = revenue()->get_campaign_path( $campaign, 'floating', $campaign_type );
 					break;
 				default:
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/inpage.php";
+					$file_path = revenue()->get_campaign_path( $campaign, 'inpage', $campaign_type );
 					break;
 			}
 		}
 
 		$file_path = apply_filters( 'revenue_campaign_shortcode_file_path', $file_path, $campaign );
-		$file_path = false;
-		if ( isset( $campaign['campaign_display_style'] ) ) {
-			switch ( $campaign['campaign_display_style'] ) {
-				case 'inpage':
-				case 'multiple':
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/inpage.php";
-					break;
-				case 'popup':
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/popup.php";
-					break;
-				case 'floating':
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/floating.php";
-					break;
-				default:
-					$file_path = $file_path_prefix . "includes/campaigns/views/{$campaign_type}/inpage.php";
-					break;
-			}
-		}
 
 		ob_start();
 		if ( file_exists( $file_path ) ) {
+			do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
 			extract($data); //phpcs:ignore
 			?>
 				<div class="revenue-campaign-shortcode">

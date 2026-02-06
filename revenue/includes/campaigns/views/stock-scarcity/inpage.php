@@ -5,7 +5,10 @@
  *
  * @package Revenue
  */
-global $product;
+
+use Revenue\Services\Revenue_Product_Context;
+
+$product = Revenue_Product_Context::get_product_context();
 $stock_quantity = null;
 $campaign_id    = $campaign['id'];
 $product_id     = $product->get_id();
@@ -84,9 +87,9 @@ if ( empty( $fixed_users ) ) {
 	$flip_second_message = '';
 if ( 'generalMessage' === $message_type ) {
 	// General Message Settings.
-	$in_stock_message     = $general_settings['in_stock_message'] ?? '{stock_number} units available now!😊';
-	$low_stock_message    = $general_settings['low_stock_message'] ?? "Only {stock_number} left - don't miss out!🏃‍♀️";
-	$urgent_stock_message = $general_settings['urgent_stock_message'] ?? 'Only {stock_number} left - restock uncertain!❗';
+	$in_stock_message     = $general_settings['in_stock_message'] ?? __('{stock_number} units available now!😊', 'revenue');
+	$low_stock_message    = $general_settings['low_stock_message'] ?? __("Only {stock_number} left - don't miss out!🏃‍♀️", 'revenue');
+	$urgent_stock_message = $general_settings['urgent_stock_message'] ?? __('Only {stock_number} left - restock uncertain!❗', 'revenue');
 	$is_low_stock         = $general_settings['isLowStockChecked'] ?? 'no';
 	$is_urgent_stock      = $general_settings['isUrgentStockChecked'] ?? 'no';
 	$enable_stock_bar     = $general_settings['enable_stock_bar'] ?? 'no';
@@ -264,7 +267,7 @@ if ( 'generalMessage' === $message_type ) {
 
 
 ?>
-<div data-campaign-id="<?php echo esc_attr( $campaign['id'] ); ?>" data-product-id="<?php echo esc_attr( $product->get_id() ); ?>" class="rvex-stock-scarcity-wrapper">
+<div data-campaign-id="<?php echo esc_attr( $campaign['id'] ); ?>" data-product-id="<?php echo esc_attr( $product->get_id() ); ?>" class="revx-stock-scarcity-wrapper">
 <?php
 if ( is_cart() && isset( $campaign['placement_settings']['cart_page'] ) && ! empty( $campaign['placement_settings']['cart_page'] ) && 'yes' === $campaign['placement_settings']['cart_page']['status'] ) {
 	if ( 'generalMessage' === $message_type ) {
@@ -275,8 +278,8 @@ if ( is_cart() && isset( $campaign['placement_settings']['cart_page'] ) && ! emp
 		<?php
 		if ( 'yes' === $enable_stock_bar ) {
 			?>
-			<div class="rvex-progress-container" style="<?php echo esc_attr( $progress_bar_style ); ?> height:8px; background:var(--revx-empty-color); display: flex; border-radius: 6px; max-width: 100%;">
-				<div class="rvex-stock-bar" style="width: <?php echo esc_attr( $percentage ); ?>%; height: inherit; background: var(--revx-filled-color, #6E3FF3); border-radius: inherit; transition: width 0.5s;"></div>
+			<div class="revx-progress-container" style="<?php echo esc_attr( $progress_bar_style ); ?> height:8px; background:var(--revx-empty-color); display: flex; border-radius: 6px; max-width: 100%;">
+				<div class="revx-stock-bar" style="width: <?php echo esc_attr( $percentage ); ?>%; height: inherit; background: var(--revx-filled-color, #6E3FF3); border-radius: inherit; transition: width 0.5s;"></div>
 			</div>
 			<?php
 		}
@@ -287,10 +290,10 @@ if ( is_cart() && isset( $campaign['placement_settings']['cart_page'] ) && ! emp
 	<?php
 	if ( 'flipMessage' === $message_type ) {
 		?>
-		<div class="rvex-flip-container">
-			<div class="rvex-flip-wrapper" style="<?php echo esc_attr( $paragraph_wrapper_style ); ?>">
-				<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $flip_first_message ), 'rvex-flip-text', 'div' ), revenue()->get_allowed_tag() ); ?>
-				<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $flip_second_message ), 'rvex-flip-text', 'div' ), revenue()->get_allowed_tag() ); ?>
+		<div class="revx-flip-container">
+			<div class="revx-flip-wrapper" style="<?php echo esc_attr( $paragraph_wrapper_style ); ?>">
+				<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $flip_first_message ), 'revx-flip-text', 'div' ), revenue()->get_allowed_tag() ); ?>
+				<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $flip_second_message ), 'revx-flip-text', 'div' ), revenue()->get_allowed_tag() ); ?>
 			</div>
 		</div>
 		<?php
@@ -298,15 +301,15 @@ if ( is_cart() && isset( $campaign['placement_settings']['cart_page'] ) && ! emp
 } elseif ( is_product() && isset( $campaign['placement_settings']['product_page'] ) && ! empty( $campaign['placement_settings']['product_page'] ) && 'yes' === $campaign['placement_settings']['product_page']['status'] ) {
 	if ( 'generalMessage' === $message_type ) {
 		?>
-		<div class="rvex-stock-scarcity-container rvex-stock-product">
+		<div class="revx-stock-scarcity-container revx-stock-product">
 		<div style="<?php echo esc_attr( $paragraph_wrapper_style ); ?>">
 			<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $general_message ), '', 'div' ), revenue()->get_allowed_tag() ); ?>
 		</div>
 			<?php
 			if ( 'yes' === $enable_stock_bar ) {
 				?>
-				<div class="rvex-progress-container" style="<?php echo esc_attr( $progress_bar_style ); ?> height:8px; background:var(--revx-empty-color); display: flex; border-radius: 6px; max-width: 100%;">
-				<div class="rvex-stock-bar" style="width: <?php echo esc_attr( $percentage ); ?>%; height: inherit; background: var(--revx-filled-color, #6E3FF3); border-radius: inherit; transition: width 0.5s;"></div>
+				<div class="revx-progress-container" style="<?php echo esc_attr( $progress_bar_style ); ?> height:8px; background:var(--revx-empty-color); display: flex; border-radius: 6px; max-width: 100%;">
+				<div class="revx-stock-bar" style="width: <?php echo esc_attr( $percentage ); ?>%; height: inherit; background: var(--revx-filled-color, #6E3FF3); border-radius: inherit; transition: width 0.5s;"></div>
 			</div>
 				<?php
 			}
@@ -318,10 +321,10 @@ if ( is_cart() && isset( $campaign['placement_settings']['cart_page'] ) && ! emp
 	<?php
 	if ( 'flipMessage' === $message_type ) {
 		?>
-		<div class="rvex-flip-container">
-			<div class="rvex-flip-wrapper" style="<?php echo esc_attr( $paragraph_wrapper_style ); ?>">
-					<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $flip_first_message ), 'rvex-flip-text', 'div' ), revenue()->get_allowed_tag() ); ?>
-					<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $flip_second_message ), 'rvex-flip-text', 'div' ), revenue()->get_allowed_tag() ); ?>
+		<div class="revx-flip-container">
+			<div class="revx-flip-wrapper" style="<?php echo esc_attr( $paragraph_wrapper_style ); ?>">
+					<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $flip_first_message ), 'revx-flip-text', 'div' ), revenue()->get_allowed_tag() ); ?>
+					<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $flip_second_message ), 'revx-flip-text', 'div' ), revenue()->get_allowed_tag() ); ?>
 			</div>
 		</div>
 		<?php
@@ -336,8 +339,8 @@ if ( is_cart() && isset( $campaign['placement_settings']['cart_page'] ) && ! emp
 		<?php
 		if ( 'yes' === $enable_stock_bar ) {
 			?>
-			<div class="rvex-progress-container" style="<?php echo esc_attr( $progress_bar_style ); ?> height:8px; background:var(--revx-empty-color); display: flex; border-radius: 6px; max-width: 100%;">
-				<div class="rvex-stock-bar" style="width: <?php echo esc_attr( $percentage ); ?>%; height: inherit; background: var(--revx-filled-color, #6E3FF3); border-radius: inherit; transition: width 0.5s;"></div>
+			<div class="revx-progress-container" style="<?php echo esc_attr( $progress_bar_style ); ?> height:8px; background:var(--revx-empty-color); display: flex; border-radius: 6px; max-width: 100%;">
+				<div class="revx-stock-bar" style="width: <?php echo esc_attr( $percentage ); ?>%; height: inherit; background: var(--revx-filled-color, #6E3FF3); border-radius: inherit; transition: width 0.5s;"></div>
 			</div>
 			<?php
 		}
@@ -348,10 +351,10 @@ if ( is_cart() && isset( $campaign['placement_settings']['cart_page'] ) && ! emp
 	<?php
 	if ( 'flipMessage' === $message_type ) {
 		?>
-		<div class="rvex-flip-container">
-			<div class="rvex-flip-wrapper" style="<?php echo esc_attr( $paragraph_wrapper_style ); ?>">
-					<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $flip_first_message ), 'rvex-flip-text', 'div' ), revenue()->get_allowed_tag() ); ?>
-					<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $flip_second_message ), 'rvex-flip-text', 'div' ), revenue()->get_allowed_tag() ); ?>
+		<div class="revx-flip-container">
+			<div class="revx-flip-wrapper" style="<?php echo esc_attr( $paragraph_wrapper_style ); ?>">
+					<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $flip_first_message ), 'revx-flip-text', 'div' ), revenue()->get_allowed_tag() ); ?>
+					<?php echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'paragraph', esc_attr( $flip_second_message ), 'revx-flip-text', 'div' ), revenue()->get_allowed_tag() ); ?>
 			</div>
 		</div>
 		<?php

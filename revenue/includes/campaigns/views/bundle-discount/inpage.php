@@ -11,6 +11,8 @@
 
 namespace Revenue;
 
+use Revenue\Services\Revenue_Product_Context;
+
 /**
  * The Template for displaying revenue view
  *
@@ -22,12 +24,11 @@ defined( 'ABSPATH' ) || exit;
 
 //phpcs:disable WordPress.PHP.StrictComparisons.LooseComparison
 
-global $product;
+$product = Revenue_Product_Context::get_product_context();
 
 $offered_product = false;
 $regular_price   = false;
 $offered_price   = false;
-global $product;
 
 $output_content = '';
 
@@ -357,7 +358,7 @@ $save_data = sprintf( __( '%s%% OFF', 'revenue' ), revenue()->calculate_percenta
 ob_start();
 if ( 'list' == $view_mode ) {
 	?>
-	<div class="revx-campaign-container__wrapper revx-campaign-text-content" data-bundle_products="<?php echo esc_html( htmlspecialchars( wp_json_encode( $trigger_items ) ) ); ?>" style="<?php echo esc_attr( $wrapper_style ); ?>">
+	<div class="revx-campaign-container__wrapper revx-campaign-text-content" data-bundle_products="<?php echo esc_html( htmlspecialchars( wp_json_encode( $trigger_items ) ) ); ?>" style="<?php echo esc_attr( $wrapper_style ); ?> width:100%;">
 		<?php
 		echo wp_kses( $items_content, revenue()->get_allowed_tag() );
 		?>

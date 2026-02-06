@@ -88,7 +88,7 @@ class Notice {
 		$type           = isset( $request_params['type'] ) ? $request_params['type'] : '';
 		$duration       = isset( $request_params['duration'] ) ? $request_params['duration'] : null;
 
-		if ( 'hello_bar' === $type && $duration ) {
+		if ( 'hello_bar' === $type ) {
 			Xpo::set_transient_without_cache( 'revx_helloBar', 'hide', $duration );
 		}
 
@@ -165,10 +165,10 @@ class Notice {
 		$revx_db_nonce  = wp_create_nonce( 'revx-dashboard-nonce' );
 		$banner_notices = array(
 			array(
-				'key'        => 'revx_summer_sale_2522',
-				'start'      => '2025-06-23 00:00 Asia/Dhaka',
-				'end'        => '2025-07-06 23:59 Asia/Dhaka',
-				'banner_src' => REVENUE_URL . 'assets/images/dashboard_banner/revenue_2.png',
+				'key'        => 'revx_new_year_26',
+				'start'      => '2026-01-01 00:00 Asia/Dhaka',
+				'end'        => '2026-01-06 23:59 Asia/Dhaka',
+				'banner_src' => REVENUE_URL . 'assets/images/dashboard_banner/rev1.png',
 				'url'        => Xpo::generate_utm_link(
 					array(
 						'utmKey' => 'summer_db',
@@ -177,10 +177,22 @@ class Notice {
 				'visibility' => ! Xpo::is_lc_active(),
 			),
 			array(
-				'key'        => 'revx_summer_sale_25_v3',
-				'start'      => '2025-07-06 00:00 Asia/Dhaka',
-				'end'        => '2025-07-09 23:59 Asia/Dhaka',
-				'banner_src' => REVENUE_URL . 'assets/images/dashboard_banner/revenue_2.png',
+				'key'        => 'revx_new_year_26_2',
+				'start'      => '2026-01-17 00:00 Asia/Dhaka',
+				'end'        => '2026-01-22 23:59 Asia/Dhaka',
+				'banner_src' => REVENUE_URL . 'assets/images/dashboard_banner/rev2.png',
+				'url'        => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'summer_db',
+					)
+				),
+				'visibility' => ! Xpo::is_lc_active(),
+			),
+			array(
+				'key'        => 'revx_new_year_26_3',
+				'start'      => '2026-02-02 00:00 Asia/Dhaka',
+				'end'        => '2026-02-07 23:59 Asia/Dhaka',
+				'banner_src' => REVENUE_URL . 'assets/images/dashboard_banner/rev3.png',
 				'url'        => Xpo::generate_utm_link(
 					array(
 						'utmKey' => 'summer_db',
@@ -193,7 +205,7 @@ class Notice {
 		foreach ( $banner_notices as $key => $notice ) {
 			$notice_key = isset( $notice['key'] ) ? $notice['key'] : $this->notice_version;
 			if ( isset( $_GET['disable_revx_notice'] ) && $notice_key === $_GET['disable_revx_notice'] ) {
-				return;
+				continue;
 			}
 
 			$current_time = gmdate( 'U' );
@@ -245,78 +257,61 @@ class Notice {
 
 		$content_notices = array(
 			array(
-				'key'                => 'revx_dashboard_content_notice2',
-				'start'              => '2025-08-04 00:00 Asia/Dhaka',
-				'end'                => '2025-08-14 23:59 Asia/Dhaka',
+				'key'                => 'revx_content_notice_new_year',
+				'start'              => '2026-01-09 00:00 Asia/Dhaka',
+				'end'                => '2026-01-14 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'final_hour',
+						'utmKey' => 'summer_db',
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( 'Final Hour Sales Alert:', 'revenue' ),
-				'content_subheading' => __( '<strong> WowRevenue </strong> on Sale – Get %s on this advanced product upselling plugin.', 'revenue' ),
-				'discount_content'   => 'up to 45% OFF',
+				'content_heading'    => __( 'Fresh New Year Savings:', 'revenue' ),
+				/* translators: %s: discount amount, for example 'up to 65% OFF'. */
+				'content_subheading' => __( 'WowRevenue offers are live – Enjoy %s on this WooCommerce bundle upseller plugin!', 'revenue' ),
+				'discount_content'   => 'up to 60% OFF',
 				'border_color'       => '#00a464',
-				'icon'               => REVENUE_URL . 'assets/images/icons/45_green.svg',
+				'icon'               => REVENUE_URL . 'assets/images/icons/60_green.svg',
 				'button_text'        => __( 'Claim Your Discount!', 'revenue' ),
 				'is_discount_logo'   => true,
 			),
 			array(
-				'key'                => 'revx_dashboard_content_notice3',
-				'start'              => '2025-08-18 00:00 Asia/Dhaka',
-				'end'                => '2025-08-29 23:59 Asia/Dhaka',
+				'key'                => 'revx_content_notice_new_year_2',
+				'start'              => '2026-01-25 00:00 Asia/Dhaka',
+				'end'                => '2026-01-30 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'massive_sale',
+						'utmKey' => 'summer_db',
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( 'Massive Sales Alert:', 'revenue' ),
-				'content_subheading' => __( 'WowRevenue on Sale - Get %s on this advanced product upselling plugin.', 'revenue' ),
-				'discount_content'   => 'up to 50% OFF',
+				'content_heading'    => __( 'New Year Sales Alert:', 'revenue' ),
+				/* translators: %s: discount amount, for example 'up to 65% OFF'. */
+				'content_subheading' => __( 'WowRevenue is on Sale - Enjoy %s on this WooCommerce bundle upseller plugin!', 'revenue' ),
+				'discount_content'   => 'up to 60% OFF',
 				'border_color'       => '#000000',
-				'icon'               => REVENUE_URL . 'assets/images/icons/wowrevenue_logo.svg',
-				'button_text'        => __( 'Upgrade to Pro &nbsp;➤', 'revenue' ),
-				'is_discount_logo'   => false,
-				'background_color'   => '#f85f05',
-			),
-			array(
-				'key'                => 'revx_dashboard_content_notice4',
-				'start'              => '2025-09-01 00:00 Asia/Dhaka',
-				'end'                => '2025-09-21 23:59 Asia/Dhaka',
-				'url'                => Xpo::generate_utm_link(
-					array(
-						'utmKey' => 'flash_sale',
-					)
-				),
-				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( 'Grab the Flash Sale Offer:', 'revenue' ),
-				'content_subheading' => __( 'Sale on <strong> WowRevenue </strong> - Enjoy %s on the advanced product discounts plugin.', 'revenue' ),
-				'discount_content'   => 'up to 45% OFF',
-				'border_color'       => '#00a464',
-				'icon'               => REVENUE_URL . 'assets/images/icons/45_red.svg',
-				'button_text'        => __( 'Claim Your Discount!', 'revenue' ),
+				'icon'               => REVENUE_URL . 'assets/images/icons/60_green.svg',
+				'button_text'        => __( 'Upgrade to Pro', 'revenue' ),
 				'is_discount_logo'   => true,
 			),
 			array(
-				'key'                => 'revx_dashboard_content_notice5',
-				'start'              => '2025-09-21 00:00 Asia/Dhaka',
-				'end'                => '2025-09-30 23:59 Asia/Dhaka',
+				'key'                => 'revx_content_notice_new_year_3',
+				'start'              => '2026-02-10 00:00 Asia/Dhaka',
+				'end'                => '2026-02-15 23:59 Asia/Dhaka',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'exclusive_deals',
+						'utmKey' => 'summer_db',
 					)
 				),
 				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( 'Exclusive Sale is Live:', 'revenue' ),
-				'content_subheading' => __( 'Sale on WowRevenue - Enjoy %s on this advanced product discounts plugin.', 'revenue' ),
-				'discount_content'   => 'up to 50% OFF',
+				'content_heading'    => __( 'Fresh New Year Deals:', 'revenue' ),
+				/* translators: %s: discount amount, for example 'up to 65% OFF'. */
+				'content_subheading' => __( 'WowRevenue is on Sale - Enjoy %s on this WooCommerce bundle upseller plugin!', 'revenue' ),
+				'discount_content'   => 'up to 60% OFF',
 				'border_color'       => '#000000',
-				'icon'               => REVENUE_URL . 'assets/images/icons/wowrevenue_logo.svg',
-				'button_text'        => __( 'Upgrade to Pro &nbsp;➤', 'revenue' ),
-				'is_discount_logo'   => false,
-				'background_color'   => '#00a464',
+				'icon'               => REVENUE_URL . 'assets/images/icons/60_green.svg',
+				'button_text'        => __( 'Upgrade to Pro', 'revenue' ),
+				'is_discount_logo'   => true,
 			),
 		);
 
@@ -385,11 +380,8 @@ class Notice {
 										<?php echo esc_html( $notice['button_text'] ); ?>
 									</a>
 								<?php else : ?>
-									<a class="revx-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank"
-									style="background-color: <?php echo ! empty( $notice['background_color'] ) ? esc_attr( $notice['background_color'] ) : '#00a464'; ?>;"
-									>
-									<?php echo esc_html( $notice['button_text'] ); ?>
-										
+									<a class="revx-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank">
+										<?php echo esc_html( $notice['button_text'] ); ?>
 									</a>
 								<?php endif; ?>
 							</div>
@@ -440,27 +432,23 @@ class Notice {
 				width: 100%;
 			}
 			.revx-notice-icon {
-				margin-left: 10px;
-				margin-right: 10px;
+				margin-left: 15px;
 			}
 			.revx-notice-discout-icon {
-				margin-left: 5px;
-			}
-			.revx-notice-icon img {
-				max-width: 42px;
-				/* width: 70px; */
-				height: 70px;
+				margin-left: 15px;
 			}
 			.revx-notice-discout-icon img {
 				height: 70px;
 				width: 70px;
 			}
+			.revx-notice-icon img {
+				max-width: 42px;
+				width: 100%;
+			}
 			.revx-notice-btn {
-				font-weight: 600;
+				font-weight: 700;
 				text-transform: uppercase !important;
 				padding: 2px 10px !important;
-				/* background-color: #00a464 !important; */
-				border: none !important;
 			}
 			.discount_btn {
 				background-color: #ffffff;
@@ -470,7 +458,10 @@ class Notice {
 				border-radius: 5px;
 				font-weight: 500;
 				text-transform: uppercase;
-				color: #00a464 !important;
+				color: #00a464;
+			}
+			.discount_btn:hover {
+				color: #005539;
 			}
 			.revx-notice-content-wrapper {
 				display: flex;
@@ -896,7 +887,7 @@ class Notice {
 					<h3><?php esc_html_e( 'Welcome to Revenue.', 'revenue' ); ?></h3>
 					<p><?php esc_html_e( 'Revenue is a WooCommerce-based plugin. So you need to installed & activate WooCommerce to start using Revenue.', 'revenue' ); ?></p>
 					<div class="revx-install-btn-wrap">
-						<a class="wc-install-btn revx-install-btn button button-primary" data-plugin-slug="<?php echo esc_attr( $plugin_slug ); ?>" href="#"><span class="dashicons dashicons-image-rotate"></span><?php file_exists( WP_PLUGIN_DIR . '/woocommerce/woocommerce.php' ) ? esc_html_e( ' Activate WooCommerce', 'revenue' ) : esc_html_e( ' Install WooCommerce', 'revenue' ); ?></a>
+						<a class="wc-install-btn revx-install-btn button button-primary" data-plugin-slug="<?php echo esc_attr( $plugin_slug ); ?>" href="#"><span class="dashicons dashicons-image-rotate"></span><?php file_exists( WP_PLUGIN_DIR . '/woocommerce/woocommerce.php' ) ? esc_html_e( 'Activate WooCommerce', 'revenue' ) : esc_html_e( 'Install WooCommerce', 'revenue' ); ?></a>
 						<?php if ( 'required' !== $type ) : ?>
 							<a href="<?php echo esc_url( add_query_arg( array( 'revx_install_key' => $install_key_tran ) ) ); ?>" class="revx-install-cancel wc-dismiss-notice">
 								<?php esc_html_e( 'Discard', 'revenue' ); ?>
@@ -916,7 +907,7 @@ class Notice {
 	 * @return STRING | Redirect URL
 	 */
 	public function install_activate_plugin() {
-		if ( ! isset( $_POST['install_plugin'] ) || ! current_user_can( 'manage_options' ) ) {
+		if ( ! isset( $_POST['install_plugin'] ) ) {
 			return wp_send_json_error( esc_html__( 'Invalid request.', 'revenue' ) );
 		}
 		$plugin_slug = sanitize_text_field( wp_unslash( $_POST['install_plugin'] ) );
@@ -1255,7 +1246,6 @@ class Notice {
 				$(document).on('click', '.wc-install-btn.revx-install-btn', function(e) {
 					e.preventDefault();
 					const $that = $(this);
-					console.log($that.attr('data-plugin-slug'));
 					$.ajax({
 						type: 'POST',
 						url: ajaxurl,

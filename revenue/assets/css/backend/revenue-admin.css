@@ -208,6 +208,10 @@ body.toplevel_page_revenue.revx-loaded {
 	text-align: center;
 	color: rgba(255, 255, 255, 0.85);
 	font-size: 14px;
+	position: fixed;
+	left: 0;
+	right: 0;
+	z-index: 999;
 }
 
 .revx-setting-hellobar a {

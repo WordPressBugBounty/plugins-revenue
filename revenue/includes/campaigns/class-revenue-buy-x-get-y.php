@@ -1,7 +1,5 @@
 <?php //phpcs:ignore Generic.Files.LineEndings.InvalidEOLChar
 /**
- * Revenue Campaign: Buy X Get Y
- *
  * @package Revenue
  */
 
@@ -9,9 +7,8 @@ namespace Revenue;
 
 //phpcs:disable WordPress.PHP.StrictInArray.MissingTrueStrict, WordPress.PHP.StrictComparisons.LooseComparison
 
-
 /**
- * Revenue Campaign: Buy X Get Y
+ * WowRevenue Campaign: Buy X Get Y
  *
  * @hooked on init
  */
@@ -46,6 +43,15 @@ class Revenue_Buy_X_Get_Y {
 	 */
 	public $campaign_type = 'buy_x_get_y';
 
+	/**
+	 * Tracks whether cart items are being removed to prevent infinite recursion.
+	 *
+	 * @var bool $is_removing_cart_items
+	 *    Set to true when removing cart items to prevent infinite recursion.
+	 *    Default value is false.
+	 */
+	protected $is_removing_cart_items = false;
+
 
 
 	/**
@@ -60,6 +66,7 @@ class Revenue_Buy_X_Get_Y {
 	 * Actions:
 	 * - `revenue_campaign_{campaign_type}_before_calculate_cart_totals`: Calls `set_price_on_cart()` to set discounted prices before cart totals are calculated.
 	 * - `revenue_campaign_{campaign_type}_added_to_cart`: Calls `after_trigger_product_added_to_cart()` when a trigger product is added to the cart.
+	 * - `revenue_campaign_{campaign_type}_remove_cart_item`: Calls `remove_cart_item()` when a cart item is removed from the cart.
 	 *
 	 * Filters:
 	 * - `revenue_campaign_{campaign_type}_cart_item_quantity`: Applies `set_cart_item_quantity()` to adjust cart item quantities.
@@ -72,8 +79,9 @@ class Revenue_Buy_X_Get_Y {
 		// Set Discounted Price on Cart Before Calculate Totals.
 		add_action( "revenue_campaign_{$this->campaign_type}_before_calculate_cart_totals", array( $this, 'set_price_on_cart' ), 10, 2 );
 		add_action( "revenue_campaign_{$this->campaign_type}_added_to_cart", array( $this, 'after_trigger_product_added_to_cart' ), 10, 4 );
-		add_filter( "revenue_campaign_{$this->campaign_type}_cart_item_price", array( $this, 'cart_item_price' ), 9999, 2 );
+		add_action( "revenue_campaign_{$this->campaign_type}_remove_cart_item", array( $this, 'remove_cart_item' ), 10, 3 );
 
+		add_filter( "revenue_campaign_{$this->campaign_type}_cart_item_price", array( $this, 'cart_item_price' ), 9999, 2 );
 		add_filter( "revenue_campaign_{$this->campaign_type}_cart_item_quantity", array( $this, 'set_cart_item_quantity' ), 10, 2 );
 		add_filter( "revenue_campaign_{$this->campaign_type}_store_api_product_quantity_minimum", array( $this, 'set_cart_item_quantity' ), 10, 2 );
 		add_filter( "revenue_campaign_{$this->campaign_type}_store_api_product_quantity_maximum", array( $this, 'set_cart_item_quantity' ), 10, 2 );
@@ -170,6 +178,59 @@ class Revenue_Buy_X_Get_Y {
 	}
 
 	/**
+	 * Remove a cart item from the cart when the "Buy X Get Y" trigger item is removed.
+	 *
+	 * @param string $cart_item_key The cart item key.
+	 * @param array  $cart_item The cart item data.
+	 * @param int    $campaign_id The campaign ID.
+	 *
+	 * @return void
+	 */
+	public function remove_cart_item( $cart_item_key, $cart_item, $campaign_id ) {
+
+		if ( ! isset( $cart_item['revx_bxgy_all_triggers_key'], $cart_item['revx_bxgy_items'] ) ) {
+			return;
+		}
+
+		$trigger_keys = (array) $cart_item['revx_bxgy_all_triggers_key'];
+		$item_keys    = (array) $cart_item['revx_bxgy_items'];
+
+		if ( empty( $trigger_keys ) && empty( $item_keys ) ) {
+			return;
+		}
+
+		// Prevent recursion
+		if ( $this->is_removing_cart_items ) {
+			return;
+		}
+		$this->is_removing_cart_items = true;
+
+		remove_action( 'revenue_campaign_' . $this->campaign_type . '_remove_cart_item', array( $this, 'remove_cart_item' ), 10 );
+
+		$cart_contents = WC()->cart->cart_contents;
+		$keys_to_remove = array_merge( $trigger_keys, $item_keys );
+
+		// Only remove keys that exist in the cart
+		foreach ( $keys_to_remove as $key ) {
+			if ( isset( $cart_contents[ $key ] ) ) {
+				// unset over remove_cart_item function
+				// to prevent infinite recursion
+				// and to avoid action calls on removed items.
+				unset( WC()->cart->cart_contents[ $key ] );
+			}
+		}
+
+		// Recalculate totals and refresh cart once
+		// manually set session as we used unset to remove items from cart, 
+		WC()->cart->set_session();
+		WC()->cart->calculate_totals();
+
+		add_action( 'revenue_campaign_' . $this->campaign_type . '_remove_cart_item', array( $this, 'remove_cart_item' ), 10 );
+
+		$this->is_removing_cart_items = false;
+	}
+
+	/**
 	 * Handles actions and updates when a trigger product is added to the cart.
 	 *
 	 * This method performs the following tasks:
@@ -186,16 +247,93 @@ class Revenue_Buy_X_Get_Y {
 	 */
 	public function after_trigger_product_added_to_cart( $cart_item_key, $cart_item_data, $product_id, $bundle_quantity ) {
 
-		if ( isset( $cart_item_data['revx_bxgy_last_trigger'], $cart_item_data['revx_offer_data'] ) ) {
+		// ADDED FOR BACKWARD COMPATIBILITY. DO NOT UPDATE THIS CODE WITHOUT PERMISSION.
 
-			$trigger_keys   = $cart_item_data['revx_bxgy_all_triggers_key'];
-			$trigger_keys[] = $cart_item_key;
+		$campaign_id      = $cart_item_data['revx_campaign_id'];
+		$campaign_version = revenue()->get_campaign_meta( $campaign_id, 'campaign_version', true ) ?? '1.0.0';
+
+		// ---------------------.
+
+		if ( '2.0.0' === $campaign_version && version_compare( REVENUE_VER, '2.0.0', '>=' ) ) {
+			if ( isset( $cart_item_data['revx_bxgy_last_trigger'], $cart_item_data['revx_offer_data'] ) ) {
+
+				$trigger_keys   = $cart_item_data['revx_bxgy_all_triggers_key'];
+				$trigger_keys[] = $cart_item_key;
+
+				foreach ( $trigger_keys as $key ) {
+					WC()->cart->cart_contents[ $key ]['revx_bxgy_all_triggers_key'] = $trigger_keys;
+				}
+
+				$offers     = $cart_item_data['revx_offer_products'];
+				$y_products = $cart_item_data['revx_y_products'];
+
+				foreach ( $y_products as $offer_product_id => $_p ) {
+					$qty           = isset( $_p['quantity'] ) ? $_p['quantity'] : 1;
+					$item_quantity = $qty;
+					$variation_id  = $_p['variation_id'] ?? '';
+					$variations    = $_p['selected_attributes'] ?? array();
+
+					$bundle_cart_data = array(
+						'revx_campaign_id'     => $cart_item_data['revx_campaign_id'],
+						'revx_bxgy_offer_qty'  => $item_quantity,
+						'revx_campaign_type'   => $cart_item_data['revx_campaign_type'],
+						'revx_bxgy_parents_id' => $cart_item_data['revx_bxgy_trigger_products'],
+						'revx_offer_data'      => $cart_item_data['revx_offer_data'],
+						'revx_bxgy_by'         => $trigger_keys,
+						'revx_quantity_type'   => '',
+						'rev_is_free_shipping' => $cart_item_data['rev_is_free_shipping'],
+					);
+
+					$product    = wc_get_product( $offer_product_id );
+					$product_id = $product->get_id();
+
+					if ( $product->is_type( array( 'simple', 'subscription' ) ) ) {
+						$variation_id = '';
+						$variations   = array();
+					}
+
+					/**
+					 * 'revenue_bundled_item_before_add_to_cart' action.
+					 *
+					 * @param  int    $product_id
+					 * @param  int    $item_quantity
+					 * @param  int    $variation_id
+					 * @param  array  $variations
+					 * @param  array  $bundled_item_cart_data
+					 */
+					do_action( 'revenue_bxgy_item_before_add_to_cart', $product_id, $item_quantity, $variation_id, $variations, $cart_item_data );
+
+					// Add to cart.
+					$bundled_item_cart_key = $this->add_to_cart( $product, $item_quantity, $variation_id, $variations, $bundle_cart_data );
+
+					foreach ( $trigger_keys as $key ) {
+						if ( $bundled_item_cart_key && ! in_array( $bundled_item_cart_key, WC()->cart->cart_contents[ $key ]['revx_bxgy_items'] ) ) {
+							WC()->cart->cart_contents[ $key ]['revx_bxgy_items'][] = $bundled_item_cart_key;
+						}
+					}
+
+					/**
+					 * 'revenue_bundled_item_after_add_to_cart' action.
+					 *
+					 * @param  int    $product_id
+					 * @param  int    $quantity
+					 * @param  int    $variation_id
+					 * @param  array  $variations
+					 * @param  array  $bundled_item_cart_data
+					 */
+					do_action( 'revenue_bxgy_item_after_add_to_cart', $product_id, $item_quantity, $variation_id, $variations, $bundle_cart_data );
+				}
+			}
+		} elseif ( isset( $cart_item_data['revx_bxgy_last_trigger'], $cart_item_data['revx_offer_data'] ) ) {
+
+				$trigger_keys   = $cart_item_data['revx_bxgy_all_triggers_key'];
+				$trigger_keys[] = $cart_item_key;
 
 			foreach ( $trigger_keys as $key ) {
 				WC()->cart->cart_contents[ $key ]['revx_bxgy_all_triggers_key'] = $trigger_keys;
 			}
 
-			$offers = $cart_item_data['revx_offer_products'];
+				$offers = $cart_item_data['revx_offer_products'];
 
 			foreach ( $offers as $offer_product_id => $qty ) {
 
@@ -285,7 +423,6 @@ class Revenue_Buy_X_Get_Y {
 		foreach ( $parents as $parent_key ) {
 			$parent_item = revenue()->get_var( WC()->cart->cart_contents[ $parent_key ] );
 
-
 			if ( ! ( $parent_item && isset( $parent_item['revx_required_qty'] ) && $parent_item['quantity'] >= $parent_item['revx_required_qty'] ) ) {
 				$status = false;
 				break;
@@ -312,10 +449,16 @@ class Revenue_Buy_X_Get_Y {
 		$cart_quantity = $cart_item['quantity'];
 
 		if ( isset( $cart_item['revx_bxgy_by'] ) && $this->is_eligible_for_discount( $cart_item ) ) {
-			
 
 			$cart_item['revx_eligibility_status'] = 'yes';
-			$offered_price                        = $cart_item['data']->get_regular_price( 'edit' );
+
+			$regular_price = $cart_item['data']->get_regular_price( 'edit' );
+			$sale_price    = $cart_item['data']->get_sale_price( 'edit' );
+
+			// Extension Filter: Sale Price Addon.
+			$filtered_price = apply_filters( 'revenue_base_price_for_discount_filter', $regular_price, $sale_price );
+			// based on extension filter use sale price or regular price for calculation.
+			$offered_price = $filtered_price;
 
 			if ( is_array( $offers ) ) {
 				foreach ( $offers as $offer ) {
@@ -339,8 +482,12 @@ class Revenue_Buy_X_Get_Y {
 						}
 					}
 					if ( ( $offer_type && ( $offer_value || 'free' == $offer_type ) ) ) {
-						$regular_price = $cart_item['data']->get_regular_price('edit');
-						$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price );
+						// based on extension filter use sale price or regular price for calculation.
+						$offered_price = revenue()->calculate_campaign_offered_price(
+							$offer_type,
+							$offer_value,
+							$filtered_price
+						);
 					}
 
 					$offered_price = apply_filters( 'revenue_campaign_buy_x_get_y_price', $offered_price, $product_id );
@@ -371,7 +518,6 @@ class Revenue_Buy_X_Get_Y {
 		}
 
 		return $subtotal;
-
 	}
 	/**
 	 * Get Y Item Price
@@ -387,12 +533,18 @@ class Revenue_Buy_X_Get_Y {
 		$variation_id  = $cart_item['variation_id'];
 		$cart_quantity = $cart_item['quantity'];
 
-		$offered_price = $cart_item['data']->get_price( 'edit' );
+		$regular_price = $cart_item['data']->get_regular_price( 'edit' );
+		$sale_price    = $cart_item['data']->get_sale_price( 'edit' );
+
+		// Extension Filter: Sale Price Addon.
+		$filtered_price = apply_filters( 'revenue_base_price_for_discount_filter', $regular_price, $sale_price );
+		// based on extension filter use sale price or regular price for calculation.
+		$offered_price = $filtered_price;
 
 		if ( isset( $cart_item['revx_bxgy_by'] ) && $this->is_eligible_for_discount( $cart_item ) ) {
 
 			$cart_item['revx_eligibility_status'] = 'yes';
-			$offered_price                        = $cart_item['data']->get_regular_price( );
+			$offered_price                        = $cart_item['data']->get_regular_price();
 
 			if ( is_array( $offers ) ) {
 				foreach ( $offers as $offer ) {
@@ -415,9 +567,12 @@ class Revenue_Buy_X_Get_Y {
 							$offer_value = '';
 						}
 					}
-					if ( ( $offer_type && ( $offer_value || 'free' == $offer_type ) ) ) {
-						$regular_price = $cart_item['data']->get_regular_price(  );
-						$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price );
+					if ( $offer_type && ( $offer_value || 'free' == $offer_type ) ) {
+						$offered_price = revenue()->calculate_campaign_offered_price(
+							$offer_type,
+							$offer_value,
+							$filtered_price
+						);
 					}
 
 					$offered_price = apply_filters( 'revenue_campaign_buy_x_get_y_price', $offered_price, $product_id );
@@ -449,6 +604,9 @@ class Revenue_Buy_X_Get_Y {
 	}
 
 
+
+	// ======================= Render Section ======================= //
+
 	/**
 	 * Outputs in-page views for a list of campaigns.
 	 *
@@ -464,11 +622,9 @@ class Revenue_Buy_X_Get_Y {
 	public function output_inpage_views( $campaigns, $data = array() ) {
 		foreach ( $campaigns as $campaign ) {
 			$this->campaigns['inpage'][ $data['position'] ][] = $campaign;
-
-			$this->current_position = $data['position'];
-
-			$this->render_views( $data );
 		}
+		$this->current_position = $data['position'];
+		$this->render_views( $data );
 	}
 
 	/**
@@ -486,8 +642,8 @@ class Revenue_Buy_X_Get_Y {
 	public function output_popup_views( $campaigns, $data = array() ) {
 		foreach ( $campaigns as $campaign ) {
 			$this->campaigns['popup'][] = $campaign;
-			$this->render_views( $data );
 		}
+		$this->render_views( $data );
 	}
 	/**
 	 * Outputs floating views for a list of campaigns.
@@ -504,8 +660,8 @@ class Revenue_Buy_X_Get_Y {
 	public function output_floating_views( $campaigns, $data = array() ) {
 		foreach ( $campaigns as $campaign ) {
 			$this->campaigns['floating'][] = $campaign;
-			$this->render_views( $data );
 		}
+		$this->render_views( $data );
 	}
 	/**
 	 * Renders and outputs views for the campaigns.
@@ -523,39 +679,31 @@ class Revenue_Buy_X_Get_Y {
 	 * @return void
 	 */
 	public function render_views( $data = array() ) {
-		global $product;
-		global $post;
-
 		if ( ! empty( $this->campaigns['inpage'][ $this->current_position ] ) ) {
 			$output    = '';
 			$campaigns = $this->campaigns['inpage'][ $this->current_position ];
 			foreach ( $campaigns as $campaign ) {
 
-				revenue()->update_campaign_impression( $campaign['id'], $post->ID );
+				revenue()->update_campaign_impression( $campaign['id'] );
 
-				$file_path = REVENUE_PATH . 'includes/campaigns/views/buy-x-get-y/inpage.php';
+				// $file_path = REVENUE_PATH . 'includes/campaigns/views/buy-x-get-y/template1.php';
+				$file_path = revenue()->get_campaign_path( $campaign, 'inpage', 'buy-x-get-y' );
 
 				$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'buy_x_get_y', 'inpage', $campaign );
 
-
-				ob_start();
 				if ( file_exists( $file_path ) ) {
+					do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
+
 					extract( $data ); //phpcs:ignore WordPress.PHP.DontExtract.extract_extract
 					include $file_path;
 				}
-
-				$output .= ob_get_clean();
-			}
-
-			if ( $output ) {
-				echo wp_kses( $output, revenue()->get_allowed_tag() );
 			}
 		}
 
 		if ( ! empty( $this->campaigns['popup'] ) ) {
 
-			wp_enqueue_script( 'revenue-popup' );
-			wp_enqueue_style( 'revenue-popup' );
+			// wp_enqueue_script( 'revenue-popup' );
+			// wp_enqueue_style( 'revenue-popup' );
 
 			$output    = '';
 			$campaigns = $this->campaigns['popup'];
@@ -564,54 +712,61 @@ class Revenue_Buy_X_Get_Y {
 
 				revenue()->update_campaign_impression( $campaign['id'] );
 
-				$file_path = REVENUE_PATH . 'includes/campaigns/views/buy-x-get-y/popup.php';
+				revenue()->load_popup_assets( $campaign );
+
+				$file_path = revenue()->get_campaign_path( $campaign, 'popup', 'buy-x-get-y' );
 
 				$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'buy_x_get_y', 'popup', $campaign );
 
-
-				ob_start();
 				if ( file_exists( $file_path ) ) {
+					do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
+
 					extract( $data );  //phpcs:ignore WordPress.PHP.DontExtract.extract_extract
 					include $file_path;
 				}
-
-				$output .= ob_get_clean();
-			}
-
-			if ( $output ) {
-				echo wp_kses( $output, revenue()->get_allowed_tag() );
 			}
 		}
 		if ( ! empty( $this->campaigns['floating'] ) ) {
 
-			wp_enqueue_script( 'revenue-floating' );
-			wp_enqueue_style( 'revenue-floating' );
+			// wp_enqueue_script( 'revenue-floating' );
 
 			$output    = '';
 			$campaigns = $this->campaigns['floating'];
 			foreach ( $campaigns as $campaign ) {
 				$current_campaign = $campaign;
 
+				// $campaign_modified = strtotime( $campaign['date_modified'] );
+				// $is_new_version    = false;
+				// $release_time      = strtotime( '2025-10-15 09:10:00' );
+				// $revenue_version   = REVENUE_VER;
+
+				// if ( $campaign_modified >= $release_time && version_compare( $revenue_version, '2.0.0', '>=' ) ) {
+				// $is_new_version = true;
+				// }
+
+				// if ( ! $is_new_version ) {
+				// wp_enqueue_style( 'revenue-floating' );
+				// }
+
+				revenue()->load_floating_assets( $campaign );
+
 				revenue()->update_campaign_impression( $campaign['id'] );
 
-				$file_path = REVENUE_PATH . 'includes/campaigns/views/buy-x-get-y/floating.php';
+				$file_path = revenue()->get_campaign_path( $campaign, 'floating', 'buy-x-get-y' );
 
 				$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'buy_x_get_y', 'floating', $campaign );
 
-
-				ob_start();
 				if ( file_exists( $file_path ) ) {
+					do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
+
 					extract( $data );  //phpcs:ignore WordPress.PHP.DontExtract.extract_extract
 					include $file_path;
 				}
-
-				$output .= ob_get_clean();
 			}
 
-			if ( $output ) {
-				echo wp_kses( $output, revenue()->get_allowed_tag() );
-			}
+			// if ( $output ) {
+			// echo wp_kses( $output, revenue()->get_allowed_tag() );
+			// }
 		}
 	}
-
 }

@@ -136,20 +136,55 @@ class Revenue_Menu {
 					<path d="M2.85952 6.55725C2.74933 6.07978 3.32046 5.74522 3.68305 6.07485L6.70249 8.81979C6.8986 8.99808 7.20913 8.95036 7.34268 8.72143L9.64009 4.783C9.80087 4.50737 10.1991 4.50737 10.3599 4.783L12.6573 8.72143C12.7909 8.95036 13.1014 8.99808 13.2975 8.81979L16.317 6.07485C16.6795 5.74522 17.2507 6.07977 17.1405 6.55725L15.1491 15.1867C15.0618 15.5648 14.7251 15.8327 14.3371 15.8327H5.66293C5.27488 15.8327 4.93819 15.5648 4.85093 15.1867L2.85952 6.55725Z" stroke="white" stroke-width="1.25"/>
 				</svg>';
 
+				//conditional text for upgrade to pro jan 1 to feb 15 2026
+				$now = new \DateTime( 'now', wp_timezone() );
+				$start_date = new \DateTime( '2026-01-01 00:00:00', wp_timezone() );
+				$end_date   = new \DateTime( '2026-02-15 23:59:59', wp_timezone() );
+
+				if ( $now >= $start_date && $now <= $end_date ) {
+					$text = esc_html__( 'New Year Offer!', 'revenue' );
+				} else {
+					$text = esc_html__( 'Upgrade Pro', 'revenue' );
+				}
+
 				$name = sprintf(
-					'<span class="revx-menu-upgrade-to-pro custom-upgrade-btn" style="background-color:#00A464; color:#ffffff; padding: 10px 12px; margin: 0px -3px; display: flex; align-items: center;border-radius:8px;">%s%s</span>',
+					'<span class="revx-menu-upgrade-to-pro custom-upgrade-btn" style="background-color:#00A464; color:#ffffff; padding: 10px 8px; margin: 0px -3px; display: flex; align-items: center;border-radius:8px;">%s%s</span>',
 					$icon,
-					Xpo::is_lc_expired() ? __('Renew License', 'revenue') : __('Upgrade Pro', 'revenue')
+					Xpo::is_lc_expired() ? __('Renew License', 'revenue') : $text
 				);
 				$license_key   = Xpo::get_lc_key();
-				$pro_link = !Xpo::is_lc_expired() ? 'https://account.wpxpo.com/checkout/?edd_license_key=' . $license_key : Xpo::generate_utm_link(array('utmKey' => 'submenu'));
+				$pro_link = !Xpo::is_lc_expired() ? 'https://www.wowrevenue.com/?utm_source=db-revenue-plugin&utm_medium=sub-menu&utm_campaign=revenue-dashboard#pricing' : 'https://account.wpxpo.com/checkout/?edd_license_key=' . $license_key;
 				$submenu[$slug][] = array($name, $capability, $pro_link);
 			}
 
 			$submenu[$slug] = apply_filters('revenue_submenu_slugs', $submenu[$slug], $slug); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 
 			add_action($dashboard_hook, array($this, 'dashboard_scripts'));
+
+			// Add hook to open roadmap link in new tab
+	        add_action('admin_head', array($this, 'roadmap_link_new_tab'));
 		}
+	}
+
+	/**
+	 * Open roadmap link in new tab
+	 *
+	 * @since  1.0.0
+	 * @return void
+	 */
+	public function roadmap_link_new_tab() {
+		?>
+		<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Target only the roadmap link
+			var roadmapLink = document.querySelector('#adminmenu a[href="https://www.wowrevenue.com/roadmap/"]');
+			if (roadmapLink) {
+				roadmapLink.setAttribute('target', '_blank');
+				roadmapLink.setAttribute('rel', 'noopener noreferrer');
+			}
+		});
+		</script>
+		<?php
 	}
 
 	/**
@@ -160,12 +195,22 @@ class Revenue_Menu {
 	 */
 	public function dashboard_scripts() {
 		$current_user = wp_get_current_user();
-		wp_enqueue_script('revenue-admin', REVENUE_URL . 'assets/js/backend/revenue-admin.js', array('react', 'react-dom', 'wp-api-fetch', 'wp-url', 'wp-i18n'), REVENUE_VER, true);
-		wp_set_script_translations('revenue-admin', 'revenue');
 
-		wp_enqueue_style('revx-atc', REVENUE_URL . 'assets/css/frontend/animated-atc.css', array(), 588);
+		$admin_js_path = REVENUE_PATH . 'assets/js/backend/revenue-admin.js';
+		$admin_js_ver  = REVENUE_VER;
+		if ( file_exists( $admin_js_path ) ) {
+			$admin_js_ver = filemtime( $admin_js_path );
+		}
+		wp_enqueue_script('revenue-admin', REVENUE_URL . 'assets/js/backend/revenue-admin.js', array('react', 'react-dom', 'wp-api-fetch', 'wp-url', 'wp-i18n','lodash'), $admin_js_ver, true);
+		
+		// Only load translations if local language is enabled
+		// if ( \REVENUE\Revenue_Language_Toggle::is_enabled() ) {
+		// 	wp_set_script_translations('revenue-admin', 'revenue', REVENUE_PATH . 'languages');
+		// }
+
+		wp_enqueue_style('revx-animation', REVENUE_URL . 'assets/css/common/revenue-animation.css', array(), REVENUE_VER);
+		wp_enqueue_style('revx-campaign', REVENUE_URL . 'assets/css/common/revenue-campaign.css', array(), REVENUE_VER);
 		$user_info = get_userdata( get_current_user_id() );
-
 
 		$localize_data = array(
 			'url'                          => REVENUE_URL,
@@ -209,6 +254,7 @@ class Revenue_Menu {
 			'campaign_counts'                  => revenue()->get_campaign_counts(),
 			'helloBar'                  => Xpo::get_transient_without_cache('revx_helloBar'),
 			'license'                  => Xpo::get_lc_key(),
+			'current_locale'           => get_locale(),
 			'userInfo'          => array(
 				'name'  => $user_info->first_name ? $user_info->first_name . ( $user_info->last_name ? ' ' . $user_info->last_name : '' ) : $user_info->user_login,
 				'email' => $user_info->user_email,
@@ -359,6 +405,11 @@ class Revenue_Menu {
 		}
 		?>
 
+<!-- paste this BEFORE any scripts -->
+<!-- <script
+  crossOrigin="anonymous"
+  src="//unpkg.com/react-scan/dist/auto.global.js"
+></script> -->
 
 
 		<div id="revenue-root"> </div>
@@ -413,7 +464,7 @@ class Revenue_Menu {
 								'thumbnail'     => wp_get_attachment_url($child->get_image_id()),
 								'regular_price' => $child->get_regular_price(),
 								'sale_price' => $child->get_sale_price(),
-								'parent'        => $product_id,
+								'parent_id'        => $product_id,
 								'url'			=> $product_link,
 								'show_attribute' => 'variable' == $product->get_type()
 							);

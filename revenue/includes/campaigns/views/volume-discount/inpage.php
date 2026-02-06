@@ -11,6 +11,8 @@
 
 namespace Revenue;
 
+use Revenue\Services\Revenue_Product_Context;
+
 /**
  * The Template for displaying revenue view
  *
@@ -22,7 +24,7 @@ defined( 'ABSPATH' ) || exit;
 
 //phpcs:disable WordPress.PHP.StrictComparisons.LooseComparison
 
-global $product;
+$product = Revenue_Product_Context::get_product_context();
 
 $offered_product = false;
 $regular_price   = false;
@@ -78,7 +80,8 @@ if ( 'list' === $view_mode ) {
 
 			// Translators: %s is the placeholder for the offer quantity.
 			$quantity_label = ( $offer_qty > 1 ) ? __( 'Quantities', 'revenue' ) : __( 'Quantity', 'revenue' );
-			$product_title  = sprintf( __( 'Buy %1$s %2$s', 'revenue' ), $offer_qty, $quantity_label );
+			// Translators: %1$s is the quantity number, %2$s is the quantity label (e.g. 'Quantity' or 'Quantities').
+			$product_title = sprintf( __( 'Buy %1$s %2$s', 'revenue' ), $offer_qty, $quantity_label );
 
 			if ( ! $product->is_type( 'variable' ) ) {
 				if ( ! isset( $offer_data[ $offer_product_id ]['regular_price'] ) ) {
@@ -104,166 +107,174 @@ if ( 'list' === $view_mode ) {
 			ob_start();
 			?>
 
-			<div data-quantity="<?php echo esc_attr( $offer_qty ); ?>" data-revx-selected="<?php echo esc_attr( $is_selected ? 'true' : 'false' ); ?>" id="revenue-campaign-item-<?php echo esc_attr( $offer_product_id . '-' . $campaign['id'] ); ?>" class="<?php echo esc_attr( $item_class ); ?>"
-				data-product-id="<?php echo esc_attr( ! $product->is_type( 'variable' ) ? $offer_product_id : '' ); ?>" data-campaign-id="<?php echo esc_attr( $campaign['id'] ); ?>" style="<?php echo esc_attr( $product_style ); ?>">
-					<div class="revx-justify-space" style="gap: inherit;">
-						<div class="revx-align-center">
-							<div class="revx-volume-discount__tag" data-default-style="<?php echo esc_attr( $checkbox_default_style ); ?>" data-selected-style="<?php echo esc_attr( $checkbox_selected_style ); ?>"  style="<?php echo esc_attr( $is_selected ? $checkbox_selected_style : $checkbox_default_style ); ?>"></div>
-							<div class="revx-align-center revx-volume-discount__text">
-								<?php
-									echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'productTitle', $product_title, 'revx-volume-title' ), revenue()->get_allowed_tag() );
-									echo wp_kses(
-										revenue()->get_template_part(
-											'save',
-											array(
-												'quantity' => $offer_qty,
-												'message'  => $price_data['message'],
-												'generated_styles' => $generated_styles,
-												'regular_price' => $regular_price,
-												'offered_price' => $offered_price,
-												'current_campaign' => $campaign,
-
-											)
-										),
-										revenue()->get_allowed_tag()
-									);
-								?>
-							</div>
+			<div data-quantity="<?php echo esc_attr( $offer_qty ); ?>"
+				data-revx-selected="<?php echo esc_attr( $is_selected ? 'true' : 'false' ); ?>"
+				id="revenue-campaign-item-<?php echo esc_attr( $offer_product_id . '-' . $campaign['id'] ); ?>"
+				class="<?php echo esc_attr( $item_class ); ?>"
+				data-product-id="<?php echo esc_attr( ! $product->is_type( 'variable' ) ? $offer_product_id : '' ); ?>"
+				data-campaign-id="<?php echo esc_attr( $campaign['id'] ); ?>" style="<?php echo esc_attr( $product_style ); ?>">
+				<div class="revx-justify-space" style="gap: inherit;">
+					<div class="revx-align-center">
+						<div class="revx-volume-discount__tag"
+							data-default-style="<?php echo esc_attr( $checkbox_default_style ); ?>"
+							data-selected-style="<?php echo esc_attr( $checkbox_selected_style ); ?>"
+							style="<?php echo esc_attr( $is_selected ? $checkbox_selected_style : $checkbox_default_style ); ?>">
 						</div>
-						<div>
+						<div class="revx-align-center revx-volume-discount__text">
 							<?php
-							if ( 'fixed_total_price' === $offer['type'] ) {
-								// print_r('<pre>'); print_r($regular_price); print_r('</pre>');
-
-								echo wp_kses(
-									revenue()->get_template_part(
-										'price_container',
-										array(
-											'campaign_type' => 'volume_discount',
-											'quantity'   => 1,
-											'offered_product' => $offered_product,
-											'generated_styles' => $generated_styles,
-											'regular_price' => floatval( $regular_price ) * floatval( $offer_qty ),
-											'offered_price' => $offered_price,
-											'current_campaign' => $campaign,
-											'force_show' => $product->is_type( 'variable' ),
-										)
-									),
-									revenue()->get_allowed_tag()
-								);
-							} else {
-								echo wp_kses(
-									revenue()->get_template_part(
-										'price_container',
-										array(
-											'campaign_type' => 'volume_discount',
-											'quantity'   => $offer_qty,
-											'offered_product' => $offered_product,
-											'generated_styles' => $generated_styles,
-											'regular_price' => $regular_price,
-											'offered_price' => $offered_price,
-											'current_campaign' => $campaign,
-											'force_show' => $product->is_type( 'variable' ),
-										)
-									),
-									revenue()->get_allowed_tag()
-								);
-							}
-
-							?>
-						</div>
-					</div>
-
-
-					<?php
-					if ( isset( $offer['isEnableTag'] ) && 'yes' == $offer['isEnableTag'] ) {
-						echo wp_kses(
-							revenue()->get_template_part(
-								'badge_tag',
-								array(
-									'generated_styles' => $generated_styles,
-									'current_campaign' => $campaign,
-								)
-							),
-							revenue()->get_allowed_tag()
-						);
-					}
-					if ( $product->is_type( 'variable' ) ) {
-						$available_variations = $product->get_available_variations();
-						$attributes           = $product->get_variation_attributes();
-						$selected_attributes  = $product->get_default_attributes();
-
-						foreach ( $available_variations as $variations ) {
-
-							$offer_product_id = $variations['variation_id'];
-
-							$offered_product = wc_get_product( $offer_product_id );
-
-							if ( ! isset( $offer_data[ $offer_product_id ]['regular_price'] ) ) {
-								$offer_data[ $offer_product_id ]['regular_price'] = $offered_product->get_regular_price();
-							}
-							if ( ! isset( $offer_data[ $offer_product_id ]['offer'] ) ) {
-								$offer_data[ $offer_product_id ]['offer'] = array();
-							}
-							$offer_data[ $offer_product_id ]['offer'][] = array(
-								'qty'   => $offer_qty,
-								'type'  => $offer_type,
-								'value' => $offer_value,
-							);
-						}
-
-						?>
-						<div class="revx-productAttr-wrapper revx-justify-space" >
-							<div class="revx-full-width revx-align-center" style="<?php echo esc_attr( $product_attr_wrapper_style ); ?>">
-								<?php
-								foreach ( $attributes as  $attribute_name => $options ) {
-									?>
-											<div class="revx-full-width" >
-											<?php
-												echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'productAttrLabel', wc_attribute_label( $attribute_name ), 'revx-productAttr-wrapper__label', 'h5' ), revenue()->get_allowed_tag() );
-												revenue()->dropdown_variation_attribute_options(
-													$generated_styles,
-													array(
-														'options'   => $options,
-														'attribute' => $attribute_name,
-														'product'   => $product,
-													)
-												);
-											?>
-											</div>
-										<?php
-								}
-								?>
-							</div>
-						</div>
-						<?php
-					}
-
-					if ( 'yes' == revenue()->get_campaign_meta( $campaign['id'], 'quantity_selector_enabled', true ) ) {
-						echo wp_kses( revenue()->get_template_part( 'product_separator', array( 'generated_styles' => $generated_styles ) ), revenue()->get_allowed_tag() );
-						?>
-						<div class="revx-justify-space">
-						<?php
-							echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'quantityLabel', __( 'Quantity', 'revenue' ), 'revx-quantity-label', 'h4' ), revenue()->get_allowed_tag() );
+							echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'productTitle', $product_title, 'revx-volume-title' ), revenue()->get_allowed_tag() );
 							echo wp_kses(
 								revenue()->get_template_part(
-									'quantity_selector',
+									'save',
 									array(
 										'quantity'         => $offer_qty,
-										'min_quantity'     => $offer_qty,
-										'value'            => $offer_qty,
+										'message'          => $price_data['message'],
 										'generated_styles' => $generated_styles,
+										'regular_price'    => $regular_price,
+										'offered_price'    => $offered_price,
 										'current_campaign' => $campaign,
-										'offered_product'  => $offered_product,
+
 									)
 								),
 								revenue()->get_allowed_tag()
 							);
+							?>
+						</div>
+					</div>
+					<div>
+						<?php
+						if ( 'fixed_total_price' === $offer['type'] ) {
+							// print_r('<pre>'); print_r($regular_price); print_r('</pre>');
+
+							echo wp_kses(
+								revenue()->get_template_part(
+									'price_container',
+									array(
+										'campaign_type'    => 'volume_discount',
+										'quantity'         => 1,
+										'offered_product'  => $offered_product,
+										'generated_styles' => $generated_styles,
+										'regular_price'    => floatval( $regular_price ) * floatval( $offer_qty ),
+										'offered_price'    => $offered_price,
+										'current_campaign' => $campaign,
+										'force_show'       => $product->is_type( 'variable' ),
+									)
+								),
+								revenue()->get_allowed_tag()
+							);
+						} else {
+							echo wp_kses(
+								revenue()->get_template_part(
+									'price_container',
+									array(
+										'campaign_type'    => 'volume_discount',
+										'quantity'         => $offer_qty,
+										'offered_product'  => $offered_product,
+										'generated_styles' => $generated_styles,
+										'regular_price'    => $regular_price,
+										'offered_price'    => $offered_price,
+										'current_campaign' => $campaign,
+										'force_show'       => $product->is_type( 'variable' ),
+									)
+								),
+								revenue()->get_allowed_tag()
+							);
+						}
+
 						?>
 					</div>
-						<?php
+				</div>
+
+
+				<?php
+				if ( isset( $offer['isEnableTag'] ) && 'yes' == $offer['isEnableTag'] ) {
+					echo wp_kses(
+						revenue()->get_template_part(
+							'badge_tag',
+							array(
+								'generated_styles' => $generated_styles,
+								'current_campaign' => $campaign,
+							)
+						),
+						revenue()->get_allowed_tag()
+					);
+				}
+				if ( $product->is_type( 'variable' ) ) {
+					$available_variations = $product->get_available_variations();
+					$attributes           = $product->get_variation_attributes();
+					$selected_attributes  = $product->get_default_attributes();
+
+					foreach ( $available_variations as $variations ) {
+
+						$offer_product_id = $variations['variation_id'];
+
+						$offered_product = wc_get_product( $offer_product_id );
+
+						if ( ! isset( $offer_data[ $offer_product_id ]['regular_price'] ) ) {
+							$offer_data[ $offer_product_id ]['regular_price'] = $offered_product->get_regular_price();
+						}
+						if ( ! isset( $offer_data[ $offer_product_id ]['offer'] ) ) {
+							$offer_data[ $offer_product_id ]['offer'] = array();
+						}
+						$offer_data[ $offer_product_id ]['offer'][] = array(
+							'qty'   => $offer_qty,
+							'type'  => $offer_type,
+							'value' => $offer_value,
+						);
 					}
+
 					?>
+					<div class="revx-productAttr-wrapper revx-justify-space">
+						<div class="revx-full-width revx-align-center" style="<?php echo esc_attr( $product_attr_wrapper_style ); ?>">
+							<?php
+							foreach ( $attributes as $attribute_name => $options ) {
+								?>
+								<div class="revx-full-width">
+									<?php
+									echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'productAttrLabel', wc_attribute_label( $attribute_name ), 'revx-productAttr-wrapper__label', 'h5' ), revenue()->get_allowed_tag() );
+									revenue()->dropdown_variation_attribute_options(
+										$generated_styles,
+										array(
+											'options'   => $options,
+											'attribute' => $attribute_name,
+											'product'   => $product,
+										)
+									);
+									?>
+								</div>
+								<?php
+							}
+							?>
+						</div>
+					</div>
+					<?php
+				}
+
+				if ( 'yes' == revenue()->get_campaign_meta( $campaign['id'], 'quantity_selector_enabled', true ) ) {
+					echo wp_kses( revenue()->get_template_part( 'product_separator', array( 'generated_styles' => $generated_styles ) ), revenue()->get_allowed_tag() );
+					?>
+					<div class="revx-justify-space">
+						<?php
+						echo wp_kses( revenue()->tag_wrapper( $campaign, $generated_styles, 'quantityLabel', __( 'Quantity', 'revenue' ), 'revx-quantity-label', 'h4' ), revenue()->get_allowed_tag() );
+						echo wp_kses(
+							revenue()->get_template_part(
+								'quantity_selector',
+								array(
+									'quantity'         => $offer_qty,
+									'min_quantity'     => $offer_qty,
+									'value'            => $offer_qty,
+									'generated_styles' => $generated_styles,
+									'current_campaign' => $campaign,
+									'offered_product'  => $offered_product,
+								)
+							),
+							revenue()->get_allowed_tag()
+						);
+						?>
+					</div>
+					<?php
+				}
+				?>
 
 			</div>
 			<?php
@@ -284,26 +295,28 @@ $container_class = 'revx-campaign-list revx-volume-discount revx-volume-discount
 ob_start();
 ?>
 
-	<div class="revx-campaign-container__wrapper revx-campaign-text-content" style="<?php echo esc_attr( $wrapper_style ); ?>">
-		<?php
-				echo wp_kses( $output_content, revenue()->get_allowed_tag() );
-		?>
-		<?php
-		echo wp_kses(
-			revenue()->get_template_part(
-				'add_to_cart',
-				array(
-					'generated_styles' => $generated_styles,
-					'current_campaign' => $campaign,
-					'offered_product'  => $offered_product,
-				)
-			),
-			revenue()->get_allowed_tag()
-		);
-		?>
-	</div>
+<div class="revx-campaign-container__wrapper revx-campaign-text-content"
+	style="<?php echo esc_attr( $wrapper_style ); ?>">
+	<?php
+	echo wp_kses( $output_content, revenue()->get_allowed_tag() );
+	?>
+	<?php
+	echo wp_kses(
+		revenue()->get_template_part(
+			'add_to_cart',
+			array(
+				'generated_styles' => $generated_styles,
+				'current_campaign' => $campaign,
+				'offered_product'  => $offered_product,
+			)
+		),
+		revenue()->get_allowed_tag()
+	);
+	?>
+</div>
 
-	<input type="hidden" name="<?php echo esc_attr( 'revx-offer-data-' . $campaign['id'] ); ?>" value="<?php echo esc_html( htmlspecialchars( wp_json_encode( $offer_data ) ) ); ?>" />
+<input type="hidden" name="<?php echo esc_attr( 'revx-offer-data-' . $campaign['id'] ); ?>"
+	value="<?php echo esc_html( htmlspecialchars( wp_json_encode( $offer_data ) ) ); ?>" />
 
 <?php
 $output_content = ob_get_clean();

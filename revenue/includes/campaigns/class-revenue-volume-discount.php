@@ -1,26 +1,18 @@
 <?php //phpcs:ignore Generic.Files.LineEndings.InvalidEOLChar
 /**
- * Revenue Campaign: Volume Discount
- *
- * This class handles the volume discount campaigns, including setting discount prices on the cart,
- * rendering views for different campaign types (in-page, popup, floating), and processing shortcodes.
- *
  * @package Revenue
- * @hooked on init
  */
 
 namespace Revenue;
 
 //phpcs:disable WordPress.PHP.StrictInArray.MissingTrueStrict, WordPress.PHP.StrictComparisons.LooseComparison
 
-
 /**
- * Revenue Campaign: Volume Discount
+ * WowRevenue Campaign: Volume Discount
  *
  * This class handles the volume discount campaigns, including setting discount prices on the cart,
  * rendering views for different campaign types (in-page, popup, floating), and processing shortcodes.
  *
- * @package Revenue
  * @hooked on init
  */
 class Revenue_Volume_Discount {
@@ -86,17 +78,28 @@ class Revenue_Volume_Discount {
 		$campaign_id   = intval( $cart_item['revx_campaign_id'] );
 		$offers        = revenue()->get_campaign_meta( $campaign_id, 'offers', true );
 		$product_id    = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+		$parent_id     = $cart_item['product_id'];
 		$variation_id  = $cart_item['variation_id'];
 		$cart_quantity = $cart_item['quantity'];
 
-		$offered_price = $cart_item['data']->get_regular_price( 'edit' );
+		$regular_price = $cart_item['data']->get_regular_price( 'edit' );
+		$sale_price    = $cart_item['data']->get_sale_price( 'edit' );
 
+		// Extension Filter: Sale Price Addon.
+		$filtered_price = apply_filters( 'revenue_base_price_for_discount_filter', $regular_price, $sale_price );
+		// based on extension filter use sale price or regular price for calculation.
+		$offered_price = $filtered_price;
+
+		$is_multiple_variation = 'yes' === ( $cart_item['revx_multiple_variation'] ?? 'no' );
 		if ( is_array( $offers ) ) {
 			$offer_type         = '';
 			$offer_value        = '';
 			$offer_qty          = '';
 			$offered_products[] = $product_id;
 
+			if ( $is_multiple_variation ) {
+				$cart_quantity = $this->get_cart_quantity_of_product( $campaign_id, $parent_id );
+			}
 			foreach ( $offers as $offer ) {
 
 				if ( in_array( $product_id, $offered_products ) && $offer['quantity'] <= $cart_quantity ) {
@@ -107,15 +110,25 @@ class Revenue_Volume_Discount {
 			}
 
 			if ( $offer_type && ( 'free' === $offer_type || $offer_value ) ) {
-				$regular_price = $cart_item['data']->get_regular_price( 'edit' );
 
 				if ( 'fixed_total_price' === $offer_type ) {
 					if ( $offer_qty == $cart_quantity ) {
-						$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price, false, 1, 'volume_discount' );
+						$offered_price = revenue()->calculate_campaign_offered_price(
+							$offer_type,
+							$offer_value,
+							$filtered_price,
+							false,
+							1,
+							'volume_discount'
+						);
 						$offered_price = $offered_price / $offer_qty;
 					}
 				} else {
-					$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price );
+					$offered_price = revenue()->calculate_campaign_offered_price(
+						$offer_type,
+						$offer_value,
+						$filtered_price
+					);
 				}
 			}
 		}
@@ -135,39 +148,75 @@ class Revenue_Volume_Discount {
 		$campaign_id   = intval( $cart_item['revx_campaign_id'] );
 		$offers        = revenue()->get_campaign_meta( $campaign_id, 'offers', true );
 		$product_id    = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+		$parent_id     = $cart_item['product_id'];
 		$variation_id  = $cart_item['variation_id'];
 		$cart_quantity = $cart_item['quantity'];
 		$offer_qty     = '';
 
-		$offered_price = $cart_item['data']->get_regular_price();
+		$regular_price = $cart_item['data']->get_regular_price( 'edit' );
+		$sale_price    = $cart_item['data']->get_sale_price( 'edit' );
+
+		// Extension Filter: Sale Price Addon.
+		$filtered_price = apply_filters( 'revenue_base_price_for_discount_filter', $regular_price, $sale_price );
+		// based on extension filter use sale price or regular price for calculation.
+		$offered_price = $filtered_price;
+
+		$product = $cart_item['data'];
+
+		// Get WooCommerce tax display setting.
+		$tax_display = get_option( 'woocommerce_tax_display_cart', 'incl' );
+
+		// Adjust base offered price based on tax setting.
+		if ( 'incl' === $tax_display ) {
+			$offered_price = wc_get_price_including_tax( $product, array( 'price' => $offered_price ) );
+		} else {
+			$offered_price = wc_get_price_excluding_tax( $product, array( 'price' => $offered_price ) );
+		}
 
 		if ( is_array( $offers ) ) {
 			$offer_type         = '';
 			$offer_value        = '';
 			$offered_products[] = $product_id;
 
+			$is_multiple_variation = 'yes' === ( $cart_item['revx_multiple_variation'] ?? 'no' );
+			if ( $is_multiple_variation ) {
+				$cart_quantity = $this->get_cart_quantity_of_product( $campaign_id, $parent_id );
+			}
 			foreach ( $offers as $offer ) {
-
 				if ( in_array( $product_id, $offered_products ) && $offer['quantity'] <= $cart_quantity ) {
 					$offer_type  = $offer['type'];
 					$offer_value = $offer['value'];
 					$offer_qty   = intval( $offer['quantity'] );
-
 				}
 			}
 
 			if ( $offer_type && ( 'free' === $offer_type || $offer_value ) ) {
-				$regular_price = $cart_item['data']->get_regular_price();
-				// $offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price );
 
 				if ( 'fixed_total_price' === $offer_type ) {
 					if ( $offer_qty === $cart_quantity ) {
-						$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price, false, 1, 'volume_discount' );
-
+						$offered_price = revenue()->calculate_campaign_offered_price(
+							$offer_type,
+							$offer_value,
+							$filtered_price,
+							false,
+							1,
+							'volume_discount'
+						);
 						$offered_price = $offered_price / $offer_qty;
 					}
 				} else {
-					$offered_price = revenue()->calculate_campaign_offered_price( $offer_type, $offer_value, $regular_price );
+					$offered_price = revenue()->calculate_campaign_offered_price(
+						$offer_type,
+						$offer_value,
+						$filtered_price
+					);
+				}
+
+				// Apply tax to final offered price based on WooCommerce setting.
+				if ( 'incl' === $tax_display ) {
+					$offered_price = wc_get_price_including_tax( $product, array( 'price' => $offered_price ) );
+				} else {
+					$offered_price = wc_get_price_excluding_tax( $product, array( 'price' => $offered_price ) );
 				}
 			}
 		}
@@ -189,15 +238,44 @@ class Revenue_Volume_Discount {
 	 */
 	public function cart_item_price( $subtotal, $cart_item ) {
 		if ( isset( $cart_item['revx_campaign_id'], $cart_item['revx_campaign_type'] ) ) {
-			$subtotal = $this->get_discounted_price( $cart_item );
+			$subtotal      = $this->get_discounted_price( $cart_item );
+			$tax_display   = get_option( 'woocommerce_tax_display_cart', 'incl' );
+			$regular_price = 'incl' === $tax_display ? wc_get_price_including_tax( $cart_item['data'], array( 'price' => $cart_item['data']->get_regular_price() ) ) : $cart_item['data']->get_regular_price();
 
-			if ( $cart_item['data']->get_regular_price() != $subtotal ) {
-				return '<del>' . wc_price( $cart_item['data']->get_regular_price() ) . '</del> ' . wc_price( $subtotal );
+			if ( $regular_price != $subtotal ) {
+				return '<del>' . wc_price( $regular_price ) . '</del> ' . wc_price( $subtotal );
 			}
 			$subtotal = wc_price( $subtotal );
 		}
 
 		return $subtotal;
+	}
+
+	/**
+	 * Get the total quantity of a specific product(including different variations) in the cart
+	 * that is associated with the given campaign.
+	 *
+	 * Iterates through the WooCommerce cart items and sums the quantities
+	 * of items where the product ID matches the provided parent product ID
+	 * and the item is tagged with the specified campaign ID.
+	 *
+	 * @param int $campaign_id The campaign ID to match against the cart item meta.
+	 * @param int $parent_id   The parent product ID to match against the cart item product ID.
+	 *
+	 * @return int The total quantity of the matched product for the given campaign in the cart.
+	 */
+	private function get_cart_quantity_of_product( $campaign_id, $parent_id ) {
+		$cart_quantity = 0;
+		foreach ( WC()->cart->get_cart() as $cart_item ) {
+			$is_same_product  = absint( $cart_item['product_id'] ) === absint( $parent_id );
+			$is_same_campaign = isset( $cart_item['revx_campaign_id'] ) &&
+				absint( $cart_item['revx_campaign_id'] ) === absint( $campaign_id );
+
+			if ( $is_same_product && $is_same_campaign ) {
+				$cart_quantity += $cart_item['quantity'];
+			}
+		}
+		return $cart_quantity;
 	}
 
 
@@ -216,10 +294,9 @@ class Revenue_Volume_Discount {
 	public function output_inpage_views( $campaigns, $data = array() ) {
 		foreach ( $campaigns as $campaign ) {
 			$this->campaigns['inpage'][ $data['position'] ][] = $campaign;
-
-			$this->current_position = $data['position'];
-			$this->render_views( $data );
 		}
+		$this->current_position = $data['position'];
+		$this->render_views( $data );
 	}
 
 
@@ -240,8 +317,8 @@ class Revenue_Volume_Discount {
 	public function output_popup_views( $campaigns, $data = array() ) {
 		foreach ( $campaigns as $campaign ) {
 			$this->campaigns['popup'][] = $campaign;
-			$this->render_views( $data );
 		}
+		$this->render_views( $data );
 	}
 
 	/**
@@ -259,8 +336,8 @@ class Revenue_Volume_Discount {
 	public function output_floating_views( $campaigns, $data = array() ) {
 		foreach ( $campaigns as $campaign ) {
 			$this->campaigns['floating'][] = $campaign;
-			$this->render_views( $data );
 		}
+		$this->render_views( $data );
 	}
 
 	/**
@@ -279,89 +356,88 @@ class Revenue_Volume_Discount {
 	 * @return void
 	 */
 	public function render_views( $data = array() ) {
-		global $post;
-
 		if ( ! empty( $this->campaigns['inpage'][ $this->current_position ] ) ) {
-			$output    = '';
+
 			$campaigns = $this->campaigns['inpage'][ $this->current_position ];
 			foreach ( $campaigns as $campaign ) {
 
-				revenue()->update_campaign_impression( $campaign['id'], $post->ID );
+				$output = '';
+				revenue()->update_campaign_impression( $campaign['id'] );
 
-				$file_path = REVENUE_PATH . 'includes/campaigns/views/volume-discount/inpage.php';
+				// $file_path = REVENUE_PATH . 'includes/campaigns/views/volume-discount/template1.php';
+				$file_path = revenue()->get_campaign_path( $campaign, 'inpage', 'volume-discount' );
 
 				$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'volume_discount', 'inpage', $campaign );
 
-				ob_start();
 				if ( file_exists( $file_path ) ) {
-					extract($data); //phpcs:ignore
+					do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
+
+					extract( $data ); //phpcs:ignore
 					include $file_path;
 				}
-
-				$output .= ob_get_clean();
-			}
-
-			if ( $output ) {
-				echo wp_kses( $output, revenue()->get_allowed_tag() );
 			}
 		}
 
 		if ( ! empty( $this->campaigns['popup'] ) ) {
 
-			wp_enqueue_script( 'revenue-popup' );
-			wp_enqueue_style( 'revenue-popup' );
+			// wp_enqueue_script( 'revenue-popup' );
+			// wp_enqueue_style( 'revenue-popup' );
 
-			$output    = '';
+			$output_popups    = '';
 			$campaigns = $this->campaigns['popup'];
 			foreach ( $campaigns as $campaign ) {
 				$current_campaign = $campaign;
+				$output           = '';
 
 				revenue()->update_campaign_impression( $campaign['id'] );
 
-				$file_path = REVENUE_PATH . 'includes/campaigns/views/volume-discount/popup.php';
+				revenue()->load_popup_assets( $campaign );
+
+				$file_path = revenue()->get_campaign_path( $campaign, 'popup', 'volume-discount' );
 
 				$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'volume_discount', 'popup', $campaign );
-
+				do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
 				ob_start();
 				if ( file_exists( $file_path ) ) {
 					extract($data); //phpcs:ignore
 					include $file_path;
 				}
 
-				$output .= ob_get_clean();
+				$output_popups .= ob_get_clean();
 			}
 
-			if ( $output ) {
-				echo wp_kses( $output, revenue()->get_allowed_tag() );
+			if ( $output_popups ) {
+				echo wp_kses( $output_popups, revenue()->get_allowed_tag() );
+				$output_popups = '';
 			}
 		}
 		if ( ! empty( $this->campaigns['floating'] ) ) {
 
-			wp_enqueue_script( 'revenue-floating' );
-			wp_enqueue_style( 'revenue-floating' );
-
-			$output    = '';
+			$output_floatings    = '';
 			$campaigns = $this->campaigns['floating'];
 			foreach ( $campaigns as $campaign ) {
-				$current_campaign = $campaign;
+
+				revenue()->load_floating_assets( $campaign );
 
 				revenue()->update_campaign_impression( $campaign['id'] );
 
-				$file_path = REVENUE_PATH . 'includes/campaigns/views/volume-discount/floating.php';
+				$file_path = revenue()->get_campaign_path( $campaign, 'floating', 'volume-discount' );
 
 				$file_path = apply_filters( 'revenue_campaign_view_path', $file_path, 'volume_discount', 'floating', $campaign );
 
+				do_action( 'revenue_before_campaign_render', $campaign['id'], $campaign );
 				ob_start();
 				if ( file_exists( $file_path ) ) {
 					extract($data); //phpcs:ignore
 					include $file_path;
 				}
 
-				$output .= ob_get_clean();
+				$output_floatings .= ob_get_clean();
 			}
 
 			if ( $output ) {
-				echo wp_kses( $output, revenue()->get_allowed_tag() );
+				echo wp_kses( $output_floatings, revenue()->get_allowed_tag() );
+				$output_floatings = '';
 			}
 		}
 	}

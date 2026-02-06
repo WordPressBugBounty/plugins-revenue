@@ -64,6 +64,9 @@ final class Revenue {
 
 		$this->include_revenue_menu();
 
+		// Ensure textdomain registers early so PHP __() calls in admin menu are translated.
+		add_action( 'plugins_loaded', array( $this, 'localization_setup' ) );
+
 		add_action( 'init', array( $this, 'init_menu' ) );
 
 		add_action( 'admin_init', array( $this, 'activation_redirect' ) );
@@ -77,6 +80,17 @@ final class Revenue {
 		add_filter( 'plugin_action_links_' . plugin_basename( REVENUE_FILE ), array( $this, 'plugin_list_action_links' ) );
 
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
+		add_action( 'wp_head', array( $this, 'inline_critical_css' ), 0 );
+	}
+	// NOTE: If faced with fatal error and page does not show, comment the above action with this function.
+	public function inline_critical_css() {
+		echo '<style>
+            .revx-template {
+                visibility: hidden;
+                opacity: 0;
+				transition: opacity 0.5s ease-out, visibility 0.3s ease-out;
+            }
+        </style>';
 	}
 
 	/**
@@ -115,7 +129,7 @@ final class Revenue {
 	 * @uses load_plugin_textdomain()
 	 */
 	public function localization_setup() {
-		load_plugin_textdomain( 'revenue', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+		load_plugin_textdomain( 'revenue', false, dirname( plugin_basename( REVENUE_FILE ) ) . '/languages/' );
 	}
 
 	/**
@@ -158,10 +172,14 @@ final class Revenue {
 		require_once REVENUE_PATH . 'includes/traits/SingletonTrait.php';
 		require_once REVENUE_PATH . 'includes/class-revenue-campaign.php';
 		require_once REVENUE_PATH . 'includes/class-revenue-analytics.php';
+		require_once REVENUE_PATH . 'includes/class-revenue-template-utils.php';
 		require_once REVENUE_PATH . 'includes/rest-api/class-revenue-campaign-rest-controller.php';
 		require_once REVENUE_PATH . 'includes/rest-api/class-revenue-analytics-rest-controller.php';
 		require_once REVENUE_PATH . 'includes/rest-api/class-revenue-settings-rest-controller.php';
 		require_once REVENUE_PATH . 'includes/rest-api/class-revenue-server.php';
+
+		// Services.
+		require_once REVENUE_PATH . 'includes/services/class-revenue-product-context.php';
 
 		// Campaigns.
 		require_once REVENUE_PATH . 'includes/campaigns/class-revenue-normal-discount.php';
@@ -248,6 +266,7 @@ final class Revenue {
 	public function init_classes() {
 		new Revenue_Campaign();
 		Revenue_Analytics::instance()->init();
+		// Revenue_Template_Utils::instance()->init();
 
 		// Load REST API.
 		Revenue_Server::instance()->init();
@@ -260,6 +279,9 @@ final class Revenue {
 		Revenue_Countdown_Timer::instance()->init();
 		Revenue_Stock_Scarcity::instance()->init();
 		Revenue_Next_Order_Coupon::instance()->init();
+
+		// Initialize Language Toggle
+		// \REVENUE\Revenue_Language_Toggle::instance();
 
 		// Revenue_Notice::instance()->init();
 	}
@@ -456,11 +478,24 @@ final class Revenue {
 		if ( ! revenue()->is_pro_active() ) {
 			$pricing_url = esc_url( revenue()->get_pricing_page_url() );
 
+			// Show campaign banner between Jan 1 and Feb 15, 2026.
+
+			$now = new DateTime( 'now', wp_timezone() );
+
+			$start_date = new DateTime( '2026-01-01 00:00:00', wp_timezone() );
+			$end_date   = new DateTime( '2026-02-15 23:59:59', wp_timezone() );
+
+			if ( $now >= $start_date && $now <= $end_date ) {
+				$text = esc_html__( 'New Year Offer!', 'revenue' );
+			} else {
+				$text = esc_html__( 'Upgrade Pro', 'revenue' );
+			}
+
 			$last_part = array(
 				'get_discounts' => sprintf(
 					'<a style="color:#00a44a; font-weight: 700;" target="_blank" href="%s">%s</a>',
 					$pricing_url,
-					esc_html__( 'Upgrade to Pro', 'revenue' )
+					$text
 				),
 			);
 

@@ -11,6 +11,8 @@
 
 namespace Revenue;
 
+use Revenue\Services\Revenue_Product_Context;
+
 /**
  * The Template for displaying revenue view
  *
@@ -22,9 +24,7 @@ defined( 'ABSPATH' ) || exit;
 
 //phpcs:disable WordPress.PHP.StrictComparisons.LooseComparison
 
-
-global $product;
-
+$product = Revenue_Product_Context::get_product_context();
 
 $offered_product = false;
 $regular_price   = false;
@@ -553,7 +553,7 @@ $container_class = 'revx-buyx-gety ' . ( 'list' === $view_mode ? 'revx-campaign-
 
 if ( $is_list_view ) {
 	?>
-	<div class="revx-campaign-container__wrapper" style="<?php echo esc_attr( $wrapper_style ); ?>">
+	<div class="revx-campaign-container__wrapper" style="<?php echo esc_attr( $wrapper_style ); ?> width:100%;">
 		<div class="revx-campaign-view__items revx-bxgy-trigger-item" style="<?php echo esc_attr( $trigger_product_style ); ?> ">
 			<?php
 			echo wp_kses( $trigger_product_output, revenue()->get_allowed_tag() );
