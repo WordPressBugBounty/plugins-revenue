@@ -39,7 +39,7 @@ class Notice {
 		// REST API routes.
 		add_action( 'rest_api_init', array( $this, 'register_rest_route' ) );
 
-		// Woocommerce Install Action
+		// Woocommerce Install Action.
 		add_action( 'wp_ajax_revx_install', array( $this, 'install_activate_plugin' ) );
 	}
 
@@ -887,7 +887,19 @@ class Notice {
 					<h3><?php esc_html_e( 'Welcome to Revenue.', 'revenue' ); ?></h3>
 					<p><?php esc_html_e( 'Revenue is a WooCommerce-based plugin. So you need to installed & activate WooCommerce to start using Revenue.', 'revenue' ); ?></p>
 					<div class="revx-install-btn-wrap">
-						<a class="wc-install-btn revx-install-btn button button-primary" data-plugin-slug="<?php echo esc_attr( $plugin_slug ); ?>" href="#"><span class="dashicons dashicons-image-rotate"></span><?php file_exists( WP_PLUGIN_DIR . '/woocommerce/woocommerce.php' ) ? esc_html_e( 'Activate WooCommerce', 'revenue' ) : esc_html_e( 'Install WooCommerce', 'revenue' ); ?></a>
+						<a
+							class="wc-install-btn revx-install-btn button button-primary"
+							data-plugin-slug="<?php echo esc_attr( $plugin_slug ); ?>"
+							data-nonce="<?php echo esc_attr( wp_create_nonce( 'revenue-dashboard' ) ); ?>"
+							href="#"
+						>
+							<span class="dashicons dashicons-image-rotate"></span>
+							<?php
+								file_exists( WP_PLUGIN_DIR . '/woocommerce/woocommerce.php' )
+									? esc_html_e( 'Activate WooCommerce', 'revenue' )
+									: esc_html_e( 'Install WooCommerce', 'revenue' );
+							?>
+						</a>
 						<?php if ( 'required' !== $type ) : ?>
 							<a href="<?php echo esc_url( add_query_arg( array( 'revx_install_key' => $install_key_tran ) ) ); ?>" class="revx-install-cancel wc-dismiss-notice">
 								<?php esc_html_e( 'Discard', 'revenue' ); ?>
@@ -907,12 +919,22 @@ class Notice {
 	 * @return STRING | Redirect URL
 	 */
 	public function install_activate_plugin() {
+
+		check_ajax_referer( 'revenue-dashboard', 'nonce' );
+
+		if ( ! current_user_can( 'install_plugins' ) ) {
+			wp_send_json_error( __( 'You do not have sufficient permissions to install plugins.', 'revenue' ) );
+		}
 		if ( ! isset( $_POST['install_plugin'] ) ) {
-			return wp_send_json_error( esc_html__( 'Invalid request.', 'revenue' ) );
+			wp_send_json_error( esc_html__( 'Invalid request.', 'revenue' ) );
 		}
 		$plugin_slug = sanitize_text_field( wp_unslash( $_POST['install_plugin'] ) );
 
-		Xpo::install_and_active_plugin( $plugin_slug );
+		$res = Xpo::install_and_active_plugin( $plugin_slug );
+
+		if ( ! $res ) {
+			wp_send_json_error( esc_html__( 'Unknown plugin.', 'revenue' ) );
+		}
 
 		if ( wp_doing_ajax() || is_network_admin() || isset( $_GET['activate-multi'] ) || isset( $_POST['action'] ) && 'activate-selected' == sanitize_text_field( $_POST['action'] ) ) { //phpcs:ignore
 			return;
@@ -1251,7 +1273,8 @@ class Notice {
 						url: ajaxurl,
 						data: {
 							install_plugin: $that.attr('data-plugin-slug'),
-							action: 'revx_install'
+							action: 'revx_install',
+							nonce: $that.attr('data-nonce'),
 						},
 						beforeSend: function() {
 							$that.parents('.wc-install').addClass('loading');

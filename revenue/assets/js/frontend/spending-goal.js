@@ -1132,6 +1132,13 @@
 				container: $( this ),
 				type: $( this ).data( 'position' ), // drawer or inpage now
 			} );
+
+			// After initialization(page-load/add-to-cart through form submit), call autoAddFreeGiftsToCart
+			// so the instance adds any claimable free gift available in the spending goal from backend via ajax.
+			const inst = $.data( this, 'revenueSpendingGoalProgress' );
+			if ( inst && typeof inst.autoAddFreeGiftsToCart === 'function' ) {
+				inst.autoAddFreeGiftsToCart();
+			}
 		} );
 	}
 
@@ -1141,7 +1148,7 @@
 		// tried to fix the issue of after cart reload
 		// Re-run every time checkout updates (AJAX reload)
 		$( document.body ).on( 'updated_checkout', function () {
-			init;
+			init();
 		} );
 	} );
 } )( jQuery );

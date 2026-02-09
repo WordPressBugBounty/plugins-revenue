@@ -340,6 +340,11 @@ class Xpo {
 			case 'wow_addon':
 				$plugin_slug = 'product-addons';
 				break;
+			case 'woocommerce':
+				$plugin_slug = 'woocommerce';
+				break;
+			default:
+				return false;
 		}
 
 		if ( ! file_exists( WP_PLUGIN_DIR . '/' . $plugin_slug . '/' . $plugin_slug . '.php' ) ) {

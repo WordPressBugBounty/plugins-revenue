@@ -92,8 +92,8 @@
 		$( document )
 			.find( '.revx-template' )
 			.each( function () {
-				// if this is any child .revx-template, return since its calculation is already done.
-				if ( $( this ).parents( '.revx-template' ).length ) {
+				// if this has any child .revx-template, return to avoid double calculation.
+				if ( $( this ).children( '.revx-template' ).length ) {
 					return;
 				}
 				// get offers/products for this campaign
