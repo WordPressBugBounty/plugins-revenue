@@ -205,32 +205,16 @@ class Xpo {
 
 	public static function generate_utm_link( $params ) {
 		$default_config = array(
-			'example'        => array(
+			'flash_sale' => array(
 				'source'   => 'db-revenue-featurearea',
-				'medium'   => 'block-featurename',
+				'medium'   => 'flash_sale',
 				'campaign' => 'revenue-dashboard',
 			),
-			'summer_db'      => array(
+			'final_hour' => array(
 				'source'   => 'db-revenue-notice-text',
-				'medium'   => 'black-friday-sale',
+				'medium'   => 'final_hour',
 				'campaign' => 'revenue-dashboard',
 			),
-			'summer_db2'      => array(
-				'source'   => 'db-revenue-notice-logo',
-				'medium'   => 'black-friday-sale',
-				'campaign' => 'revenue-dashboard',
-			),
-			'summer_db3'      => array(
-				'source'   => 'db-revenue-notice-text',
-				'medium'   => 'flash-sale',
-				'campaign' => 'revenue-dashboard',
-			),
-			'summer_db4'      => array(
-				'source'   => 'db-revenue-notice-logo',
-				'medium'   => 'exclusive-deals',
-				'campaign' => 'revenue-dashboard',
-			),
-			
 		);
 
 		// Step 1: Get parameters.

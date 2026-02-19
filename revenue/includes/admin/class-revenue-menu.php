@@ -10,6 +10,7 @@
 namespace Revenue;
 
 use REVX\Includes\Durbin\Xpo;
+use REVX\Includes\Notice\Notice;
 
 /**
  * Revenue Menu
@@ -252,7 +253,7 @@ class Revenue_Menu {
 			'campaign_list_trigger_row_message' => revenue()->get_campaign_list_trigger_row(),
 			'campaign_enabled_quantity_selector' => revenue()->show_quantity_selector_on_campaigns(),
 			'campaign_counts'                  => revenue()->get_campaign_counts(),
-			'helloBar'                  => Xpo::get_transient_without_cache('revx_helloBar'),
+			'helloBar'                  => Notice::get_hellobar_config(),
 			'license'                  => Xpo::get_lc_key(),
 			'current_locale'           => get_locale(),
 			'userInfo'          => array(

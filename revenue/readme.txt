@@ -4,7 +4,7 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 6.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.1.4
+Stable tag: 2.1.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -226,6 +226,9 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page
 
 == Changelog ==
+
+= 2.1.5 – 19 February 2026 =
+* Improvement: Enhanced the performance of the Buy X Get Y campaign.
 
 = 2.1.4 – 09 February 2026 =
 * Fix: Free gift items are now added automatically on page load and when products are added to cart via forms, ensuring eligible rewards are not missed.

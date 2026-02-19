@@ -3,7 +3,7 @@
  * Plugin Name: WowRevenue
  * Plugin URI: https://www.wowrevenue.com/
  * Description: WowRevenue is a product bundles plugin with various discount campaigns, allowing you to create enticing offers and encourage shoppers to make more purchases. As a result, your average order value and overall revenue will be increased.
- * Version: 2.1.4
+ * Version: 2.1.5
  * Author: WowRevenue
  * Author URI: https://wowrevenue.com/
  * License: GPLv3
@@ -30,7 +30,7 @@ if ( ! defined( 'REVENUE_URL' ) ) {
 }
 
 if ( ! defined( 'REVENUE_VER' ) ) {
-	define( 'REVENUE_VER', '2.1.4' );
+	define( 'REVENUE_VER', '2.1.5' );
 }
 
 // // Auto-generate translation files from .po files
