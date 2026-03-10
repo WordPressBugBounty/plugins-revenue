@@ -1,7 +1,50 @@
 jQuery( document ).ready( function ( $ ) {
+	function adjustStickyStack() {
+		let offset = 0;
+
+		// 1. WP Admin Bar
+		const wpAdminBar = document.getElementById( 'wpadminbar' );
+		if ( wpAdminBar ) {
+			offset += wpAdminBar.offsetHeight;
+		}
+
+		// 2. WC Install banner
+		const wcInstall = document.querySelector( '.revx-wc-install' );
+		if ( wcInstall && wcInstall.offsetParent !== null ) {
+			wcInstall.style.top = offset + 'px';
+			wcInstall.style.opacity = 1; // reveal smoothly
+			offset += wcInstall.offsetHeight;
+		}
+
+		// 3. Other notices (can be multiple)
+		const notices = document.querySelectorAll( '.revx-notice' );
+		notices.forEach( ( notice ) => {
+			if ( notice.offsetParent !== null ) {
+				notice.style.top = offset + 'px';
+				notice.style.opacity = 1; // reveal smoothly
+				offset += notice.offsetHeight;
+			}
+		} );
+
+		// 4. Navbar
+		const navbar = document.querySelector( '.revx-nav.revx-nav-wrapper' );
+		if ( navbar ) {
+			navbar.style.top = offset + 'px';
+			navbar.style.opacity = 1; // reveal smoothly
+		}
+	}
+
+	adjustStickyStack();
+	const observer = new MutationObserver( adjustStickyStack );
+
+	observer.observe( document.body, {
+		childList: true,
+		subtree: true,
+	} );
+
 	$( '#revx-activate-woocommerce' ).on( 'click', function ( e ) {
 		e.preventDefault();
-		let $button = $( this );
+		const $button = $( this );
 		$button.removeClass( 'installing' ).addClass( 'activating' );
 		$button
 			.text( 'Activating...' )
@@ -32,7 +75,7 @@ jQuery( document ).ready( function ( $ ) {
 
 	$( '#revx-install-woocommerce' ).on( 'click', function ( e ) {
 		e.preventDefault();
-		var $button = $( this );
+		const $button = $( this );
 		$button.addClass( 'installing' );
 		$button.find( '.spinner' ).show();
 		$button

@@ -5,6 +5,19 @@ body.toplevel_page_revenue.revx-loaded {
 	display: block;
 }
 
+.revx-wc-install{
+  transition: top 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+.revx-notice {
+  transition: top 0.5s ease, opacity 0.5s ease;
+  opacity: 0;
+}
+.revx-nav.revx-nav-wrapper {
+  transition: top 0.7s ease, opacity 0.7s ease;
+  opacity: 0;
+}
+
 .revx-wc-install__btn::before,
 .button.activating-message:before,
 .button.installing:before,
@@ -19,13 +32,13 @@ body.toplevel_page_revenue.revx-loaded {
 	display: flex;
 	align-items: center;
 	background: #fff;
-	width: calc(100% - 30px);
+	width: calc(100% - 24px);
 	border-left: 24px solid #f17b2c;
 	margin: auto;
 	background-color: #fef3eb;
 	height: 112px;
-	display: flex;
-	align-items: center;
+	position: sticky;
+	z-index: 998;
 }
 
 .revx-wc-install__img {
@@ -44,6 +57,7 @@ body.toplevel_page_revenue.revx-loaded {
 	flex: 1;
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
 }
 
 .revx-wc-install__message {

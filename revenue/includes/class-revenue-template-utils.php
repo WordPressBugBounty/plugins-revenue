@@ -178,6 +178,7 @@ class Revenue_Template_Utils {
 	 * @return void Outputs HTML directly.
 	 */
 	public static function render_product_item( $offered_product_ids, $offer, $campaign, $template_data, $is_variation, $is_divider, $is_bundle, $view_mode, $offer_length, $offer_index, &$render_index, &$total_offer_products, &$offer_data, $is_grid_view, $is_x_product = false, $is_trigger = false ) {
+		// @todo refactor long line
 		$render_products = $is_variation ? self::get_product_group( $offered_product_ids ) : self::get_product_list( $offered_product_ids );
 
 		$render_product_length   = count( $render_products );
@@ -532,7 +533,17 @@ class Revenue_Template_Utils {
 	 *
 	 * @return void
 	 */
-	public static function render_mix_match_product_item( $offered_product_ids, $offer, $campaign, $template_data, $is_variation, $view_mode, &$render_index, &$total_offer_products, &$offer_data ) {
+	public static function render_mix_match_product_item(
+		$offered_product_ids,
+		$offer,
+		$campaign,
+		$template_data,
+		$is_variation,
+		$view_mode,
+		&$render_index,
+		&$total_offer_products,
+		&$offer_data
+	) {
 		$render_products         = $is_variation ? self::get_product_group( $offered_product_ids ) : self::get_product_list( $offered_product_ids );
 		$total_rendered_products = 0;
 		$campaign_type           = $campaign['campaign_type'];
@@ -795,7 +806,7 @@ class Revenue_Template_Utils {
 					}
 				}
 			}
-
+			// @todo refactor this with ternary operator
 			if ( $is_x_product ) {
 				$product_array = array(
 					'id'            => $product_id,
@@ -2830,7 +2841,7 @@ class Revenue_Template_Utils {
 			 *
 			 * @var WC_Product_Variation $variation_product
 			 */
-			$variation_product = wc_get_product( $variation['item_id'] );
+			$variation_product = wc_get_product( $variation['item_id'] ?? 0 );
 			if ( empty( $variation_product ) ) {
 				continue;
 			}
@@ -2996,6 +3007,9 @@ class Revenue_Template_Utils {
 			$default_attributes = $product->get_default_attributes();
 		}
 
+		if ( $product && $product->is_type( 'variable' ) ) {
+			$default_attributes = $product->get_default_attributes();
+		}
 		foreach ( $attributes as $attr => $options ) :
 			$attribute_name = strtolower( $attr );
 			$attr_key       = str_replace( 'attribute_', '', $attr );
@@ -3092,6 +3106,7 @@ class Revenue_Template_Utils {
 	 * @return string Escaped HTML attributes string.
 	 */
 	public static function get_data_price_attributes( $product_id, $offer ) {
+		// @todo move function to different file.
 		$data_price_attributes = '';
 		$product_id            = absint( $product_id );
 		// if product id is empty return empty string.
@@ -3104,6 +3119,7 @@ class Revenue_Template_Utils {
 			return $data_price_attributes;
 		}
 		$tax_display  = get_option( 'woocommerce_tax_display_shop', 'incl' );
+		// @todo refactor to simpler variable checking code.
 		$product_type = $product_->get_type();
 		if ( 'variable' === $product_type ) {
 			$children                = $product_->get_children();
@@ -3826,6 +3842,7 @@ class Revenue_Template_Utils {
 		$product_quantity = isset( $pd['quantity'] ) ? $pd['quantity'] : '';
 		$campaign_id      = $campaign['id'];
 		$campaign_type    = $campaign['campaign_type'];
+		// @todo refactor lines and remove extra sapces
 		?>
 			<div data-product-id="<?php echo esc_attr( $product_id ); ?>"
 				date-variation-id="0"
@@ -3958,6 +3975,7 @@ class Revenue_Template_Utils {
 	 * @see self::revenue_render_product_cart()
 	 */
 	public static function revenue_render_buy_x_get_y_product_card( $offer = array(), $pd = array(), $layout = 'grid', $campaign = null, $template_data = null, $hide_cart = false, $add_cart_id = 'addToCartWrapper', $product_index = '', $is_x_product = false ) {
+		// @todo refactor this long line.
 		if ( ! $pd || ! $campaign ) {
 			return;
 		}
@@ -4080,6 +4098,8 @@ class Revenue_Template_Utils {
 			}
 			$product_tag_to_render = ob_get_clean();
 		}
+
+		// @todo remove extra spaces from below.
 		?>
 
 		<div 
@@ -5946,6 +5966,7 @@ class Revenue_Template_Utils {
 				'is_in_stock'   => $product->is_in_stock(),
 				'quantity'      => 2,
 				'parent_id'     => $parent_id ? (int) $parent_id : '',
+				'attributes'    => $is_variation ? $attributes : '',
 			);
 
 			if ( $is_variation ) {

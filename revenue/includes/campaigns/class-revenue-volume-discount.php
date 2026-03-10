@@ -108,28 +108,29 @@ class Revenue_Volume_Discount {
 					$offer_qty   = intval( $offer['quantity'] );
 				}
 			}
+		}
 
-			if ( $offer_type && ( 'free' === $offer_type || $offer_value ) ) {
+			// @todo if 'free' is never possible remove this codition.
+		if ( $offer_type && ( 'free' === $offer_type || $offer_value ) ) {
 
-				if ( 'fixed_total_price' === $offer_type ) {
-					if ( $offer_qty == $cart_quantity ) {
-						$offered_price = revenue()->calculate_campaign_offered_price(
-							$offer_type,
-							$offer_value,
-							$filtered_price,
-							false,
-							1,
-							'volume_discount'
-						);
-						$offered_price = $offered_price / $offer_qty;
-					}
-				} else {
+			if ( 'fixed_total_price' === $offer_type ) {
+				if ( $offer_qty == $cart_quantity ) {
 					$offered_price = revenue()->calculate_campaign_offered_price(
 						$offer_type,
 						$offer_value,
-						$filtered_price
+						$filtered_price,
+						false,
+						1,
+						'volume_discount'
 					);
+					$offered_price = $offered_price / $offer_qty;
 				}
+			} else {
+				$offered_price = revenue()->calculate_campaign_offered_price(
+					$offer_type,
+					$offer_value,
+					$filtered_price
+				);
 			}
 		}
 
@@ -188,43 +189,43 @@ class Revenue_Volume_Discount {
 					$offer_value = $offer['value'];
 					$offer_qty   = intval( $offer['quantity'] );
 				}
-			}
+				// }
 
-			if ( $offer_type && ( 'free' === $offer_type || $offer_value ) ) {
+				if ( $offer_type && ( 'free' === $offer_type || $offer_value ) ) {
 
-				if ( 'fixed_total_price' === $offer_type ) {
-					if ( $offer_qty === $cart_quantity ) {
+					if ( 'fixed_total_price' === $offer_type ) {
+						if ( $offer_qty === $cart_quantity ) {
+							$offered_price = revenue()->calculate_campaign_offered_price(
+								$offer_type,
+								$offer_value,
+								$filtered_price,
+								false,
+								1,
+								'volume_discount'
+							);
+							$offered_price = $offered_price / $offer_qty;
+						}
+					} else {
 						$offered_price = revenue()->calculate_campaign_offered_price(
 							$offer_type,
 							$offer_value,
-							$filtered_price,
-							false,
-							1,
-							'volume_discount'
+							$filtered_price
 						);
-						$offered_price = $offered_price / $offer_qty;
 					}
-				} else {
-					$offered_price = revenue()->calculate_campaign_offered_price(
-						$offer_type,
-						$offer_value,
-						$filtered_price
-					);
-				}
 
-				// Apply tax to final offered price based on WooCommerce setting.
-				if ( 'incl' === $tax_display ) {
-					$offered_price = wc_get_price_including_tax( $product, array( 'price' => $offered_price ) );
-				} else {
-					$offered_price = wc_get_price_excluding_tax( $product, array( 'price' => $offered_price ) );
+					// Apply tax to final offered price based on WooCommerce setting.
+					if ( 'incl' === $tax_display ) {
+						$offered_price = wc_get_price_including_tax( $product, array( 'price' => $offered_price ) );
+					} else {
+						$offered_price = wc_get_price_excluding_tax( $product, array( 'price' => $offered_price ) );
+					}
 				}
 			}
+
+			$offered_price = apply_filters( 'revenue_campaign_volume_discount_price', $offered_price, $product_id );
+			return $offered_price;
 		}
-
-		$offered_price = apply_filters( 'revenue_campaign_volume_discount_price', $offered_price, $product_id );
-		return $offered_price;
 	}
-
 
 	/**
 	 * Filters the cart item price to display the discounted price.
@@ -278,7 +279,6 @@ class Revenue_Volume_Discount {
 		return $cart_quantity;
 	}
 
-
 	/**
 	 * Outputs in-page views for the provided campaigns.
 	 *
@@ -298,9 +298,6 @@ class Revenue_Volume_Discount {
 		$this->current_position = $data['position'];
 		$this->render_views( $data );
 	}
-
-
-
 
 	/**
 	 * Outputs popup views for the provided campaigns.
@@ -383,8 +380,8 @@ class Revenue_Volume_Discount {
 			// wp_enqueue_script( 'revenue-popup' );
 			// wp_enqueue_style( 'revenue-popup' );
 
-			$output_popups    = '';
-			$campaigns = $this->campaigns['popup'];
+			$output_popups = '';
+			$campaigns     = $this->campaigns['popup'];
 			foreach ( $campaigns as $campaign ) {
 				$current_campaign = $campaign;
 				$output           = '';
@@ -413,8 +410,8 @@ class Revenue_Volume_Discount {
 		}
 		if ( ! empty( $this->campaigns['floating'] ) ) {
 
-			$output_floatings    = '';
-			$campaigns = $this->campaigns['floating'];
+			$output_floatings = '';
+			$campaigns        = $this->campaigns['floating'];
 			foreach ( $campaigns as $campaign ) {
 
 				revenue()->load_floating_assets( $campaign );

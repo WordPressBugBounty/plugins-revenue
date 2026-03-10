@@ -1342,7 +1342,7 @@ class Revenue_Functions {
 	 *               An empty string if a valid but non-existing campaign ID is passed.
 	 */
 	public function get_campaign_meta( $campaign_id, $meta_key = '', $single = false ) {
-		if ( ! $campaign_id ) {
+		if ( ! $campaign_id || is_wp_error( $campaign_id ) || ! is_numeric( $campaign_id ) ) {
 			return null;
 		}
 		$meta_cache = wp_cache_get( $campaign_id, 'revenue_campaign_meta' );
@@ -4055,7 +4055,8 @@ class Revenue_Functions {
 	public function get_allowed_tag() {
 		// Add safecss filter to allow display property
 		add_filter( 'safe_style_css', array( $this, 'allow_display_in_kses' ) );
-		
+
+		// @todo input is repeated - check back properly
 		$allowed_tags = array_merge(
 			wp_kses_allowed_html( 'post' ),
 			array(

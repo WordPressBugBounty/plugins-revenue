@@ -293,7 +293,7 @@ ob_start();
 						}
 
 						// Extension Filter: Sale Price Addon.
-						$filtered_price = apply_filters(
+						$variation_filtered_price = apply_filters(
 							'revenue_base_price_for_discount_filter',
 							$variation['regular_price'],
 							$variation['sale_price']
@@ -302,7 +302,7 @@ ob_start();
 						$variation['offered_price'] = revenue()->calculate_campaign_offered_price(
 							$offer_type,
 							$offer_value,
-							$filtered_price,
+							$variation_filtered_price,
 							false,
 							$offer_qty,
 							$campaign_type

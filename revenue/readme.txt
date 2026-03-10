@@ -4,14 +4,14 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 6.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.1.5
+Stable tag: 2.1.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 WowRevenue is a combination of product bundles and discount campaigns, including bulk discounts, buy x get y discounts, and more.
 
 == Description ==
-
+ 
 💲 **Increase AOV** with product bundles & **discount campaigns.**
 📈 **Boost** your **revenue** without increasing the **marketing cost.**
 💕 A plugin by **WPXPO**, that empowers **60K+ businesses!**
@@ -227,6 +227,11 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 
 == Changelog ==
 
+= 2.1.6 – 10 March 2026 =
+* New: Filters added for extensibilty of buy x get y.
+* Improvement: Navbar and notices alignment on plugin dashboard.
+* Fix: Bundle discount badge percentage calculation issue.
+
 = 2.1.5 – 19 February 2026 =
 * Improvement: Enhanced the performance of the Buy X Get Y campaign.
 
@@ -260,7 +265,7 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 * Improvement: Improved the positioning and behavior of front-end popups and floating displays.
 * Improvement: Enhanced the builder settings panel with an improved UI/UX.
 
-= 2.0.9 – 22 December 2025 =
+= 2.0.9 – 22 December 2025 = 
 * Fix: Corrected decimal precision issues in pricing and discounts to ensure proper rounding and display in mini carts.  
 * Fix: Resolved automatic campaign update issues caused by multi-render scenarios.  
 * Fix: Prevented unnecessary “unsaved changes” warnings when opening and closing campaigns without making edits. 

@@ -911,7 +911,8 @@ class Revenue_Ajax {
 					// Last Product.
 					$cart_item_data['revx_bxgy_last_trigger']     = true;
 					$cart_item_data['revx_bxgy_all_triggers_key'] = $parent_keys;
-					$status                                       = WC()->cart->add_to_cart( $id, $qty, $current_variation_id, $current_attributes, $cart_item_data );
+
+					$status = WC()->cart->add_to_cart( $id, $qty, $current_variation_id, $current_attributes, $cart_item_data );
 				} else {
 					$status = WC()->cart->add_to_cart( $id, $qty, $current_variation_id, $current_attributes, $cart_item_data );
 				}

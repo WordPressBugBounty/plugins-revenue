@@ -204,8 +204,8 @@ class Revenue_Stock_Scarcity {
 						false,
 						'stock_scarcity'
 					);
-
-					if ( ! empty( $campaigns ) ) {
+					$product = wc_get_product( $product_id );
+					if ( ! empty( $campaigns ) && $product->get_stock_quantity() > 0 ) {
 						add_filter( 'woocommerce_get_stock_html', fn( $html, $product ) => '', 10, 2 );
 					}
 				}

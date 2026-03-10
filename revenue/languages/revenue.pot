@@ -2,79 +2,143 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
+<<<<<<< HEAD
+"Project-Id-Version: WowRevenue 2.0.9\n"
+=======
 "Project-Id-Version: WowRevenue 2.0.10\n"
+>>>>>>> dev
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/revenue\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+<<<<<<< HEAD
+"POT-Creation-Date: 2025-12-22T08:54:41+00:00\n"
+=======
 "POT-Creation-Date: 2025-12-29T10:20:12+00:00\n"
+>>>>>>> dev
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.12.0\n"
+"X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: revenue\n"
 
 #. Plugin Name of the plugin
 #. Author of the plugin
-#: revenue.php
 #: includes/class-revenue-functions.php:89
 msgid "WowRevenue"
 msgstr ""
 
+#. Plugin URI of the plugin
+msgid "https://www.wowrevenue.com/"
+msgstr ""
+
 #. Description of the plugin
-#: revenue.php
 msgid "WowRevenue is a product bundles plugin with various discount campaigns, allowing you to create enticing offers and encourage shoppers to make more purchases. As a result, your average order value and overall revenue will be increased."
 msgstr ""
 
+#. Author URI of the plugin
+msgid "https://wowrevenue.com/"
+msgstr ""
+
 #: includes/admin/class-revenue-menu.php:122
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82663
+#: assets/js/backend/revenue-admin.js:82679
+=======
 #: assets/js/backend/revenue-admin.js:113642
 #: assets/js/backend/revenue-admin.js:113662
 #: assets/js/backend/revenue-admin.js:106912
 #: assets/js/backend/revenue-admin.js:106928
+>>>>>>> dev
 msgid "Overview"
 msgstr ""
 
 #: includes/admin/class-revenue-menu.php:123
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82664
+#: assets/js/backend/revenue-admin.js:82680
+=======
 #: assets/js/backend/revenue-admin.js:113645
 #: assets/js/backend/revenue-admin.js:113665
 #: assets/js/backend/revenue-admin.js:106913
 #: assets/js/backend/revenue-admin.js:106929
+>>>>>>> dev
 msgid "Campaigns"
 msgstr ""
 
 #: includes/admin/class-revenue-menu.php:124
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82665
+#: assets/js/backend/revenue-admin.js:82681
+=======
 #: assets/js/backend/revenue-admin.js:113648
 #: assets/js/backend/revenue-admin.js:113668
 #: assets/js/backend/revenue-admin.js:106914
 #: assets/js/backend/revenue-admin.js:106930
+>>>>>>> dev
 msgid "Analytics"
 msgstr ""
 
 #: includes/admin/class-revenue-menu.php:129
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82682
+=======
 #: assets/js/backend/revenue-admin.js:113671
 #: assets/js/backend/revenue-admin.js:106931
+>>>>>>> dev
 msgid "License"
 msgstr ""
 
 #: includes/admin/class-revenue-menu.php:131
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82823
+=======
 #: assets/js/backend/revenue-admin.js:113862
 #: assets/js/backend/revenue-admin.js:107110
+>>>>>>> dev
 msgid "Suggest Features"
 msgstr ""
 
 #: includes/admin/class-revenue-menu.php:145
+<<<<<<< HEAD
+#: includes/class-revenue.php:486
+=======
 #: includes/class-revenue.php:490
+>>>>>>> dev
 msgid "New Year Offer!"
 msgstr ""
 
 #: includes/admin/class-revenue-menu.php:147
+<<<<<<< HEAD
+#: includes/class-revenue.php:488
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45306
+=======
 #: includes/class-revenue.php:492
 #: assets/js/backend/revenue-admin.js:173708
 #: assets/js/backend/revenue-admin.js:171035
+>>>>>>> dev
 msgid "Upgrade Pro"
 msgstr ""
 
 #: includes/admin/class-revenue-menu.php:153
+<<<<<<< HEAD
+#: includes/class-revenue.php:317
+#: assets/js/backend/revenue-admin.js:117336
+msgid "Renew License"
+msgstr ""
+
+#: includes/admin/class-revenue-menu.php:360
+msgid "Install WooCommerce"
+msgstr ""
+
+#: includes/admin/class-revenue-menu.php:393
+=======
 #: includes/class-revenue.php:321
 #: assets/js/backend/revenue-admin.js:142880
 #: assets/js/backend/revenue-admin.js:138580
@@ -88,6 +152,7 @@ msgstr ""
 
 #: includes/admin/class-revenue-menu.php:397
 #: includes/notice/class-notice.php:890
+>>>>>>> dev
 msgid "Activate WooCommerce"
 msgstr ""
 
@@ -117,7 +182,10 @@ msgstr ""
 #: includes/campaigns/views/bundle-discount/inpage.php:356
 #: includes/campaigns/views/bundle-discount/popup.php:114
 #: includes/campaigns/views/bundle-discount/popup.php:337
+<<<<<<< HEAD
+=======
 #, php-format
+>>>>>>> dev
 msgid "%s%% OFF"
 msgstr ""
 
@@ -133,9 +201,15 @@ msgstr ""
 #: includes/campaigns/views/buy-x-get-y/inpage.php:695
 #: includes/campaigns/views/buy-x-get-y/popup.php:578
 #: includes/campaigns/views/buy-x-get-y/popup.php:693
+<<<<<<< HEAD
+#: includes/class-revenue-functions.php:3059
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45404
+=======
 #: includes/class-revenue-functions.php:3058
 #: assets/js/backend/revenue-admin.js:173806
 #: assets/js/backend/revenue-admin.js:171133
+>>>>>>> dev
 msgid "Total"
 msgstr ""
 
@@ -146,7 +220,6 @@ msgstr ""
 #: includes/campaigns/views/buy-x-get-y/inpage.php:245
 #: includes/campaigns/views/buy-x-get-y/popup.php:176
 #: includes/campaigns/views/buy-x-get-y/popup.php:243
-#, php-format
 msgid "Buy %s"
 msgstr ""
 
@@ -154,11 +227,17 @@ msgstr ""
 #: includes/campaigns/views/buy-x-get-y/floating.php:322
 #: includes/campaigns/views/buy-x-get-y/inpage.php:321
 #: includes/campaigns/views/buy-x-get-y/popup.php:319
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45702
+#: assets/js/backend/revenue-admin.js:45943
+=======
 #: assets/js/backend/revenue-admin.js:174087
 #: assets/js/backend/revenue-admin.js:174251
 #: assets/js/backend/revenue-admin.js:171431
 #: assets/js/backend/revenue-admin.js:171672
 #, php-format,js-format
+>>>>>>> dev
 msgid "Get %s%% OFF"
 msgstr ""
 
@@ -169,6 +248,14 @@ msgstr ""
 #: includes/campaigns/views/buy-x-get-y/inpage.php:332
 #: includes/campaigns/views/buy-x-get-y/popup.php:325
 #: includes/campaigns/views/buy-x-get-y/popup.php:330
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45718
+#: assets/js/backend/revenue-admin.js:45740
+#: assets/js/backend/revenue-admin.js:45763
+#: assets/js/backend/revenue-admin.js:45959
+#: assets/js/backend/revenue-admin.js:45979
+=======
 #: assets/js/backend/revenue-admin.js:174100
 #: assets/js/backend/revenue-admin.js:174111
 #: assets/js/backend/revenue-admin.js:174123
@@ -180,17 +267,25 @@ msgstr ""
 #: assets/js/backend/revenue-admin.js:171688
 #: assets/js/backend/revenue-admin.js:171708
 #, php-format,js-format
+>>>>>>> dev
 msgid "Get %s OFF"
 msgstr ""
 
 #: includes/campaigns/views/buy-x-get-y/floating.php:341
 #: includes/campaigns/views/buy-x-get-y/inpage.php:340
 #: includes/campaigns/views/buy-x-get-y/popup.php:338
+<<<<<<< HEAD
+#: includes/class-revenue-functions.php:1945
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45784
+#: assets/js/backend/revenue-admin.js:45971
+=======
 #: includes/class-revenue-functions.php:1944
 #: assets/js/backend/revenue-admin.js:174137
 #: assets/js/backend/revenue-admin.js:174260
 #: assets/js/backend/revenue-admin.js:171513
 #: assets/js/backend/revenue-admin.js:171700
+>>>>>>> dev
 msgid "Get Free"
 msgstr ""
 
@@ -204,30 +299,59 @@ msgstr ""
 #: includes/campaigns/views/volume-discount/floating.php:71
 #: includes/campaigns/views/volume-discount/popup.php:71
 #: includes/campaigns/views/volume-discount/template2.php:202
+<<<<<<< HEAD
+#: includes/class-revenue-template-utils.php:1970
+=======
 #: includes/class-revenue-template-utils.php:1994
 #, php-format
+>>>>>>> dev
 msgid "%s%%"
 msgstr ""
 
 #: includes/campaigns/views/countdown-timer/inpage.php:84
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112714
+=======
 #: assets/js/backend/revenue-admin.js:128787
 #: assets/js/backend/revenue-admin.js:122540
+>>>>>>> dev
 msgid "Days"
 msgstr ""
 
 #: includes/campaigns/views/countdown-timer/inpage.php:85
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112730
+=======
 #: assets/js/backend/revenue-admin.js:128795
 #: assets/js/backend/revenue-admin.js:122556
+>>>>>>> dev
 msgid "Hours"
 msgstr ""
 
 #: includes/campaigns/views/countdown-timer/inpage.php:86
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112746
+=======
 #: assets/js/backend/revenue-admin.js:128803
 #: assets/js/backend/revenue-admin.js:122572
+>>>>>>> dev
 msgid "Minutes"
 msgstr ""
 
 #: includes/campaigns/views/countdown-timer/inpage.php:87
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105594
+#: assets/js/backend/revenue-admin.js:105677
+#: assets/js/backend/revenue-admin.js:112762
+#: assets/js/backend/revenue-admin.js:113651
+#: assets/js/backend/revenue-admin.js:113818
+#: assets/js/backend/revenue-admin.js:115828
+#: assets/js/backend/revenue-admin.js:115842
+=======
 #: assets/js/backend/revenue-admin.js:106358
 #: assets/js/backend/revenue-admin.js:106370
 #: assets/js/backend/revenue-admin.js:128102
@@ -242,6 +366,7 @@ msgstr ""
 #: assets/js/backend/revenue-admin.js:122588
 #: assets/js/backend/revenue-admin.js:127614
 #: assets/js/backend/revenue-admin.js:127784
+>>>>>>> dev
 msgid "Seconds"
 msgstr ""
 
@@ -249,26 +374,44 @@ msgstr ""
 #: includes/campaigns/views/free-shipping-bar/hellobar.php:300
 #: includes/campaigns/views/free-shipping-bar/inpage.php:320
 #: includes/campaigns/views/parts/add_to_cart.php:132
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:98513
+#: assets/js/backend/revenue-admin.js:98554
+#: assets/js/backend/revenue-admin.js:100458
+=======
 #: assets/js/backend/revenue-admin.js:137527
 #: assets/js/backend/revenue-admin.js:137568
 #: assets/js/backend/revenue-admin.js:141561
 #: assets/js/backend/revenue-admin.js:133202
 #: assets/js/backend/revenue-admin.js:133243
 #: assets/js/backend/revenue-admin.js:137361
+>>>>>>> dev
 msgid "Add to Cart"
 msgstr ""
 
 #: includes/campaigns/views/parts/add_to_cart.php:109
+<<<<<<< HEAD
+#: includes/class-revenue-functions.php:3063
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45326
+#: assets/js/backend/revenue-admin.js:98515
+=======
 #: includes/class-revenue-functions.php:3062
 #: assets/js/backend/revenue-admin.js:137533
 #: assets/js/backend/revenue-admin.js:173728
 #: assets/js/backend/revenue-admin.js:133204
 #: assets/js/backend/revenue-admin.js:171055
+>>>>>>> dev
 msgid "Checkout"
 msgstr ""
 
 #: includes/campaigns/views/parts/badge_tag.php:30
+<<<<<<< HEAD
+#: includes/class-revenue-functions.php:3072
+=======
 #: includes/class-revenue-functions.php:3071
+>>>>>>> dev
 msgid "Most Popular"
 msgstr ""
 
@@ -278,6 +421,15 @@ msgid "Hurry! Offer Ends in "
 msgstr ""
 
 #: includes/campaigns/views/parts/free_shipping.php:32
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37037
+#: assets/js/backend/revenue-admin.js:45257
+#: assets/js/backend/revenue-admin.js:103215
+#: assets/js/backend/revenue-admin.js:104914
+#: assets/js/backend/revenue-admin.js:108221
+#: assets/js/backend/revenue-admin.js:113854
+=======
 #: assets/js/backend/revenue-admin.js:127491
 #: assets/js/backend/revenue-admin.js:132377
 #: assets/js/backend/revenue-admin.js:133438
@@ -290,6 +442,7 @@ msgstr ""
 #: assets/js/backend/revenue-admin.js:133395
 #: assets/js/backend/revenue-admin.js:170986
 #: assets/js/backend/revenue-admin.js:173222
+>>>>>>> dev
 msgid "Free Shipping"
 msgstr ""
 
@@ -300,25 +453,47 @@ msgstr ""
 
 #: includes/campaigns/views/stock-scarcity/inpage.php:91
 #: includes/campaigns/views/stock-scarcity/template1.php:126
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110872
+#: assets/js/backend/revenue-admin.js:111394
+=======
 #: assets/js/backend/revenue-admin.js:134928
 #: assets/js/backend/revenue-admin.js:135295
 #: assets/js/backend/revenue-admin.js:129565
 #: assets/js/backend/revenue-admin.js:130166
+>>>>>>> dev
 msgid "Only {stock_number} left - don't miss out!🏃‍♀️"
 msgstr ""
 
 #: includes/campaigns/views/stock-scarcity/inpage.php:92
 #: includes/campaigns/views/stock-scarcity/template1.php:127
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110876
+#: assets/js/backend/revenue-admin.js:111526
+=======
 #: assets/js/backend/revenue-admin.js:134931
 #: assets/js/backend/revenue-admin.js:135353
 #: assets/js/backend/revenue-admin.js:129571
 #: assets/js/backend/revenue-admin.js:130301
+>>>>>>> dev
 msgid "Only {stock_number} left - restock uncertain!❗"
 msgstr ""
 
 #. Translators: %s is the placeholder for the data being saved.
 #: includes/campaigns/views/volume-discount/floating.php:77
 #: includes/campaigns/views/volume-discount/popup.php:77
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45723
+#: assets/js/backend/revenue-admin.js:45730
+#: assets/js/backend/revenue-admin.js:45745
+#: assets/js/backend/revenue-admin.js:45752
+#: assets/js/backend/revenue-admin.js:45768
+#: assets/js/backend/revenue-admin.js:45963
+#: assets/js/backend/revenue-admin.js:45983
+=======
 #: assets/js/backend/revenue-admin.js:174102
 #: assets/js/backend/revenue-admin.js:174105
 #: assets/js/backend/revenue-admin.js:174113
@@ -334,6 +509,7 @@ msgstr ""
 #: assets/js/backend/revenue-admin.js:171692
 #: assets/js/backend/revenue-admin.js:171712
 #, php-format,js-format
+>>>>>>> dev
 msgid "Save %s"
 msgstr ""
 
@@ -361,7 +537,10 @@ msgstr ""
 #: includes/campaigns/views/volume-discount/floating.php:92
 #: includes/campaigns/views/volume-discount/inpage.php:84
 #: includes/campaigns/views/volume-discount/popup.php:92
+<<<<<<< HEAD
+=======
 #, php-format
+>>>>>>> dev
 msgid "Buy %1$s %2$s"
 msgstr ""
 
@@ -381,6 +560,22 @@ msgstr ""
 msgid "Plugin installation failed."
 msgstr ""
 
+<<<<<<< HEAD
+#: includes/class-revenue-campaign.php:912
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104112
+msgid "Edit Campaign"
+msgstr ""
+
+#: includes/class-revenue-campaign.php:944
+#: includes/class-revenue-campaign.php:1491
+#: includes/class-revenue-campaign.php:2940
+msgid "Added to Cart"
+msgstr ""
+
+#: includes/class-revenue-campaign.php:2046
+msgid "WoW Revenue Free Shipping"
+=======
 #: includes/class-revenue-campaign.php:956
 #: assets/js/backend/revenue-admin.js:136890
 #: assets/js/backend/revenue-admin.js:132369
@@ -395,6 +590,7 @@ msgstr ""
 
 #: includes/class-revenue-campaign.php:2121
 msgid "WowRevenue Free Shipping"
+>>>>>>> dev
 msgstr ""
 
 #: includes/class-revenue-functions.php:109
@@ -646,6 +842,13 @@ msgstr ""
 #: includes/class-revenue-functions.php:342
 #: includes/class-revenue-functions.php:354
 #: includes/class-revenue-functions.php:359
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105361
+#: assets/js/backend/revenue-admin.js:105364
+#: assets/js/backend/revenue-admin.js:105368
+#: assets/js/backend/revenue-admin.js:105381
+=======
 #: assets/js/backend/revenue-admin.js:127947
 #: assets/js/backend/revenue-admin.js:127950
 #: assets/js/backend/revenue-admin.js:127954
@@ -654,6 +857,7 @@ msgstr ""
 #: assets/js/backend/revenue-admin.js:121426
 #: assets/js/backend/revenue-admin.js:121430
 #: assets/js/backend/revenue-admin.js:121443
+>>>>>>> dev
 msgid "None (Select if using shortcode)"
 msgstr ""
 
@@ -797,38 +1001,65 @@ msgstr ""
 
 #: includes/class-revenue-functions.php:491
 #: includes/class-revenue-functions.php:512
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115817
+=======
 #: assets/js/backend/revenue-admin.js:106348
 #: assets/js/backend/revenue-admin.js:99219
+>>>>>>> dev
 msgid "Zoom"
 msgstr ""
 
 #: includes/class-revenue-functions.php:492
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113809
+#: assets/js/backend/revenue-admin.js:115821
+=======
 #: assets/js/backend/revenue-admin.js:106352
 #: assets/js/backend/revenue-admin.js:133393
 #: assets/js/backend/revenue-admin.js:99223
 #: assets/js/backend/revenue-admin.js:127775
+>>>>>>> dev
 msgid "Bounce"
 msgstr ""
 
 #: includes/class-revenue-functions.php:493
 #: includes/class-revenue-functions.php:511
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113805
+#: assets/js/backend/revenue-admin.js:115818
+=======
 #: assets/js/backend/revenue-admin.js:106349
 #: assets/js/backend/revenue-admin.js:133389
 #: assets/js/backend/revenue-admin.js:99220
 #: assets/js/backend/revenue-admin.js:127771
+>>>>>>> dev
 msgid "Shake"
 msgstr ""
 
 #: includes/class-revenue-functions.php:494
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113808
+=======
 #: assets/js/backend/revenue-admin.js:133392
 #: assets/js/backend/revenue-admin.js:127774
+>>>>>>> dev
 msgid "Swing"
 msgstr ""
 
 #: includes/class-revenue-functions.php:495
 #: includes/class-revenue-functions.php:510
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115819
+=======
 #: assets/js/backend/revenue-admin.js:106350
 #: assets/js/backend/revenue-admin.js:99221
+>>>>>>> dev
 msgid "Wobble"
 msgstr ""
 
@@ -837,6 +1068,23 @@ msgid "Flash"
 msgstr ""
 
 #: includes/class-revenue-functions.php:513
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113807
+#: assets/js/backend/revenue-admin.js:115820
+msgid "Pulse"
+msgstr ""
+
+#: includes/class-revenue-functions.php:3056
+msgid "BUNDLE OFFER"
+msgstr ""
+
+#: includes/class-revenue-functions.php:3065
+msgid "Add To Cart"
+msgstr ""
+
+#: includes/class-revenue-functions.php:3069
+=======
 #: assets/js/backend/revenue-admin.js:106351
 #: assets/js/backend/revenue-admin.js:133391
 #: assets/js/backend/revenue-admin.js:99222
@@ -853,20 +1101,48 @@ msgid "Add To Cart"
 msgstr ""
 
 #: includes/class-revenue-functions.php:3068
+>>>>>>> dev
 msgid "No, Thanks"
 msgstr ""
 
 #. translators: %s: Discount percentage value
+<<<<<<< HEAD
+#: includes/class-revenue-functions.php:3707
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45704
+#: assets/js/backend/revenue-admin.js:45947
+=======
 #: includes/class-revenue-functions.php:3706
 #: assets/js/backend/revenue-admin.js:174089
 #: assets/js/backend/revenue-admin.js:174251
 #: assets/js/backend/revenue-admin.js:171433
 #: assets/js/backend/revenue-admin.js:171676
 #, php-format,js-format
+>>>>>>> dev
 msgid "Save %s%%"
 msgstr ""
 
 #. translators: %1s: Currency Symbol, %2s: Value
+<<<<<<< HEAD
+#: includes/class-revenue-functions.php:3715
+#: includes/class-revenue-functions.php:3734
+msgid "Save %1$s%2$s"
+msgstr ""
+
+#: includes/class-revenue-functions.php:3726
+#: includes/class-revenue-template-utils.php:3818
+#: includes/class-revenue-template-utils.php:3819
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45388
+#: assets/js/backend/revenue-admin.js:45786
+#: assets/js/backend/revenue-admin.js:45972
+msgid "Free"
+msgstr ""
+
+#: includes/class-revenue-functions.php:4208
+#: includes/class-revenue-functions.php:4230
+#: includes/class-revenue-template-utils.php:2928
+=======
 #: includes/class-revenue-functions.php:3714
 #: includes/class-revenue-functions.php:3733
 #, php-format
@@ -888,10 +1164,40 @@ msgstr ""
 #: includes/class-revenue-functions.php:4205
 #: includes/class-revenue-functions.php:4227
 #: includes/class-revenue-template-utils.php:2971
+>>>>>>> dev
 msgid "Select"
 msgstr ""
 
 #. translators: %s: Discount percentage value
+<<<<<<< HEAD
+#: includes/class-revenue-functions.php:4572
+msgid "Save $%s"
+msgstr ""
+
+#: includes/class-revenue-functions.php:4865
+msgid "Search and select products..."
+msgstr ""
+
+#: includes/class-revenue-functions.php:4866
+msgid "Search and select categories..."
+msgstr ""
+
+#: includes/class-revenue-functions.php:4887
+#: includes/class-revenue-functions.php:4898
+msgid "Product"
+msgstr ""
+
+#: includes/class-revenue-functions.php:4888
+#: includes/class-revenue-functions.php:4899
+msgid "Category"
+msgstr ""
+
+#: includes/class-revenue-functions.php:4908
+msgid "Oops, Product not found!"
+msgstr ""
+
+#: includes/class-revenue-functions.php:4909
+=======
 #: includes/class-revenue-functions.php:4569
 #, php-format
 msgid "Save $%s"
@@ -920,6 +1226,7 @@ msgid "Oops, Product not found!"
 msgstr ""
 
 #: includes/class-revenue-functions.php:4906
+>>>>>>> dev
 msgid "Oops, Category not found"
 msgstr ""
 
@@ -930,6 +1237,37 @@ msgstr ""
 msgid "Dismiss"
 msgstr ""
 
+<<<<<<< HEAD
+#: includes/class-revenue-template-utils.php:3813
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45386
+#: assets/js/backend/revenue-admin.js:109762
+msgid "No Discount"
+msgstr ""
+
+#: includes/class-revenue.php:305
+msgid "Options"
+msgstr ""
+
+#: includes/class-revenue.php:317
+msgid "Switch to Pro"
+msgstr ""
+
+#: includes/class-revenue.php:469
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45221
+msgid "Create Campaign"
+msgstr ""
+
+#: includes/class-revenue.php:517
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82689
+#: assets/js/backend/revenue-admin.js:82930
+msgid "Docs"
+msgstr ""
+
+#: includes/class-revenue.php:518
+=======
 #: includes/class-revenue-template-utils.php:3867
 #: assets/js/backend/revenue-admin.js:136220
 #: assets/js/backend/revenue-admin.js:173788
@@ -961,6 +1299,7 @@ msgid "Docs"
 msgstr ""
 
 #: includes/class-revenue.php:522
+>>>>>>> dev
 msgid "Support"
 msgstr ""
 
@@ -1013,14 +1352,21 @@ msgid "Hello Bar Action performed"
 msgstr ""
 
 #: includes/notice/class-notice.php:269
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:82553
+=======
 #: assets/js/backend/revenue-admin.js:142305
 #: assets/js/backend/revenue-admin.js:138084
+>>>>>>> dev
 msgid "Fresh New Year Savings:"
 msgstr ""
 
 #. translators: %s: discount amount, for example 'up to 65% OFF'.
 #: includes/notice/class-notice.php:271
+<<<<<<< HEAD
+=======
 #, php-format
+>>>>>>> dev
 msgid "WowRevenue offers are live – Enjoy %s on this WooCommerce bundle upseller plugin!"
 msgstr ""
 
@@ -1035,7 +1381,10 @@ msgstr ""
 #. translators: %s: discount amount, for example 'up to 65% OFF'.
 #: includes/notice/class-notice.php:290
 #: includes/notice/class-notice.php:309
+<<<<<<< HEAD
+=======
 #, php-format
+>>>>>>> dev
 msgid "WowRevenue is on Sale - Enjoy %s on this WooCommerce bundle upseller plugin!"
 msgstr ""
 
@@ -1072,6 +1421,17 @@ msgstr ""
 msgid "Revenue is a WooCommerce-based plugin. So you need to installed & activate WooCommerce to start using Revenue."
 msgstr ""
 
+<<<<<<< HEAD
+#: includes/notice/class-notice.php:890
+msgid " Activate WooCommerce"
+msgstr ""
+
+#: includes/notice/class-notice.php:890
+msgid " Install WooCommerce"
+msgstr ""
+
+=======
+>>>>>>> dev
 #: includes/notice/class-notice.php:893
 msgid "Discard"
 msgstr ""
@@ -1290,7 +1650,11 @@ msgid "campaign trigger relation"
 msgstr ""
 
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2321
+<<<<<<< HEAD
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2925
+=======
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2930
+>>>>>>> dev
 msgid "Trigger items"
 msgstr ""
 
@@ -1321,8 +1685,13 @@ msgid "Page Name"
 msgstr ""
 
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2380
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105920
+=======
 #: assets/js/backend/revenue-admin.js:128350
 #: assets/js/backend/revenue-admin.js:121987
+>>>>>>> dev
 msgid "Page Status"
 msgstr ""
 
@@ -1432,12 +1801,19 @@ msgstr ""
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2609
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2614
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2619
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37039
+#: assets/js/backend/revenue-admin.js:45243
+#: assets/js/backend/revenue-admin.js:103216
+=======
 #: assets/js/backend/revenue-admin.js:137732
 #: assets/js/backend/revenue-admin.js:173666
 #: assets/js/backend/revenue-admin.js:175614
 #: assets/js/backend/revenue-admin.js:133396
 #: assets/js/backend/revenue-admin.js:170972
 #: assets/js/backend/revenue-admin.js:173224
+>>>>>>> dev
 msgid "Spending Goal"
 msgstr ""
 
@@ -1505,10 +1881,17 @@ msgid "Spending Progress message"
 msgstr ""
 
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2739
+<<<<<<< HEAD
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3126
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3131
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3136
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3141
+=======
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:3131
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:3136
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:3141
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:3146
+>>>>>>> dev
 msgid "Campaign countdown timer enabled or not"
 msgstr ""
 
@@ -1599,6 +1982,16 @@ msgstr ""
 msgid "action if click on product title or image"
 msgstr ""
 
+<<<<<<< HEAD
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2855
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:114036
+msgid "Allow users to choose the variations of items based on selected quantity"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2860
+=======
+>>>>>>> dev
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2865
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2870
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2875
@@ -1611,6 +2004,16 @@ msgstr ""
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2910
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2915
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2920
+<<<<<<< HEAD
+msgid "Builder Data"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2930
+msgid "Builder unique id"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2935
+=======
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2925
 msgid "Builder Data"
 msgstr ""
@@ -1619,6 +2022,7 @@ msgstr ""
 msgid "Builder unique id"
 msgstr ""
 
+>>>>>>> dev
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2940
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2945
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2950
@@ -1628,7 +2032,11 @@ msgstr ""
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2970
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2975
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2980
+<<<<<<< HEAD
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:2986
+=======
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2985
+>>>>>>> dev
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2991
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:2996
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:3001
@@ -1646,6 +2054,1885 @@ msgstr ""
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:3061
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:3066
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:3071
+<<<<<<< HEAD
+msgid "Builder view class"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3076
+msgid "Countdown Timer Campaign Countdown Type"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3081
+msgid "Countdown Timer Campaign Static Settings"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3086
+msgid "Countdown Timer Campaign EverGreen Settings"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3091
+msgid "Countdown Timer Campaign Daily Recurring Settings"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3096
+msgid "Countdown Timer Campaign Shop page progress Bar"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3101
+msgid "Countdown Timer Campaign Cart page progress Bar"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3106
+msgid "Countdown Timer Campaign Entire Site Action Type"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3111
+msgid "Countdown Timer Campaign Entire Site Action Link"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3116
+msgid "Countdown Timer Campaign Entire Site Action Enable"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3121
+msgid "Countdown Timer Campaign Entire Site Enable Close Button"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3146
+msgid "Stock Scarcity Message Type"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3151
+msgid "Stock Scarcity Enable Fake Stock"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3156
+msgid "Stock Scarcity General Message Settings"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3161
+msgid "Stock Scarcity Flip Message Settings"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3166
+msgid "Stock Scarcity Animation Settings"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3171
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113062
+msgid "Next Order Coupon Settings"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3176
+msgid "Active Template"
+msgstr ""
+
+#: includes/rest-api/class-revenue-campaign-rest-controller.php:3181
+msgid "Campaign Version"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:31957
+msgid "Upgrade"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37017
+#: assets/js/backend/revenue-admin.js:45237
+#: assets/js/backend/revenue-admin.js:103206
+msgid "Normal Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37019
+#: assets/js/backend/revenue-admin.js:45245
+#: assets/js/backend/revenue-admin.js:103207
+msgid "Bundle Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37021
+#: assets/js/backend/revenue-admin.js:45247
+#: assets/js/backend/revenue-admin.js:103208
+msgid "Volume Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37023
+#: assets/js/backend/revenue-admin.js:45239
+#: assets/js/backend/revenue-admin.js:103209
+msgid "Buy X Get Y"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37025
+#: assets/js/backend/revenue-admin.js:45261
+#: assets/js/backend/revenue-admin.js:103210
+#: assets/js/backend/revenue-admin.js:104913
+msgid "Mix and Match"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37027
+#: assets/js/backend/revenue-admin.js:45241
+#: assets/js/backend/revenue-admin.js:103211
+msgid "Frequently Bought Together"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37029
+#: assets/js/backend/revenue-admin.js:45255
+#: assets/js/backend/revenue-admin.js:103217
+#: assets/js/backend/revenue-admin.js:104912
+msgid "Double Order Plus"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37031
+#: assets/js/backend/revenue-admin.js:45251
+#: assets/js/backend/revenue-admin.js:103220
+msgid "Next Order Coupon"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37033
+#: assets/js/backend/revenue-admin.js:45263
+#: assets/js/backend/revenue-admin.js:103218
+msgid "Stock Scarcity"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37035
+#: assets/js/backend/revenue-admin.js:45259
+#: assets/js/backend/revenue-admin.js:103219
+#: assets/js/backend/revenue-admin.js:113489
+#: assets/js/backend/revenue-admin.js:113643
+msgid "Countdown Timer"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:37041
+msgid "Unknown Campaign Type"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38334
+#: assets/js/backend/revenue-admin.js:38493
+msgid "Desktop"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38335
+#: assets/js/backend/revenue-admin.js:38513
+msgid "Tablet"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38336
+#: assets/js/backend/revenue-admin.js:38533
+msgid "Mobile"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38475
+msgid "Campaign Visibility On:"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38487
+msgid "Activate at least one device."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38667
+msgid "Icon Style Customize"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38668
+#: assets/js/backend/revenue-admin.js:38713
+#: assets/js/backend/revenue-admin.js:38743
+#: assets/js/backend/revenue-admin.js:38773
+msgid "Customizer"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38676
+#: assets/js/backend/revenue-admin.js:38867
+#: assets/js/backend/revenue-admin.js:39301
+msgid "Default"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38680
+#: assets/js/backend/revenue-admin.js:38871
+#: assets/js/backend/revenue-admin.js:39302
+msgid "Hover"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38689
+#: assets/js/backend/revenue-admin.js:38701
+#: assets/js/backend/revenue-admin.js:38764
+#: assets/js/backend/revenue-admin.js:38876
+#: assets/js/backend/revenue-admin.js:38919
+#: assets/js/backend/revenue-admin.js:38929
+#: assets/js/backend/revenue-admin.js:38954
+#: assets/js/backend/revenue-admin.js:38979
+#: assets/js/backend/revenue-admin.js:39004
+#: assets/js/backend/revenue-admin.js:39029
+#: assets/js/backend/revenue-admin.js:39054
+#: assets/js/backend/revenue-admin.js:39079
+#: assets/js/backend/revenue-admin.js:39308
+#: assets/js/backend/revenue-admin.js:39313
+#: assets/js/backend/revenue-admin.js:39318
+#: assets/js/backend/revenue-admin.js:39323
+#: assets/js/backend/revenue-admin.js:39328
+#: assets/js/backend/revenue-admin.js:115667
+msgid "Color"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38694
+#: assets/js/backend/revenue-admin.js:38706
+#: assets/js/backend/revenue-admin.js:38728
+#: assets/js/backend/revenue-admin.js:38881
+#: assets/js/backend/revenue-admin.js:39388
+#: assets/js/backend/revenue-admin.js:39393
+#: assets/js/backend/revenue-admin.js:39398
+#: assets/js/backend/revenue-admin.js:39403
+#: assets/js/backend/revenue-admin.js:39408
+#: assets/js/backend/revenue-admin.js:39413
+#: assets/js/backend/revenue-admin.js:78689
+msgid "Background"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38712
+#: assets/js/backend/revenue-admin.js:38772
+msgid "Divider Style Customize"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38718
+#: assets/js/backend/revenue-admin.js:38803
+#: assets/js/backend/revenue-admin.js:39149
+#: assets/js/backend/revenue-admin.js:39154
+#: assets/js/backend/revenue-admin.js:39159
+#: assets/js/backend/revenue-admin.js:39170
+#: assets/js/backend/revenue-admin.js:44132
+msgid "Size"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38723
+#: assets/js/backend/revenue-admin.js:38811
+#: assets/js/backend/revenue-admin.js:39190
+#: assets/js/backend/revenue-admin.js:39195
+#: assets/js/backend/revenue-admin.js:39368
+#: assets/js/backend/revenue-admin.js:39373
+msgid "Icon"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38735
+#: assets/js/backend/revenue-admin.js:38829
+#: assets/js/backend/revenue-admin.js:39144
+#: assets/js/backend/revenue-admin.js:78507
+#: assets/js/backend/revenue-admin.js:78566
+msgid "Gap"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38742
+msgid "Separator Style Customize"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38744
+#: assets/js/backend/revenue-admin.js:39205
+#: assets/js/backend/revenue-admin.js:39418
+#: assets/js/backend/revenue-admin.js:78706
+msgid "Separator"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38751
+#: assets/js/backend/revenue-admin.js:38934
+#: assets/js/backend/revenue-admin.js:38959
+#: assets/js/backend/revenue-admin.js:38984
+#: assets/js/backend/revenue-admin.js:39009
+#: assets/js/backend/revenue-admin.js:39034
+#: assets/js/backend/revenue-admin.js:39059
+#: assets/js/backend/revenue-admin.js:39084
+#: assets/js/backend/revenue-admin.js:39239
+#: assets/js/backend/revenue-admin.js:39248
+msgid "Width"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38758
+#: assets/js/backend/revenue-admin.js:38849
+#: assets/js/backend/revenue-admin.js:39253
+msgid "Height"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38778
+msgid "Type"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38816
+#: assets/js/backend/revenue-admin.js:39258
+msgid "Position"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38824
+msgid "Container Customization"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38834
+#: assets/js/backend/revenue-admin.js:39134
+#: assets/js/backend/revenue-admin.js:78511
+#: assets/js/backend/revenue-admin.js:78578
+msgid "Padding"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38839
+#: assets/js/backend/revenue-admin.js:39139
+#: assets/js/backend/revenue-admin.js:78516
+#: assets/js/backend/revenue-admin.js:78571
+#: assets/js/backend/revenue-admin.js:78590
+#: assets/js/backend/revenue-admin.js:78629
+msgid "Margin"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38844
+#: assets/js/backend/revenue-admin.js:39229
+#: assets/js/backend/revenue-admin.js:39234
+#: assets/js/backend/revenue-admin.js:78521
+#: assets/js/backend/revenue-admin.js:78534
+#: assets/js/backend/revenue-admin.js:78585
+msgid "Radius"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38854
+#: assets/js/backend/revenue-admin.js:78549
+#: assets/js/backend/revenue-admin.js:78624
+msgid "Max Width"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38859
+msgid "Navigation Color"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38888
+#: assets/js/backend/revenue-admin.js:38924
+#: assets/js/backend/revenue-admin.js:38949
+#: assets/js/backend/revenue-admin.js:38974
+#: assets/js/backend/revenue-admin.js:38999
+#: assets/js/backend/revenue-admin.js:39024
+#: assets/js/backend/revenue-admin.js:39049
+#: assets/js/backend/revenue-admin.js:39074
+#: assets/js/backend/revenue-admin.js:39423
+#: assets/js/backend/revenue-admin.js:39428
+#: assets/js/backend/revenue-admin.js:39433
+#: assets/js/backend/revenue-admin.js:39438
+#: assets/js/backend/revenue-admin.js:39443
+#: assets/js/backend/revenue-admin.js:39449
+#: assets/js/backend/revenue-admin.js:78698
+#: assets/js/backend/revenue-admin.js:78716
+#: assets/js/backend/revenue-admin.js:78723
+msgid "Border"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38894
+#: assets/js/backend/revenue-admin.js:39455
+msgid "Shadow"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38899
+msgid "Horizontal"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38904
+msgid "Vertical"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38909
+msgid "Blur"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38914
+msgid "Spread"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38939
+#: assets/js/backend/revenue-admin.js:38964
+#: assets/js/backend/revenue-admin.js:38989
+#: assets/js/backend/revenue-admin.js:39014
+#: assets/js/backend/revenue-admin.js:39039
+#: assets/js/backend/revenue-admin.js:39064
+#: assets/js/backend/revenue-admin.js:39089
+#: assets/js/backend/revenue-admin.js:39220
+msgid "Style"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38941
+#: assets/js/backend/revenue-admin.js:38966
+#: assets/js/backend/revenue-admin.js:38991
+#: assets/js/backend/revenue-admin.js:39016
+#: assets/js/backend/revenue-admin.js:39041
+#: assets/js/backend/revenue-admin.js:39066
+#: assets/js/backend/revenue-admin.js:39091
+msgid "━━━━━━━ Solid"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38942
+#: assets/js/backend/revenue-admin.js:38967
+#: assets/js/backend/revenue-admin.js:38992
+#: assets/js/backend/revenue-admin.js:39017
+#: assets/js/backend/revenue-admin.js:39042
+#: assets/js/backend/revenue-admin.js:39067
+#: assets/js/backend/revenue-admin.js:39092
+msgid "╌╌╌╌╌╌ Dashed"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:38943
+#: assets/js/backend/revenue-admin.js:38968
+#: assets/js/backend/revenue-admin.js:38993
+#: assets/js/backend/revenue-admin.js:39018
+#: assets/js/backend/revenue-admin.js:39043
+#: assets/js/backend/revenue-admin.js:39068
+#: assets/js/backend/revenue-admin.js:39093
+msgid "⋯⋯⋯⋯⋯⋯⋯ Dotted"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39099
+#: assets/js/backend/revenue-admin.js:115677
+msgid "Typography"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39104
+msgid "Choose Font Style"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39106
+#: assets/js/backend/revenue-admin.js:114877
+msgid "Style 1"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39107
+#: assets/js/backend/revenue-admin.js:114878
+msgid "Style 2"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39108
+#: assets/js/backend/revenue-admin.js:114879
+msgid "Style 3"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39109
+#: assets/js/backend/revenue-admin.js:114880
+msgid "Style 4"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39110
+#: assets/js/backend/revenue-admin.js:114881
+msgid "Style 5"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39119
+#: assets/js/backend/revenue-admin.js:105799
+#: assets/js/backend/revenue-admin.js:105814
+msgid "Top"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39124
+#: assets/js/backend/revenue-admin.js:105800
+#: assets/js/backend/revenue-admin.js:105815
+msgid "Bottom"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39161
+#: assets/js/backend/revenue-admin.js:39172
+msgid "S"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39162
+#: assets/js/backend/revenue-admin.js:39173
+msgid "M"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39163
+#: assets/js/backend/revenue-admin.js:39174
+msgid "L"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39180
+msgid "Icon Size"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39185
+msgid "Nav Size"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39200
+msgid "Navigation"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39210
+#: assets/js/backend/revenue-admin.js:39215
+msgid "Divider"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39222
+msgid "Fill"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39223
+msgid "Outline"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39241
+msgid "Auto"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39242
+msgid "Full"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39260
+#: assets/js/backend/revenue-admin.js:105518
+msgid "Top Left"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39261
+#: assets/js/backend/revenue-admin.js:105519
+msgid "Top Right"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39262
+#: assets/js/backend/revenue-admin.js:105520
+msgid "Bottom Left"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39263
+#: assets/js/backend/revenue-admin.js:105521
+msgid "Bottom Right"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39269
+msgid "Direction"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39271
+msgid "Row"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39272
+#: assets/js/backend/revenue-admin.js:44591
+msgid "Column"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39278
+msgid "Alignment"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39280
+#: assets/js/backend/revenue-admin.js:39290
+msgid "Start"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39281
+#: assets/js/backend/revenue-admin.js:39291
+msgid "Center"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39282
+#: assets/js/backend/revenue-admin.js:39292
+msgid "End"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39288
+msgid "Text Align"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39333
+#: assets/js/backend/revenue-admin.js:39343
+msgid "Active"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39338
+#: assets/js/backend/revenue-admin.js:39348
+msgid "Inactive"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39353
+#: assets/js/backend/revenue-admin.js:39358
+#: assets/js/backend/revenue-admin.js:39378
+#: assets/js/backend/revenue-admin.js:39383
+msgid "Text"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:39363
+msgid "Timer"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:40613
+msgid "Select Option"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:41679
+msgid "Click to Edit"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:43402
+msgid "Preset"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:43403
+#: assets/js/backend/revenue-admin.js:99523
+msgid "Custom"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:43516
+msgid "Solid"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:43517
+msgid "Dashed"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:43518
+msgid "Dotted"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:43581
+msgid "Add border"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:43711
+msgid "Applied"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:43712
+msgid "Add shadow"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:44029
+msgid "Customize Style"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:44095
+msgid "Custom Size"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:44153
+msgid "Weight"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:44194
+msgid "Select Preset"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:48362
+msgid "Enter heading"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:48371
+msgid "Enter subheading"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:54480
+#: assets/js/backend/revenue-admin.js:59072
+#: assets/js/backend/revenue-admin.js:72433
+#: assets/js/backend/revenue-admin.js:76219
+#: assets/js/backend/revenue-admin.js:76701
+#: assets/js/backend/revenue-admin.js:77892
+msgid "Something went wrong loading products. Please Report on Support"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:54531
+#: assets/js/backend/revenue-admin.js:59113
+msgid "No products available to display"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:57021
+#: assets/js/backend/revenue-admin.js:62547
+msgid "Something went wrong while rendering the campaign."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:62640
+msgid "No products available."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:65967
+msgid "Something went wrong loading products. Please report to support."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:66131
+msgid "Please select some products to create bundle"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:69706
+#: assets/js/backend/revenue-admin.js:75349
+msgid "Something went wrong loading products. Please report on support."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:70353
+msgid "Something went wrong loading double order options."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/frontend/spending-goal.js:766
+#: assets/js/backend/revenue-admin.js:72715
+msgid "Spend %s more to claim your gift!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:72722
+msgid "Spend %s more to get any %d %s as a gift!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:72729
+msgid "items"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:72730
+msgid "item"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:76094
+#: assets/js/backend/revenue-admin.js:76304
+#: assets/js/backend/revenue-admin.js:76452
+#: assets/js/backend/revenue-admin.js:112923
+msgid "{discount_value} OFF Your Next Purchase"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:76123
+#: assets/js/backend/revenue-admin.js:76320
+#: assets/js/backend/revenue-admin.js:76468
+#: assets/js/backend/revenue-admin.js:112927
+#: assets/js/backend/revenue-admin.js:113201
+msgid "Thank you for being an amazing customer! Enjoy a coupon in your next order! 🎉"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:76565
+#: assets/js/backend/revenue-admin.js:76764
+#: assets/js/backend/revenue-admin.js:111319
+msgid "🔥 Hurry! Almost Sold Out. Only {stock_number} units available now! 😊"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:78335
+msgid "This page is not support in this campaign"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45140
+#: assets/js/backend/revenue-admin.js:78800
+#: assets/js/backend/revenue-admin.js:103388
+#: assets/js/backend/revenue-admin.js:103681
+msgid "Cancel"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:78810
+msgid "Save"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:78854
+msgid "Save Style"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:78857
+msgid "Save this style to reuse later"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:78872
+msgid "Save as a new style"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:78901
+msgid "Replace a saved style"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:78604
+msgid "CountDown Timer Customize"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:78620
+msgid "Coupon Customize"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:78991
+#: assets/js/backend/revenue-admin.js:79570
+msgid "Color Customization"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:79169
+msgid "Loading template..."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:79559
+msgid "Style Customize"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:79581
+msgid "Spacing Customize"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45098
+#: assets/js/backend/revenue-admin.js:100369
+msgid "Campaign Name"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45100
+#: assets/js/backend/revenue-admin.js:101232
+msgid "Campaign Type"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45102
+msgid "Campaign ID"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45104
+msgid "Save & Publish"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45106
+msgid "Save & Draft"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45108
+msgid "Some fields are empty!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45110
+msgid "Please Select Trigger Type"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45112
+#: assets/js/backend/revenue-admin.js:107512
+msgid "Campaign Trigger Product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45114
+msgid "Add Trigger Row"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45116
+msgid "Behavior Settings"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45118
+msgid "Display Mode"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45120
+#: assets/js/backend/revenue-admin.js:45122
+msgid "Campaign Placement"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45124
+msgid "Offered Products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45126
+msgid "Products to offer"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45128
+msgid "Min Qty"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45130
+#: assets/js/backend/revenue-admin.js:108222
+msgid "Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45132
+#: assets/js/backend/revenue-admin.js:108546
+#: assets/js/backend/revenue-admin.js:109625
+msgid "Discount Type"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45134
+msgid "Tags"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45136
+msgid "Show Variants"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45138
+msgid "Add Offer Row"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45142
+msgid "Save and Continue"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45144
+msgid "Select Campaign Trigger Items"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45146
+msgid "Select Offer Products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45148
+msgid "Mix & Match Settings"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45150
+msgid "Enable required products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45152
+msgid "Pre-selected Items"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45154
+msgid "mix_match_enable_required_product_tooltip"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45156
+msgid "All Items Selected"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45158
+msgid "No product is selected (except the required products)"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45163
+msgid "Campaign Title (Visible to Audience)"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45165
+msgid "Campaign Title"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45167
+msgid "Campaign Subheading"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45169
+msgid "Action"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45171
+msgid "Stock Status"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45173
+msgid "Stock Text Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45175
+msgid "Stock Value"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45177
+msgid "Stock Scarcity Content Formatting Settings"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45182
+msgid "ID"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45184
+#: assets/js/backend/revenue-admin.js:104677
+msgid "Status"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45186
+msgid "Triggers"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45188
+#: assets/js/backend/revenue-admin.js:98512
+#: assets/js/backend/revenue-admin.js:98521
+#: assets/js/backend/revenue-admin.js:100379
+#: assets/js/backend/revenue-admin.js:102112
+msgid "Revenue"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45190
+msgid "Progress"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45192
+msgid "Export"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45194
+msgid "Ultimate Campaigns"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45196
+msgid "Search campaign …"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45198
+msgid "Impression"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45200
+msgid "Order"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45202
+msgid "Added to cart"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45204
+msgid "ASC"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45206
+msgid "DESC"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45208
+#: assets/js/backend/revenue-admin.js:100430
+msgid "Conversion Rate"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45210
+msgid "Date created"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45212
+msgid "Date modified"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45214
+msgid "Create Your First Campaign"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45216
+msgid "Insert the campaign creation description here by your own"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45223
+msgid "No campaign found!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45225
+msgid "Status Successfully Activated"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45227
+msgid "Status Successfully updated"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45229
+msgid "Status Successfully Deactivated"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45231
+msgid "Duplicate of"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45233
+msgid "Successfully Duplicated"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45235
+msgid "Successfully Deleted"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45249
+msgid "Volume / Quantity Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45253
+msgid "Double Order"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45265
+msgid "Buy X Get Y Bundle Builder"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45267
+msgid "Create an attractive discount campaign and display it across your site."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45272
+msgid "Encourage shoppers to get bundle products with special discounts and boost your AOV!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45277
+msgid "Offer special discounts based on product quantity."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45282
+msgid "Offer products for free or at discounted rates for purchasing predefined quantities of a specific product."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45287
+msgid "Empower shoppers to create their product bundles by choosing from multiple options and enjoying special discounts."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45292
+msgid "Recommend essential items with the main products that can be purchased together at a discounted price."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45297
+msgid "Provide discounts or free shipping to achieve their spending goals and boost your revenue."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45302
+#: assets/js/backend/revenue-admin.js:82040
+#: assets/js/backend/revenue-admin.js:82052
+#: assets/js/backend/revenue-admin.js:82172
+msgid "Create the Campaign"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45304
+msgid "Product Mix & Match"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45308
+msgid "Select Your Campaign"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45310
+msgid "Insert the campaign title"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45312
+msgid "Campaign Successfully Created"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45314
+msgid "Delete this campaign"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45316
+#: assets/js/backend/revenue-admin.js:101250
+#: assets/js/backend/revenue-admin.js:101960
+msgid "Total Revenue"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45318
+#: assets/js/backend/revenue-admin.js:102126
+#: assets/js/backend/revenue-admin.js:118517
+msgid "Total Order"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45320
+#: assets/js/backend/revenue-admin.js:98509
+#: assets/js/backend/revenue-admin.js:98543
+#: assets/js/backend/revenue-admin.js:100403
+#: assets/js/backend/revenue-admin.js:100973
+#: assets/js/backend/revenue-admin.js:101276
+#: assets/js/backend/revenue-admin.js:102140
+#: assets/js/backend/revenue-admin.js:103792
+msgid "Impressions"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45322
+#: assets/js/backend/revenue-admin.js:103799
+msgid "Add to cart"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45324
+#: assets/js/backend/revenue-admin.js:98514
+#: assets/js/backend/revenue-admin.js:103806
+msgid "Rejection"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45328
+msgid "Campaign Performance"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45330
+#: assets/js/backend/revenue-admin.js:101205
+#: assets/js/backend/revenue-admin.js:102155
+msgid "Conversions"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45332
+#: assets/js/backend/revenue-admin.js:98511
+#: assets/js/backend/revenue-admin.js:98587
+msgid "Orders"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45334
+msgid "Successfully Saved"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45336
+msgid "Shortcode Copied!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45338
+msgid "Campaign Not Found!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45340
+#: assets/js/backend/revenue-admin.js:114158
+msgid "Schedule Settings"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45342
+msgid "Set Campaign Activation Time"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45344
+msgid "Enable to Set End Time"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45346
+#: assets/js/backend/revenue-admin.js:99550
+msgid "End Date"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45348
+msgid "End Time"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45350
+msgid "Hide Products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45352
+msgid "Hide Campaign"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45354
+msgid "Go To Product Page"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45356
+msgid "Show Product Details on Popup"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45358
+#: assets/js/backend/revenue-admin.js:112412
+#: assets/js/backend/revenue-admin.js:112692
+#: assets/js/backend/revenue-admin.js:113925
+msgid "Do Nothing"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45360
+msgid "Additional Settings"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45362
+msgid "Free Shipping Offer"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45364
+msgid "Discount Offer"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45366
+#: assets/js/backend/revenue-admin.js:108485
+msgid "Reward Type"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45368
+msgid "Subtotal"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45370
+msgid "Cart Total"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45372
+msgid "Percentage Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45374
+msgid "Percentage"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45376
+msgid "Fixed Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45378
+msgid "Fixed Unit Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45380
+msgid "Fixed Price"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45382
+msgid "Fixed Unit Price"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45384
+#: assets/js/backend/revenue-admin.js:109761
+msgid "Fixed Amount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45390
+msgid "Goal"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45392
+msgid "Based on"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45394
+#: assets/js/backend/revenue-admin.js:107565
+msgid "Specific Products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45396
+msgid "Content Formatting"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45398
+msgid "Order ID"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45400
+msgid "Order Date"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45402
+msgid "Offer Type"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45406
+msgid "Please complete the required field above."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45552
+msgid "12:00 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45553
+msgid "12:30 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45554
+msgid "1:00 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45555
+msgid "1:30 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45556
+msgid "2:00 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45557
+msgid "2:30 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45558
+msgid "3:00 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45559
+msgid "3:30 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45560
+msgid "4:00 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45561
+msgid "4:30 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45562
+msgid "5:00 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45563
+msgid "5:30 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45564
+msgid "6:00 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45565
+msgid "6:30 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45566
+msgid "7:00 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45567
+msgid "7:30 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45568
+msgid "8:00 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45569
+msgid "8:30 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45570
+msgid "9:00 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45571
+msgid "9:30 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45572
+msgid "10:00 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45573
+msgid "10:30 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45574
+msgid "11:00 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45575
+msgid "11:30 AM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45576
+msgid "12:00 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45577
+msgid "12:30 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45578
+msgid "1:00 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45579
+msgid "1:30 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45580
+msgid "2:00 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45581
+msgid "2:30 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45582
+msgid "3:00 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45583
+msgid "3:30 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45584
+msgid "4:00 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45585
+msgid "4:30 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45586
+msgid "5:00 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45587
+msgid "5:30 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45588
+msgid "6:00 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45589
+msgid "6:30 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45590
+msgid "7:00 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45591
+msgid "7:30 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45592
+msgid "8:00 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45593
+msgid "8:30 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45594
+msgid "9:00 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45595
+msgid "9:30 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45596
+msgid "10:00 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45597
+msgid "10:30 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45598
+msgid "11:00 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45599
+msgid "11:30 PM"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:81916
+msgid "Boost sales and increase revenue by offering discounts on high-demand products."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:81928
+msgid "Bundle products easily to boost profits and attract more buyers."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:81940
+msgid "Offer quantity discounts to encourage larger purchases and boost sales."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:81952
+msgid "Attract buyers with unbeatable BOGO deals on best-selling products."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:81964
+msgid "Allow users to mix and match products for a hassle-free shopping experience."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:81976
+msgid "Display frequently bought together items to encourage more purchases."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:81988
+msgid "Let customers unlock free shipping & track progress with a visual bar."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82000
+msgid "Grow your revenue by allowing users to complete goals."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82012
+msgid "Push customers to multiply their entire cart or specific product by 2x, 3x, or more at checkout."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82024
+msgid "Improve sales by introducing scarcity of lucrative items"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82028
+#: assets/js/backend/revenue-admin.js:82064
+#: assets/js/backend/revenue-admin.js:103641
+msgid "Coming Soon"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82036
+msgid "Create limited-time offers for popular store items without coding."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82048
+msgid "Offer incentives - offer coupons to recurring customers"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82060
+msgid "Easily create custom BOGO bundles - with flexible buy X get Y offers for customers."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82105
+=======
 #: includes/rest-api/class-revenue-campaign-rest-controller.php:3076
 msgid "Builder view class"
 msgstr ""
@@ -1926,10 +4213,2090 @@ msgstr ""
 
 #: assets/js/backend/revenue-admin.js:108851
 #: assets/js/backend/revenue-admin.js:101889
+>>>>>>> dev
 msgid "Free Campaigns Used"
 msgstr ""
 
 #. translators: %s: number of free campaign creations remaining. This comment fixes the warning from eslint of transltion.
+<<<<<<< HEAD
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82108
+msgid "Enjoy %s Free Campaign Creations!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82171
+msgid "Creating the Campaign…"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82175
+msgid "Unlock Pro to create campaign"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82188
+msgid "Get Full Access"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82234
+msgid "This campaign will be available shortly."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82256
+msgid "Loading…"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82302
+msgid "Free Creation Campaign Ended - Unlock Pro for More Features!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82310
+msgid "Create %s Discount Campaigns for Free - Boost Sales Today!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82406
+msgid "Unlock More Sales with"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82408
+msgid "WowRevenue Pro!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82412
+msgid "The free features of WowRevenue do a lot - still, without PRO, you're holding yourself back from getting more profits."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82421
+msgid "With PRO, You'll Get:"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82453
+#: assets/js/backend/revenue-admin.js:117412
+msgid "Upgrade Now"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:82672
+#: assets/js/backend/revenue-admin.js:82694
+msgid "WPXPO Plugins"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:98438
+#: assets/js/backend/revenue-admin.js:102028
+msgid "Monthly Revenue & Cost"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:98532
+#: assets/js/backend/revenue-admin.js:103820
+msgid "Conversion"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:98565
+msgid "Rejection Status"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:98576
+msgid "Checkout Status"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99033
+msgid "Show Result:"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99189
+msgid "Order History"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99204
+#: assets/js/backend/revenue-admin.js:101617
+msgid "No Data Found!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99386
+#: assets/js/backend/revenue-admin.js:102250
+msgid "Today"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99387
+msgid "Last Week"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99388
+msgid "Last Month"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99458
+msgid "Hello, %s"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99463
+msgid "Let's analyze your store metrics for today."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99532
+msgid "Start Date"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99773
+msgid "Page"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99779
+#: assets/js/backend/revenue-admin.js:100209
+#: assets/js/backend/revenue-admin.js:103827
+msgid "Sold"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:100123
+msgid "Best Performing Campaigns"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99898
+#: assets/js/backend/revenue-admin.js:103994
+msgid "No Products Selected"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99911
+#: assets/js/backend/revenue-admin.js:104007
+#: assets/js/backend/revenue-admin.js:106545
+#: assets/js/backend/revenue-admin.js:108259
+msgid "All"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:99916
+#: assets/js/backend/revenue-admin.js:104012
+#: assets/js/backend/revenue-admin.js:106550
+msgid "All Products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:100138
+msgid "No Campaigns Found!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:100528
+msgid "Most Effective Campaigns"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:100872
+#: assets/js/backend/revenue-admin.js:118366
+msgid "Total Sales"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:100922
+#: assets/js/backend/revenue-admin.js:118443
+msgid "Average Order Value"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:101024
+#: assets/js/backend/revenue-admin.js:101985
+msgid "Total Orders"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:101075
+#: assets/js/backend/revenue-admin.js:101309
+msgid "Conversion Rates"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:101337
+msgid "Items Add to Cart"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:102180
+msgid "Rejections"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:102251
+msgid "Last 7 Days"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:102252
+msgid "Last 30 Days"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:102348
+msgid "Sales and Data Statistics"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:102386
+msgid "Select Campaign"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103146
+msgid "Show Columns"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103205
+msgid "All Types"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103223
+#: assets/js/backend/revenue-admin.js:103286
+#: assets/js/backend/revenue-admin.js:104675
+msgid "Publish"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103224
+#: assets/js/backend/revenue-admin.js:103288
+#: assets/js/backend/revenue-admin.js:104676
+msgid "Draft"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103225
+#: assets/js/backend/revenue-admin.js:103284
+#: assets/js/backend/revenue-admin.js:103691
+msgid "Delete"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103302
+msgid "Bulk Action"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103316
+msgid "Apply"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103324
+msgid "You have to select at least one campaigns to perform bulk action."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103352
+msgid "Filter by type"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103248
+msgid "Bulk Delete Confirmation"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103250
+msgid "Publish Campaign Confirmation"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103252
+msgid "Draft Campaign Confirmation"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103261
+msgid "Do you really want to delete selected campaigns? This process is irreversible."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103266
+msgid "Do you really want to publish selected campaigns?"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103271
+msgid "Do you really want to draft publish selected campaigns?"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103635
+msgid "Pro"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103672
+msgid "Do you really want to delete this campaign?"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:103813
+msgid "Checkout Count"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104119
+msgid "Campaign Statistics"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104126
+msgid "Duplicate Campaign"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104133
+msgid "Delete Campaign"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104607
+msgid "Your First Campaign is Almost Here!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104610
+msgid "Dive into your first campaign: a world of adventure and mystery awaits. Forge your legend in a realm of magic and lore!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104797
+msgid "Enter Campaign Name…"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104814
+#: assets/js/backend/revenue-admin.js:105422
+msgid "Copy and paste the shortcode - place it where you want to show the discount - use it for 3rd party plugins."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104824
+#: assets/js/backend/revenue-admin.js:105432
+msgid "Get Shortcode"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104835
+#: assets/js/backend/revenue-admin.js:115651
+msgid "Global Style"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104926
+msgid "Saving Failed."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104993
+#: assets/js/backend/revenue-admin.js:116283
+msgid "Exit"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105001
+msgid "Leaving this Page? Save the Changes"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105009
+msgid "Hold on a minute — make sure to save your work before moving to another page."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105021
+msgid "Continue Editing"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105032
+msgid "Exit Anyway"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105071
+msgid "Status of the campaign. Toggle to switch between Publish and Draft."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104899
+msgid "Saved"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104902
+msgid "Saving"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:104904
+msgid "Update & Save"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105354
+msgid "Before Place Order Button"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105358
+msgid "Before Payment Gateways"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105360
+msgid "After Billing Form"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105365
+msgid "After Cart Item Name"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105370
+msgid "Below the Product Title"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105374
+msgid "Below the Price"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105375
+msgid "Before the Add to Cart Button"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105382
+msgid "Before the Price"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105383
+msgid "After Cart Item Price"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105386
+msgid "Top of the Page"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105387
+msgid "Bottom of the Page"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105926
+msgid "Allow the ability to send coupons via email"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105927
+msgid "Activate or Deactivate the campaign on this page"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105947
+msgid "Pages"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105953
+msgid "This campaign is designed to appear exclusively on the checkout page."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105957
+msgid "Select page(s) where the campaign will run"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:106042
+msgid "Add page to start setting up"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105910
+msgid "Product Page Status"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105911
+msgid "Cart Page Status"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105912
+msgid "Checkout Page Status"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105913
+msgid "Thankyou Page Status"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105914
+msgid "Entire Site Status"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105915
+msgid "Shop Page Status"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105916
+msgid "Email Status"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105445
+#: assets/js/backend/revenue-admin.js:105759
+msgid "In-page Position"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105472
+#: assets/js/backend/revenue-admin.js:105508
+#: assets/js/backend/revenue-admin.js:105764
+msgid "Choose where to place the campaign on the page"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105768
+msgid "Choose how the campaign appears on a page based on your selection."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105801
+#: assets/js/backend/revenue-admin.js:105806
+msgid "Drawer"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105805
+msgid "In Page"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105418
+msgid "Coupon Shortcode for Email"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105444
+msgid "Checkout Page Position"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105468
+msgid "Choose where you want the Double Order Plus campaign to appear on the checkout page."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105532
+msgid "Pop-up Animation"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105550
+msgid "Choose the animation style for the pop-up."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105560
+msgid "Select Popup Animation"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105565
+msgid "Pop-up Appearance Delay"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105585
+msgid "Set delay time before the pop-up appears"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105623
+msgid "Floating Position"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105636
+msgid "Select floating position"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105647
+msgid "Floating Appearance Delay"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105668
+msgid "Set delay time before the floating appears"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105678
+msgid "Set Floating Delay"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:105492
+msgid "Drawer Position"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:106441
+msgid "Categories"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:106442
+msgid "Products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107418
+#: assets/js/backend/revenue-admin.js:107428
+msgid "All items selected"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107422
+msgid "Required items selected"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107432
+msgid "None"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107531
+msgid "Select the product(s) that will trigger this campaign"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107537
+msgid "Select Product(s) to Apply Quantity Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107543
+msgid "Select the products you want to offer for customers to mix and match"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107549
+msgid "Choose the product (X) that will trigger this campaign"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:45906
+#: assets/js/backend/revenue-admin.js:107515
+#: assets/js/backend/revenue-admin.js:113043
+msgid "Trigger Product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107518
+msgid "Mix and Match Products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107521
+msgid "Trigger Product (X)"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107589
+msgid "Alert:"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107591
+msgid "You must add stock quantity to each trigger product: Products > All Products > Edit > Inventory > Stock Management."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107455
+#: assets/js/backend/revenue-admin.js:109317
+#: assets/js/backend/revenue-admin.js:109320
+msgid "Search and Select products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107679
+msgid "Product Relation"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107685
+msgid "Selecting AND will add all products to the bundle. Selecting OR will only add the campaign trigger product."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107690
+msgid "Check the doc"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107692
+msgid "for more."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107703
+msgid "OR"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107706
+msgid "AND"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107741
+msgid "Exclude Products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107756
+msgid "Search and exclude product(s)"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107779
+msgid "Exclude Items from Campaign Trigger"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107795
+msgid "Bundle with trigger product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107824
+msgid "Required trigger product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107855
+msgid "Enable Required Product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107882
+msgid "Set Individual Product Quantity"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107924
+#: assets/js/backend/revenue-admin.js:108009
+msgid "Select Required Items"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:107926
+msgid "Add Quantity"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108121
+msgid "You can not select variable product as pre selected items"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108223
+msgid "Gift Items"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108226
+msgid "Preview"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108227
+msgid "No Preview"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108244
+#: assets/js/backend/revenue-admin.js:109149
+msgid "Customer Gets"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108258
+msgid "Any"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108358
+msgid "Search and Select Product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108422
+msgid "Reorder"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108434
+#: assets/js/backend/revenue-admin.js:110716
+msgid "Required Spend"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108445
+msgid "Minimum spend must be greater than 0 (zero) to activate this campaign."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108495
+msgid "Reward Label"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108529
+#: assets/js/backend/revenue-admin.js:109614
+msgid "Discount Value"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108564
+msgid "Tag"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108602
+msgid "Select Product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108638
+msgid "Gift Item View on Hover"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108660
+#: assets/js/backend/revenue-admin.js:110630
+msgid "Pre-reward Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108669
+msgid "Use {remaining_amount} to show the amount left to reach the goal. <br> Use {reward_type} to show reward type. <br> Use {discount_value} to show the discount value."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108679
+#: assets/js/backend/revenue-admin.js:110640
+#: assets/js/backend/revenue-admin.js:113690
+msgid "Success Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108771
+msgid "Use {qty} to show the offer quantity. <br> Use {discount_value} to show the discount value. <br> Use {save_amount} to show the saving value."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108776
+#: assets/js/backend/revenue-admin.js:108783
+msgid "Use {qty} to show the offer quantity. <br> Use {discount_value} to show the discount value."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108781
+msgid "Use {save_amount} to show the saving value."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108787
+msgid "Use {discount_value} to show the discount value."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108795
+msgid "Manual"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108797
+msgid "Automatic"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109059
+msgid "Choose Product (Y)"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109073
+msgid "Req. Qty"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109076
+msgid "Unique Qty"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108987
+#: assets/js/backend/revenue-admin.js:108993
+msgid "Select the products you want to offer discounts or special deals on"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108999
+msgid "Choose product(s) to offer with product X"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109005
+msgid "Set Discount Based on Product Quantity"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109011
+msgid "Set discounts based on the count of products mixed and matched"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109017
+msgid "Add complementary/substitute/same category products to show with the trigger products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108964
+msgid "Products for Promotion"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108967
+msgid "Product to Offer (Y)"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108970
+msgid "Quantity-Based Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108973
+msgid "Order Quantity Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:108976
+msgid "Related Products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109124
+msgid "This feature is on development. Will be release later."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109031
+msgid "Add New Offer Product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109034
+msgid "Add Product (Y)"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109037
+msgid "Set Quantity and Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109040
+msgid "Set Order Quantity Discount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109043
+msgid "Add Related Product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109300
+msgid "Any Product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109301
+msgid "Specific"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109338
+msgid "Trigger Condition"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109343
+msgid "Trigger the Double Order Plus campaign for any product or a specific product(s) in the cart."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109373
+msgid "Specific Product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109377
+msgid "Specific Category"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109322
+msgid "Search and Select category"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109474
+msgid "🎉 Just for you! 💖 Order {qty}x to unlock {discount_value} Off!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109478
+msgid "Even better! 🥳 Order {qty}x to unlock {discount_value} Off!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109482
+msgid "Go wild! ⚡️ Order {qty}x to unlock {discount_value} Off!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109495
+msgid "Order {qty}x to unlock {discount_value} Off!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109576
+msgid "Multi-Order Discounts"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109582
+msgid "Set discounts for (double, triple, 4x, 5x, etc.,) order of the entire cart or specific product(s)."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109600
+msgid "Order Count"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109607
+msgid "X"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109637
+msgid "Discount Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109641
+msgid "Use {discount_value} to display the discount amount. <br> Use {qty} to show the required number of orders."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109728
+msgid "Add Discount Row"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109528
+msgid "Please upgrade to pro to add more offer row"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109902
+msgid "Choose the product(s) for which the ad campaign/feature will activate."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109910
+msgid "Display Upsell Products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:109999
+msgid "Add Upsell Product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110055
+#: assets/js/backend/revenue-admin.js:110097
+#: assets/js/backend/revenue-admin.js:110118
+msgid "Spend {remaining_amount} more to earn your reward."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110059
+msgid "🌟 Boom! You earned your reward!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110101
+#: assets/js/backend/revenue-admin.js:110122
+msgid "🎉 Congratulations! You earned your reward!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110204
+#: assets/js/backend/revenue-admin.js:111195
+#: assets/js/backend/revenue-admin.js:112428
+#: assets/js/backend/revenue-admin.js:113054
+msgid "Set up spending goals for your customers to motivate them to shop more and unlock rewards."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110213
+msgid "Spending Goal Settings"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110220
+msgid "Display Goal Icon"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110228
+msgid "Use a reward icon instead of a generic tick mark"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110256
+#: assets/js/backend/revenue-admin.js:110540
+msgid "Display Confetti"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110268
+#: assets/js/backend/revenue-admin.js:110549
+msgid "Display a cheerful animation when customers reach their goals to celebrate their reward."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110283
+#: assets/js/backend/revenue-admin.js:110564
+msgid "Display Close Button"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110297
+#: assets/js/backend/revenue-admin.js:110576
+msgid "Enable this to let visitors close the bar"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110317
+msgid "Select Gift Items"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110366
+msgid "Add New Goal"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110086
+msgid "Please upgrade to pro to add more offer products"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110388
+msgid "Ultimate Goal Completion Note"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110620
+msgid "Promo Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110624
+msgid "Use {remaining_amount} to show how much to spend for free shipping"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110634
+msgid "Use {remaining_amount} to show the remaining amount to spend"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110646
+msgid "Link for CTA"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110650
+msgid "Insert link here"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110729
+msgid "To run the campaign properly, set a minimum spend above 0 (zero)."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110744
+msgid "Based On"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110748
+msgid "Subtotal (Product Price Only)"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110752
+msgid "Cart Total (After Discounts & Additional Fees)"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110675
+msgid "Enable CTA Button"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110444
+msgid "Spend {remaining_amount} More to Unlock Free Shipping. 🚚"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110448
+msgid "🌟 Boom! Free Shipping is Unlocked! 🎉"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110452
+msgid "Spend {remaining_amount} to Unlock Free Shipping 🚚"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110493
+msgid "Set up shipping bar & progress settings to motivate customers to buy more and unlock free shipping."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110502
+msgid "Shipping Bar & Progress Settings"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110510
+msgid "Enable Progress Bar"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:110518
+msgid "Enable this to display a progress bar"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111034
+msgid "Stock Number"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111035
+msgid "Sales Number"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111036
+msgid "View Number"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111037
+msgid "Shopper Number"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111153
+#: assets/js/backend/revenue-admin.js:111173
+#: assets/js/backend/revenue-admin.js:111332
+#: assets/js/backend/revenue-admin.js:111407
+#: assets/js/backend/revenue-admin.js:111539
+msgid "Use {stock_number} tag to show stock amount."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111158
+msgid "Use {sales_number} tag to show sales amount."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111163
+msgid "Use {view_number} tag to show product view amount."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111168
+msgid "Use {shopper_number} tag to show number of user bought the product."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111205
+msgid "Stock Scarcity Settings"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111211
+#: assets/js/backend/revenue-admin.js:112436
+#: assets/js/backend/revenue-admin.js:112441
+msgid "Countdown Type"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111179
+msgid "General Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111183
+msgid "Flip Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111252
+#: assets/js/backend/revenue-admin.js:111652
+msgid "Enable Fake Stock"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111276
+#: assets/js/backend/revenue-admin.js:111796
+#: assets/js/backend/revenue-admin.js:111922
+msgid "Repeat Interval"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111299
+#: assets/js/backend/revenue-admin.js:111673
+msgid "Enable Stock Bar"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111309
+msgid "In Stock Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111341
+#: assets/js/backend/revenue-admin.js:111467
+#: assets/js/backend/revenue-admin.js:111600
+#: assets/js/backend/revenue-admin.js:111751
+#: assets/js/backend/revenue-admin.js:111877
+msgid "Fake Amount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111368
+msgid "Low Stock Alert"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111379
+msgid "Low Stock Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111421
+#: assets/js/backend/revenue-admin.js:111460
+msgid "Provide a higher stock quantity from urgent-stock."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111428
+#: assets/js/backend/revenue-admin.js:111560
+msgid "Stock Amount"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111500
+msgid "Urgent Stock Alert"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111511
+msgid "Urgent Stock Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111553
+#: assets/js/backend/revenue-admin.js:111593
+msgid "Provide a lower stock quantity from low-stock."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111686
+#: assets/js/backend/revenue-admin.js:111695
+msgid "Select First Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111711
+msgid "First Stock Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111811
+#: assets/js/backend/revenue-admin.js:111820
+msgid "Select Second Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111836
+msgid "Second Stock Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:111988
+#: assets/js/backend/revenue-admin.js:112169
+#: assets/js/backend/revenue-admin.js:112180
+#: assets/js/backend/revenue-admin.js:113556
+#: assets/js/backend/revenue-admin.js:113601
+#: assets/js/backend/revenue-admin.js:114220
+#: assets/js/backend/revenue-admin.js:114291
+msgid "Select Time"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112135
+msgid "Add Slot Time"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112591
+msgid "Set Timeframe"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112617
+#: assets/js/backend/revenue-admin.js:113514
+#: assets/js/backend/revenue-admin.js:114176
+msgid "Set Start Date & Time"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112623
+#: assets/js/backend/revenue-admin.js:112652
+#: assets/js/backend/revenue-admin.js:113582
+#: assets/js/backend/revenue-admin.js:114270
+msgid "Select End Date"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112647
+#: assets/js/backend/revenue-admin.js:113571
+msgid "Set End Date & Time"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112688
+msgid "Timer End Behavior"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112800
+msgid "Repeat after finished"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112824
+msgid "Sunday"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112825
+msgid "Monday"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112826
+msgid "Tuesday"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112827
+msgid "Wednesday"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112828
+msgid "Thursday"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112829
+msgid "Friday"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112830
+msgid "Saturday"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112837
+msgid "Select a Mode"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112383
+#: assets/js/backend/revenue-admin.js:113371
+#: assets/js/backend/revenue-admin.js:113630
+#: assets/js/backend/revenue-admin.js:113680
+msgid "Start Now"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112385
+#: assets/js/backend/revenue-admin.js:113373
+#: assets/js/backend/revenue-admin.js:113632
+#: assets/js/backend/revenue-admin.js:113682
+msgid "Schedule for Later"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112391
+msgid "Static"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112392
+msgid "Evergreen"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112394
+msgid "Daily Recurring"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112400
+msgid "Daily"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112402
+msgid "Weekdays"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112413
+msgid "Hide Timer"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:112479
+msgid "Enable Time Progress Bar"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113080
+msgid "Share Coupon on Next Order Automatically"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113113
+msgid "Choose Coupon"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113119
+msgid "Select Coupon"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113139
+msgid "Edit Coupon"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113156
+msgid "Create New Coupon"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113166
+msgid "Note: Go to WooCommerce to Create New Coupons"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113175
+msgid "Coupon Title"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113180
+msgid "{discount_value} OFF your next purchase!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113189
+msgid "Use {discount_value} tag to show stock amount."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113195
+msgid "Subheading"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113212
+msgid "Button Link"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113223
+msgid "Enter Page Link for the Coupon."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113230
+msgid "The coupon link will be tied to the button. If a user clicks on the button, they will be taken to the linked page."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113341
+msgid "Campaign Heading"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113548
+#: assets/js/backend/revenue-admin.js:114184
+msgid "Select Start Date"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113648
+msgid "Countdown Duration"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113665
+msgid "The countdown starts instantly at checkout, and the offer expires when reaches zero."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113704
+msgid "Congrats! You saved {discount_value} on your order!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113715
+msgid "Use {discount_value} to display the discount amount. <br> Use {qty} to indicate the cart quantity"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113727
+msgid "Loop"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113728
+msgid "On Hover"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113742
+msgid "Animated Discount Row"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113743
+msgid "Animated Add to Cart"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113752
+msgid "Animation Mode"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113784
+#: assets/js/backend/revenue-admin.js:113802
+#: assets/js/backend/revenue-admin.js:115814
+msgid "Select Animation"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113785
+#: assets/js/backend/revenue-admin.js:113803
+msgid "Animation Style"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113806
+msgid "Tada"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113815
+msgid "Delay Between"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113955
+msgid "Skip Add to Cart"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113968
+msgid "Send users to checkout directly"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113982
+msgid "Enable Quantity Selector"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:113999
+msgid "Allow users to choose the quantity of items"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:114014
+msgid "Multiple Variation Selection"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:114052
+msgid "If offer products are in the cart"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:114068
+msgid "When product title/image is clicked"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:114165
+msgid "Choose from when and for how long the campaign should run. By default, it starts immediately and runs until manually stopped."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:114487
+msgid "Set Preset"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:114497
+msgid "Back To Default"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:114503
+msgid "Base Colors"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:114695
+msgid "Save Changes"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115292
+#: assets/js/backend/revenue-admin.js:115684
+msgid "Saved Style"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115363
+#: assets/js/backend/revenue-admin.js:115444
+#: assets/js/backend/revenue-admin.js:115446
+msgid "Delete Style"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115431
+#: assets/js/backend/revenue-admin.js:115434
+msgid "Apply Style"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115469
+msgid "No saved styles available."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115658
+#: assets/js/backend/revenue-admin.js:116657
+#: assets/js/backend/revenue-admin.js:116851
+msgid "Close styles panel"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115706
+#: assets/js/backend/revenue-admin.js:115731
+msgid "Make Full Bar Clickable"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115707
+msgid "Add a CTA Button"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115720
+msgid "Enable Click Action"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115727
+msgid "Select the type"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115743
+msgid "Link for bar"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115745
+msgid "Insert a link here"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115772
+msgid "Enable Close Button"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115799
+msgid "Animated Countdown Timer"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115815
+msgid "Animation Type"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115825
+msgid "Animation Speed"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115839
+msgid "Delay Between Loop"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:115979
+msgid "Click Here"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:116159
+msgid "Coupon form not found inside"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:116168
+msgid "Coupon form not found inside iframe"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:116193
+msgid "Coupon updated successfully!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:116201
+#: assets/js/backend/revenue-admin.js:116226
+msgid "There was an error with the request."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:116217
+msgid "Coupon generated successfully!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:116299
+msgid "Update Coupon"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:116300
+msgid "Generate Coupon"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:116837
+#: assets/js/backend/revenue-admin.js:116842
+msgid "Templates"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:116860
+msgid "No templates available for this campaign type."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:116906
+msgid "Use This Template"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:116637
+msgid "General Settings"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117741
+msgid "Join Our Community"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117744
+msgid "Join the WowCommerce Community - share your thoughts, concerns, and ideas with everyone."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117765
+msgid "Join The Community"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117779
+msgid "Quick Access"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117785
+msgid "Learn about WowRevenue"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117796
+msgid "Learn More"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117802
+msgid "Step-by-Step Tutorials"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117813
+msgid "Watch Now"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117819
+msgid "Latest Insights & Tips"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117830
+msgid "Explore Now"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117847
+msgid "Impressed with WowRevenue? Share Some Love!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117853
+msgid "Your support drives us—tell the world what you love!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:117867
+msgid "Write a Review"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:118274
+msgid "The All-in-One-Solution"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:118277
+msgid "Boost Sales and AOV"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:118280
+msgid "12+ Campaigns"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:118287
+msgid "Explore Your Campaigns"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:118324
+msgid "Advance Analytics"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:118327
+msgid "Track campaign performance and make decisions rooted in data."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:2
+#: assets/js/backend/revenue-admin.js:118339
+msgid "View All Analytics"
+msgstr ""
+
+#: assets/js/frontend/spending-goal.js:761
+msgid "Spend %s more to claim your gifts!"
+msgstr ""
+
+#: assets/js/frontend/spending-goal.js:773
+msgid "Spend %s more to get %d gift items!"
+=======
 #: assets/js/backend/revenue-admin.js:108853
 #: assets/js/backend/revenue-admin.js:101892
 #, js-format
@@ -5487,13 +9854,18 @@ msgstr ""
 #: assets/js/backend/revenue-admin.js:164760
 #, js-format
 msgid "Spend %s more to claim your gift!"
+>>>>>>> dev
 msgstr ""
 
 #: assets/js/backend/revenue-admin.js:168511
 #: assets/js/frontend/spending-goal.js:779
+<<<<<<< HEAD
+msgid "Spend %s more to get %d gift item!"
+=======
 #: assets/js/backend/revenue-admin.js:164769
 #, js-format
 msgid "Spend %1$s more to get any %2$d gift items!"
+>>>>>>> dev
 msgstr ""
 
 #: assets/js/backend/revenue-admin.js:168511
@@ -5515,6 +9887,179 @@ msgstr ""
 msgid "Congrats! Your gift is here!"
 msgstr ""
 
+<<<<<<< HEAD
+#: assets/js/frontend/spending-goal.js:794
+msgid "Congrats! Choose any %d items."
+msgstr ""
+
+#: assets/js/frontend/spending-goal.js:799
+msgid "Congrats! Choose any %d item."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:82554
+msgid "Enjoy"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:82555
+msgid "up to 60% OFF"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:82556
+msgid "on WowRevenue -"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:82557
+msgid "Get it Now!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:82615
+msgid "Close notification"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:113041
+msgid "All Product"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117055
+msgid "Your License Key is invalid. Please try again."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117068
+msgid "Something went wrong. Please try again."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117101
+msgid "Ready to Use WowRevenue Pro?"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117108
+msgid "Enter Your License Key Here…"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117116
+msgid "If you’re unable to activate your product license, please contact the"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117126
+msgid "support team"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117141
+msgid "Activate License"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117150
+msgid "Congratulations!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117151
+msgid "Congratulations on unlocking WowRevenue Pro! Ignite your imagination and design your ideal experience. Let WowRevenue take care of you and your users."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117169
+msgid "Do I need the free version of the plugin on my site?"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117173
+msgid "Yes. You can use the free version of the plugin, which includes the free features of WowRevenue. However, please note that to use the pro features, you need the free version of the plugin installed on your WordPress site."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117179
+msgid "Where do I get my product license?"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117180
+msgid "You can copy the product license from the client dashboard. Once you copy it, paste the license key into the WowRevenue License validation page."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117186
+msgid "How do I get help to use WowRevenue Pro?"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117189
+msgid "Please go to the support link:"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117213
+msgid "WowRevenue is a product of WPXPO. The contact support team is ready to help you with any queries, including how to use the pro version of WowRevenue."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117302
+msgid "License Type"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117310
+msgid "Expire On"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117353
+msgid "Deactivate License"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117363
+msgid "Unlimited Sites - Yearly"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117364
+msgid "1 Site - Lifetime"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117365
+msgid "25 Sites - Lifetime"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117388
+msgid "Choose a upgrade plan"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117645
+msgid "Thank You!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117648
+msgid "Your message has been received. We will contact you soon on your email with a response. Stay connected and check mail!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:117684
+msgid "Message"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:118722
+msgid "is a B2B wholesale plugin featuring advanced wholesale pricing and customization features."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:118731
+msgid "is a complete WooCommerce store builder featuring advanced options to improve sales!"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:118740
+msgid "generates actionable leads and boost sales with popups, banners, and floating bars using WowOptin."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:118749
+msgid "creates wonderful custom blogs and more using the powerful and customizable PostX site builder."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:118758
+msgid "extends the functionality of your WooCommerce store with additional features and options."
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:118823
+msgid "Activated"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:118839
+msgid "Install"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:118840
+msgid "Activate"
+msgstr ""
+
+#: assets/js/backend/revenue-admin.js:118867
+msgid "Plugin Details"
+msgstr ""
+=======
 #: assets/js/backend/revenue-admin.js:168518
 #: assets/js/frontend/spending-goal.js:812
 #: assets/js/backend/revenue-admin.js:164800
@@ -6261,3 +10806,4 @@ msgstr ""
 msgid "Unknown Campaign Type"
 msgstr ""
 
+>>>>>>> dev
