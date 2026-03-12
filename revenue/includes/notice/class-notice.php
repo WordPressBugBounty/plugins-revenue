@@ -84,8 +84,9 @@ class Notice {
 	 */
 	public static function get_hellobar_config() {
 		return array(
-			'revx_helloBar_flash_sale_2026_1'      => Xpo::get_transient_without_cache( 'revx_helloBar_flash_sale_2026_1' ),
-			'revx_helloBar_final_hour_sale_2026_1' => Xpo::get_transient_without_cache( 'revx_helloBar_final_hour_sale_2026_1' ),
+			'revx_helloBar_spring_sale_2026_1'     => Xpo::get_transient_without_cache( 'revx_helloBar_spring_sale_2026_1' ),
+			'revx_helloBar_spring_sale_2026_2'     => Xpo::get_transient_without_cache( 'revx_helloBar_spring_sale_2026_2' ),
+			'revx_helloBar_spring_sale_2026_3'     => Xpo::get_transient_without_cache( 'revx_helloBar_spring_sale_2026_3' ),
 		);
 	}
 
@@ -169,6 +170,7 @@ class Notice {
 	 */
 	public function revx_dashboard_notice_callback() {
 		$this->revx_dashboard_banner_notice();
+		$this->revx_dashboard_content_notice();
 	}
 
 	/**
@@ -180,42 +182,21 @@ class Notice {
 		$revx_db_nonce  = wp_create_nonce( 'revx-nonce' );
 		$banner_notices = array(
 			array(
-				'key'                => 'revx_flash_sale_2026_1',
-				'start'              => '2026-02-19 00:00 Asia/Dhaka',
-				'end'                => '2026-02-23 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
+				'key'                => 'revx_spring_sale_2026_1',
+				'start'              => '2026-04-05 00:00 Asia/Dhaka',
+				'end'                => '2026-04-14 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
 
 				'brand_color'        => '#00a464',
 
-				'left_image'         => REVENUE_URL . '/assets/images/dashboard_banner/flash_sale/left_image.png',
-				'right_image'        => REVENUE_URL . '/assets/images/dashboard_banner/flash_sale/right_image.png',
-				'bg_image'           => REVENUE_URL . '/assets/images/dashboard_banner/flash_sale/bg.png',
+				'left_image'         => REVENUE_URL . '/assets/images/dashboard_banner/spring_sale/left_image.png',
+				'right_image'        => REVENUE_URL . '/assets/images/dashboard_banner/spring_sale/right_image.png',
+				'bg_image'           => REVENUE_URL . '/assets/images/dashboard_banner/spring_sale/bg.png',
 				'text'               => 'Hurry Before It Ends!',
 				'countdown_duration' => 259200, // Duration in seconds.
-				'countdown_color'    => '#3CF357',
+				'countdown_color'    => '#000',
 				'url'                => Xpo::generate_utm_link(
 					array(
-						'utmKey' => 'flash_sale',
-					)
-				),
-
-				'visibility'         => ! Xpo::is_lc_active(),
-			),
-			array(
-				'key'                => 'revx_final_hour_sale_2026_1',
-				'start'              => '2026-02-25 00:00 Asia/Dhaka',
-				'end'                => '2026-03-01 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
-
-				'brand_color'        => '#00a464',
-
-				'left_image'         => REVENUE_URL . '/assets/images/dashboard_banner/final_hour/left_image.png',
-				'right_image'        => REVENUE_URL . '/assets/images/dashboard_banner/final_hour/right_image.png',
-				'bg_image'           => REVENUE_URL . '/assets/images/dashboard_banner/final_hour/bg.png',
-				'text'               => 'Hurry Before It Ends!',
-				'countdown_duration' => 172800, // Duration in seconds.
-				'countdown_color'    => '#3CF357',
-				'url'                => Xpo::generate_utm_link(
-					array(
-						'utmKey' => 'final_hour',
+						'utmKey' => 'spring_sale',
 					)
 				),
 
@@ -290,7 +271,7 @@ class Notice {
 						justify-content: center;
 						font-weight: 700;
 						font-size: 28px;
-						color: #fff;
+						color: #00a464;
 						line-height: 32px;
 						text-align: center;
 					}
@@ -476,6 +457,230 @@ class Notice {
 		<?php
 	}
 
+	/**
+	 * Dashboard Content Notice
+	 *
+	 * @return void
+	 */
+	public function revx_dashboard_content_notice() {
+
+		$content_notices = array(
+			array(
+				'key'                => 'revx_dashboard_content_notice_spring_sale_v1',
+				'start'              => '2026-03-16 00:00 Asia/Dhaka',
+				'end'                => '2026-03-25 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'content_notice',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Spring Sale:', 'revenue' ),
+				'content_subheading' => __( 'WowRevenue offers are live - Enjoy %s off on WowRevenue Pro.', 'revenue' ),
+				'discount_content'   => ' up to 55% OFF',
+				'border_color'       => '#00a464',
+				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/logo.svg',
+				'button_text'        => __( 'Upgrade Now', 'revenue' ),
+				'is_discount_logo'   => true,
+			),
+			array(
+				'key'                => 'revx_dashboard_content_notice_spring_sale_v2',
+				'start'              => '2026-03-26 00:00 Asia/Dhaka',
+				'end'                => '2026-04-04 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'content_notice',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Spring Sale:', 'revenue' ),
+				'content_subheading' => __( 'WowRevenue offers are live - Enjoy %s off on WowRevenue Pro.', 'revenue' ),
+				'discount_content'   => ' up to 55% OFF',
+				'border_color'       => '#00a464',
+				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/discount.svg',
+				'button_text'        => __( 'Upgrade Now', 'revenue' ),
+				'is_discount_logo'   => true,
+			),
+
+		);
+
+		$revx_db_nonce = wp_create_nonce( 'revx-nonce' );
+
+		foreach ( $content_notices as $key => $notice ) {
+			$notice_key = isset( $notice['key'] ) ? $notice['key'] : $this->notice_version;
+			if ( isset( $_GET['disable_revx_notice'] ) && $notice_key === $_GET['disable_revx_notice'] ) {
+				continue;
+			} else {
+				$border_color = $notice['border_color'];
+
+				$current_time = gmdate( 'U' );
+				$notice_start = gmdate( 'U', strtotime( $notice['start'] ) );
+				$notice_end   = gmdate( 'U', strtotime( $notice['end'] ) );
+				if ( $current_time >= $notice_start && $current_time <= $notice_end && $notice['visibility'] ) {
+					$notice_transient = Xpo::get_transient_without_cache( 'revx_get_pro_notice_' . $notice_key );
+
+					if ( 'off' !== $notice_transient ) {
+
+						$query_args = array(
+							'disable_revx_notice' => $notice_key,
+							'revx_db_nonce'       => $revx_db_nonce,
+						);
+						if ( isset( $notice['repeat_interval'] ) && $notice['repeat_interval'] ) {
+							$query_args['revx_interval'] = $notice['repeat_interval'];
+						}
+
+						$url = isset( $notice['url'] ) ? $notice['url'] : Xpo::generate_utm_link(
+							array(
+								'utmKey' => 'content_notice',
+							)
+						);
+
+						?>
+
+						<style id="revx-notice-css" type="text/css">
+							.revx-content-notice-wrapper {
+								border: 1px solid #c3c4c7;
+								border-left: 3px solid #00a464;
+								margin: 15px 0 !important;
+								display: flex;
+								align-items: center;
+								background: #F8FFF5;
+								width: 100%;
+								padding: 10px 0;
+								position: relative;
+								box-sizing: border-box;
+							}
+
+							.revx-content-notice-wrapper.notice {
+								margin: 10px 0;
+								width: calc(100% - 20px);
+							}
+
+							.wrap .revx-content-notice-wrapper.notice {
+								width: 100%;
+							}
+
+							.revx-content-notice-icon {
+								margin-left: 15px;
+							}
+
+							.revx-content-notice-discout-icon {
+								margin-left: 10px;
+							}
+
+							.revx-content-notice-icon img {
+								max-width: 42px;
+								height: 70px;
+							}
+
+							.revx-content-notice-discout-icon img {
+								height: 70px;
+								width: 70px;
+							}
+
+							.revx-notice-content-wrapper {
+								display: flex;
+								flex-direction: column;
+								gap: 8px;
+								font-size: 14px;
+								line-height: 20px;
+								margin-left: 15px;
+							}
+
+							.revx-content-notice-buttons {
+								display: flex;
+								align-items: center;
+								gap: 15px;
+							}
+
+							.revx-content-notice-btn {
+								font-weight: 600;
+								text-transform: uppercase !important;
+								padding: 2px 10px !important;
+								background-color: #00a464;
+								border: none !important;
+							}
+
+							.revx-content-discount_btn {
+								background-color: #ffffff;
+								text-decoration: none;
+								border: 1px solid #00a464;
+								padding: 5px 10px;
+								border-radius: 5px;
+								font-weight: 500;
+								text-transform: uppercase;
+								color: #00a464 !important;
+							}
+
+							.revx-content-notice-close {
+								position: absolute;
+								right: 2px;
+								top: 5px;
+								text-decoration: none;
+								color: #b6b6b6;
+								font-family: dashicons;
+								font-size: 16px;
+								line-height: 20px;
+							}
+
+							.revx-content-notice-close-icon {
+								font-size: 14px;
+							}
+						</style>
+					<div class="revx-content-notice-wrapper notice data_collection_notice" 
+					style="border-left: 3px solid <?php echo esc_attr( $border_color ); ?>;"
+					> 
+						<?php
+						if ( $notice['is_discount_logo'] ) {
+							?>
+								<div class="revx-content-notice-discout-icon"> <img src="<?php echo esc_url( $notice['icon'] ); ?>"/>  </div>
+							<?php
+						} else {
+							?>
+								<div class="revx-content-notice-icon"> <img src="<?php echo esc_url( $notice['icon'] ); ?>"/>  </div>
+							<?php
+						}
+						?>
+						
+						<div class="revx-notice-content-wrapper">
+							<div class="">
+								<strong><?php printf( esc_html( $notice['content_heading'] ) ); ?> </strong>
+						<?php
+						printf(
+							wp_kses_post( $notice['content_subheading'] ),
+							'<strong>' . esc_html( $notice['discount_content'] ) . '</strong>'
+						);
+						?>
+							</div>
+							<div class="revx-content-notice-buttons">
+							<?php if ( isset( $notice['is_discount_logo'] ) && $notice['is_discount_logo'] ) : ?>
+									<a class="revx-content-discount_btn" href="<?php echo esc_url( $url ); ?>" target="_blank">
+										<?php echo esc_html( $notice['button_text'] ); ?>
+									</a>
+								<?php else : ?>
+									<a class="revx-content-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank" style="background-color: <?php echo ! empty( $notice['background_color'] ) ? esc_attr( $notice['background_color'] ) : '#00a464'; ?>;">
+									<?php echo esc_html( $notice['button_text'] ); ?>
+										
+									</a>
+								<?php endif; ?>
+							</div>
+						</div>
+						<a href=
+							<?php
+							echo esc_url(
+								add_query_arg(
+									$query_args
+								)
+							);
+							?>
+						class="revx-content-notice-close"><span class="revx-content-notice-close-icon dashicons dashicons-dismiss"> </span></a>
+					</div>
+								<?php
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 * The Durbin Html
@@ -717,7 +922,7 @@ class Notice {
 			}
 			.revx-pro-notice {
 				position: relative;
-				border-left: 3px solid #86a62c;
+				border-left: 3px solid #00a464;
 			}
 			.revx-pro-notice .revx-install-body h3 {
 				font-size: 20px;
@@ -800,7 +1005,7 @@ class Notice {
 			.revx-notice {
 				background: #fff;
 				border: 1px solid #c3c4c7;
-				border-left-color: #86a62c !important;
+				border-left-color: #00a464 !important;
 				border-left-width: 4px;
 				border-radius: 4px 0px 0px 4px;
 				box-shadow: 0 1px 1px rgba(0, 0, 0, .04);

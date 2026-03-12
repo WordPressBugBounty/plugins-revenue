@@ -461,6 +461,17 @@ final class Revenue {
 	 * @return array
 	 */
 	public function plugin_list_action_links( $links ) {
+		$offer_config = array(
+			array(
+				'start'  => '2026-02-16 00:00 Asia/Dhaka',
+				'end'    => '2026-04-14 23:59 Asia/Dhaka',
+				'text'   => __(
+					'Spring Sale - Up to 55% OFF',
+					'revenue'
+				),
+				'utmKey' => 'spring_sale_meta',
+			),
+		);
 
 		// Create the base URL for campaigns admin page.
 		$campaign_url = esc_url( admin_url( 'admin.php?page=' . revenue()->get_admin_menu_slug() . '#/campaigns' ) );
@@ -476,25 +487,29 @@ final class Revenue {
 		$links = array_merge( $first_part, $links );
 
 		if ( ! revenue()->is_pro_active() ) {
-			$pricing_url = esc_url( revenue()->get_pricing_page_url() );
 
-			// Show campaign banner between Jan 1 and Feb 15, 2026.
+			$text = esc_html__( 'Upgrade to Pro', 'revenue' );
+			$url  = Xpo::generate_utm_link();
 
-			$now = new DateTime( 'now', wp_timezone() );
-
-			$start_date = new DateTime( '2026-01-01 00:00:00', wp_timezone() );
-			$end_date   = new DateTime( '2026-02-15 23:59:59', wp_timezone() );
-
-			if ( $now >= $start_date && $now <= $end_date ) {
-				$text = esc_html__( 'New Year Offer!', 'revenue' );
-			} else {
-				$text = esc_html__( 'Upgrade Pro', 'revenue' );
+			foreach ( $offer_config as $offer ) {
+				$current_time = gmdate( 'U' );
+				$notice_start = gmdate( 'U', strtotime( $offer['start'] ) );
+				$notice_end   = gmdate( 'U', strtotime( $offer['end'] ) );
+				if ( $current_time >= $notice_start && $current_time <= $notice_end ) {
+					$url      = Xpo::generate_utm_link(
+						array(
+							'utmKey' => $offer['utmKey'],
+						)
+					);
+						$text = $offer['text'];
+						break;
+				}
 			}
 
 			$last_part = array(
 				'get_discounts' => sprintf(
 					'<a style="color:#00a44a; font-weight: 700;" target="_blank" href="%s">%s</a>',
-					$pricing_url,
+					$url,
 					$text
 				),
 			);

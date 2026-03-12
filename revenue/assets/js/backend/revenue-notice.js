@@ -17,9 +17,11 @@ jQuery( document ).ready( function ( $ ) {
 		}
 
 		// 3. Other notices (can be multiple)
-		const notices = document.querySelectorAll( '.revx-notice' );
+		const notices = document.querySelectorAll( '.revx-setting-hellobar' );
 		notices.forEach( ( notice ) => {
-			if ( notice.offsetParent !== null ) {
+			// parents are nulll since child has fixed position. removed parent check.
+			if ( notice ) {
+				notice.style.position = 'fixed';
 				notice.style.top = offset + 'px';
 				notice.style.opacity = 1; // reveal smoothly
 				offset += notice.offsetHeight;

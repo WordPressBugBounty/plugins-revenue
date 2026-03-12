@@ -203,7 +203,7 @@ class Xpo {
 		return $result;
 	}
 
-	public static function generate_utm_link( $params ) {
+	public static function generate_utm_link( $params = array() ) {
 		$default_config = array(
 			'flash_sale' => array(
 				'source'   => 'db-revenue-featurearea',
@@ -215,6 +215,23 @@ class Xpo {
 				'medium'   => 'final_hour',
 				'campaign' => 'revenue-dashboard',
 			),
+			// spring sale 2026.
+			'spring_sale_meta' => array(
+				'source'   => 'db-revenue-plugin-meta',
+				'medium'   => 'spring_sale',
+				'campaign' => 'revenue-dashboard',
+			),
+			'spring_sale'      => array(
+				'source'   => 'db-revenue-notice',
+				'medium'   => 'spring_sale',
+				'campaign' => 'revenue-dashboard',
+			),
+			'content_notice'   => array(
+				'source'   => 'db-revenue-notice',
+				'medium'   => 'spring-sale',
+				'campaign' => 'revenue-dashboard',
+			),
+			// -------------------------------------
 		);
 
 		// Step 1: Get parameters.
