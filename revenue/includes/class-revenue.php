@@ -60,6 +60,8 @@ final class Revenue {
 		register_activation_hook( REVENUE_FILE, array( $this, 'activate' ) );
 		register_deactivation_hook( REVENUE_FILE, array( $this, 'deactivate' ) );
 
+		add_action( 'wp_initialize_site', array( $this, 'new_site_activate_revenue' ), 10, 1 );
+
 		$this->include_ajax();
 
 		$this->include_revenue_menu();
@@ -423,10 +425,38 @@ final class Revenue {
 	 *
 	 * Nothing being called here yet.
 	 */
-	public function activate() {
+	public function activate( $network_wide ) {
+		$installer = new Revenue_Install();
+
+		if ( is_multisite() && $network_wide ) {
+
+			$sites = get_sites( [ 'number' => 0 ] );
+
+			foreach ( $sites as $site ) {
+
+				switch_to_blog( $site->blog_id );
+
+				$installer->install();
+
+				restore_current_blog();
+			}
+
+		} else {
+			// Single site activation
+			$installer->install();
+		}
+	}
+
+	public function new_site_activate_revenue( $new_site ) {
+		// Only run if the plugin is network-activated
+		if ( ! is_plugin_active_for_network( 'revenue/revenue.php' ) ) {
+			return;
+		}
 
 		$installer = new Revenue_Install();
+		switch_to_blog( $new_site->blog_id );
 		$installer->install();
+		restore_current_blog();
 	}
 
 	/**
@@ -463,7 +493,7 @@ final class Revenue {
 	public function plugin_list_action_links( $links ) {
 		$offer_config = array(
 			array(
-				'start'  => '2026-02-16 00:00 Asia/Dhaka',
+				'start'  => '2026-03-16 00:00 Asia/Dhaka',
 				'end'    => '2026-04-14 23:59 Asia/Dhaka',
 				'text'   => __(
 					'Spring Sale - Up to 55% OFF',

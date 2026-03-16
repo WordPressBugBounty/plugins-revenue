@@ -5075,7 +5075,7 @@ class Revenue_Template_Utils {
 		}
 
 		if ( $is_countdown_timer_enable && $is_countdown_timer_visible ) {
-			self::render_countdown_timer( $campaign_id, $template_data );
+			self::render_countdown_timer( $campaign_id, $template_data, $start_timestamp, $end_timestamp );
 		}
 
 		if ( $is_any_enable ) {
@@ -5093,7 +5093,8 @@ class Revenue_Template_Utils {
 	 * @param array $template_data Template builder data (array) used for classes/text.
 	 * @return void Echoes HTML directly.
 	 */
-	public static function render_countdown_timer( $campaign_id, $template_data ) {
+	public static function render_countdown_timer( $campaign_id, $template_data, $start_timestamp, $end_timestamp ) {
+		// start  time and end time was sent for safety purpose.
 
 		// IMPORTANT NOTE: for devs
 		// the id="revx-countdown-timer-$campaign_id",

@@ -855,7 +855,9 @@
 					quantity,
 				},
 				success: ( response ) => {
-					Revenue.showToast( 'Added to cart' );
+					Revenue.showToast(
+						revenue_campaign?.added_to_cart || 'Added to cart'
+					);
 
 					$( document.body ).trigger( 'added_to_cart', [
 						response?.data?.fragments,
@@ -880,7 +882,10 @@
 				success: ( response ) => {
 					if ( response.success ) {
 						if ( response.data.status ) {
-							Revenue.showToast( 'Free gifts added to cart' );
+							Revenue.showToast(
+								revenue_campaign?.free_gifts_added_to_cart ||
+									'Free gifts added to cart'
+							);
 
 							// Update gift item display after adding to cart
 							const added_items_id = response.data.added_items_id;
@@ -918,7 +923,10 @@
 				success: ( response ) => {
 					if ( response.success ) {
 						if ( response.data.status ) {
-							Revenue.showToast( 'Free gift added to cart' );
+							Revenue.showToast(
+								revenue_campaign?.free_gift_added_to_cart ||
+									'Free gift added to cart'
+							);
 							[
 								'wc_fragment_refresh',
 								'update_checkout',

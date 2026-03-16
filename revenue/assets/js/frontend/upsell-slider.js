@@ -1,5 +1,5 @@
 //  NOTE: this file is currently not being used.
-//  free shipping add to cart is working from the add-to-cart.js 
+//  free shipping add to cart is working from the add-to-cart.js
 // search handleFreeShippingBarUpsellAddToCart()
 ( function ( $ ) {
 	'use strict';
@@ -44,7 +44,9 @@
 					quantity,
 				},
 				success: ( response ) => {
-					Revenue.showToast( 'Added to cart' );
+					Revenue.showToast(
+						revenue_campaign?.added_to_cart || 'Added to cart'
+					);
 
 					$( document.body ).trigger( 'added_to_cart', [
 						response?.data?.fragments,

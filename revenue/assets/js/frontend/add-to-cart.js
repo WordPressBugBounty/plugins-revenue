@@ -977,10 +977,15 @@ jQuery( function ( $ ) {
 			$button,
 		] );
 
-		toggleLoading( $button, false, 'Added to Cart' );
-		showToast( 'Added to cart' );
+		toggleLoading(
+			$button,
+			false,
+			revenue_campaign?.added_to_cart || 'Added to Cart'
+		);
+		showToast( revenue_campaign?.added_to_cart || 'Added to cart' );
 
-		if ( $button.hasClass( 'revx-builder-atc-skip' ) ) {
+		// true if any of the class exist.
+		if ( $button.is( '.revx-builder-atc-skip, .revx-skip-add-to-cart' ) ) {
 			// Remove revx-loading class and update button text to 'Added to Cart'
 			window.location.assign( revenue_campaign.checkout_page_url );
 		}
@@ -1021,8 +1026,12 @@ jQuery( function ( $ ) {
 			hideProduct( $button.attr( 'data-product-id' ), campaignId );
 		}
 
-		toggleLoading( $button, false, 'Added to Cart' );
-		showToast( 'Added to cart' );
+		toggleLoading(
+			$button,
+			false,
+			revenue_campaign?.added_to_cart || 'Added to Cart'
+		);
+		showToast( revenue_campaign?.added_to_cart || 'Added to cart' );
 
 		$( document.body ).trigger( 'added_to_cart', [
 			response?.data?.fragments,
@@ -1048,7 +1057,11 @@ jQuery( function ( $ ) {
 		} );
 	};
 
-	const toggleLoading = ( $button, isLoading, text = 'Adding...' ) => {
+	const toggleLoading = (
+		$button,
+		isLoading,
+		text = revenue_campaign?.adding || 'Adding...'
+	) => {
 		$button
 			.toggleClass( 'revx-loading', isLoading )
 			.text( isLoading ? text : prevButtonText || 'Add to Cart' );
@@ -1242,7 +1255,7 @@ jQuery( function ( $ ) {
 					.find( '.revx-checkbox-wrapper' )
 					.hasClass( 'revx-required-product' );
 
-				if( isRequired ) {
+				if ( isRequired ) {
 					requiredProducts.push( $product.data( 'product-id' ) );
 				}
 

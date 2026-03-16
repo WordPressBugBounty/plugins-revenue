@@ -986,6 +986,9 @@ class Revenue_Campaign {
 			'currency_format'              => get_woocommerce_price_format(),
 			'checkout_page_url'            => wc_get_checkout_url(),
 			'added_to_cart'                => __( 'Added to Cart', 'revenue' ),
+			'adding'                       => __( 'Adding...', 'revenue' ),
+			'free_gift_added_to_cart'      => __( 'Free gift added to cart', 'revenue' ),
+			'free_gifts_added_to_cart'     => __( 'Free gifts added to cart', 'revenue' ),
 		);
 
 		if ( ! empty( $this->campaign_additional_data ) ) {
@@ -1564,6 +1567,9 @@ class Revenue_Campaign {
 			'checkout_page_url'            => wc_get_checkout_url(),
 			'revenue_campaign_id'          => $campaign_id,
 			'added_to_cart'                => __( 'Added to Cart', 'revenue' ),
+			'adding'                       => __( 'Adding...', 'revenue' ),
+			'free_gift_added_to_cart'      => __( 'Free gift added to cart', 'revenue' ),
+			'free_gifts_added_to_cart'     => __( 'Free gifts added to cart', 'revenue' ),
 		);
 
 		if ( ! $this->is_enqueue_data_already ) {
@@ -3075,6 +3081,9 @@ class Revenue_Campaign {
 			'checkout_page_url'            => wc_get_checkout_url(),
 			'revenue_campaign_id'          => $campaign_id,
 			'added_to_cart'                => __( 'Added to Cart', 'revenue' ),
+			'adding'                       => __( 'Adding...', 'revenue' ),
+			'free_gift_added_to_cart'      => __( 'Free gift added to cart', 'revenue' ),
+			'free_gifts_added_to_cart'     => __( 'Free gifts added to cart', 'revenue' ),
 		);
 
 		if ( ! $this->is_enqueue_data_already ) {
