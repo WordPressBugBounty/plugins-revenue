@@ -1973,8 +1973,14 @@ class Revenue_Functions {
 				// code...
 				break;
 		}
-		// 2nd parameter empty string for woocommerce settings, integer for specific decimal places.
-		$offered_price = wc_format_decimal( $offered_price, '' );
+		// Ignoring particular case which results in round up for corner case like 17.999 = 18.00
+		// where quantity is 10 and total price is 179.99 . If modification needed, handle with care.
+		$volume_and_fixed_total = 'volume_discount' === $campaign_type && 'fixed_total_price' === $offer_type;
+		if ( ! $volume_and_fixed_total ) {
+			// 2nd parameter empty string for woocommerce settings, integer for specific decimal places.
+			$offered_price = wc_format_decimal( $offered_price, '' );
+		}
+
 		if ( $with_save_data ) {
 			$save_data['price'] = max( 0.0, $offered_price );
 

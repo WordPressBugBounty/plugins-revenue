@@ -2276,12 +2276,12 @@
 	} );
 
 	let giftHideTimer;
-	$( '.revx-progress-step-icon-container' )
-		.on( 'mouseenter', function () {
+	$( document )
+		.on( 'mouseenter', '.revx-progress-step-icon-container', function () {
 			clearTimeout( giftHideTimer ); // prevent hiding
 			updateGiftPosition( $( this ) );
 		} )
-		.on( 'mouseleave', function () {
+		.on( 'mouseleave', '.revx-progress-step-icon-container', function () {
 			const $this = $( this );
 			giftHideTimer = setTimeout( () => {
 				$this
@@ -2296,11 +2296,11 @@
 			}, 200 ); // adjust delay as needed
 		} );
 
-	$( '.revx-gift-container' )
-		.on( 'mouseenter', function () {
+	$( document )
+		.on( 'mouseenter', '.revx-gift-container', function () {
 			clearTimeout( giftHideTimer ); // prevent hiding
 		} )
-		.on( 'mouseleave', function () {
+		.on( 'mouseleave', '.revx-gift-container', function () {
 			$( this ).addClass( 'revx-d-none' ).css( {
 				visibility: 'hidden',
 				opacity: 0,

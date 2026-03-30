@@ -114,7 +114,7 @@ class Revenue_Volume_Discount {
 		if ( $offer_type && ( 'free' === $offer_type || $offer_value ) ) {
 
 			if ( 'fixed_total_price' === $offer_type ) {
-				if ( $offer_qty == $cart_quantity ) {
+				if ( $offer_qty <= $cart_quantity ) {
 					$offered_price = revenue()->calculate_campaign_offered_price(
 						$offer_type,
 						$offer_value,
@@ -135,6 +135,7 @@ class Revenue_Volume_Discount {
 		}
 
 		$offered_price = apply_filters( 'revenue_campaign_volume_discount_price', $offered_price, $product_id );
+
 		$cart_item['data']->set_price( $offered_price );
 	}
 
@@ -189,36 +190,37 @@ class Revenue_Volume_Discount {
 					$offer_value = $offer['value'];
 					$offer_qty   = intval( $offer['quantity'] );
 				}
-				// }
+			}
 
-				if ( $offer_type && ( 'free' === $offer_type || $offer_value ) ) {
+			if ( $offer_type && ( 'free' === $offer_type || $offer_value ) ) {
 
-					if ( 'fixed_total_price' === $offer_type ) {
-						if ( $offer_qty === $cart_quantity ) {
-							$offered_price = revenue()->calculate_campaign_offered_price(
-								$offer_type,
-								$offer_value,
-								$filtered_price,
-								false,
-								1,
-								'volume_discount'
-							);
-							$offered_price = $offered_price / $offer_qty;
-						}
-					} else {
+				if ( 'fixed_total_price' === $offer_type ) {
+					if ( $offer_qty <= $cart_quantity ) {
 						$offered_price = revenue()->calculate_campaign_offered_price(
 							$offer_type,
 							$offer_value,
-							$filtered_price
+							$filtered_price,
+							false,
+							$offer_qty,
+							'volume_discount'
 						);
+						// Ignoring particular case which results in round up for corner case like 17.999 = 18.00
+						// where quantity is 10 and total price is 179.99 . If modification needed, handle with care.
+						$offered_price = floor( $offered_price * pow( 10, wc_get_price_decimals() ) ) / pow( 10, wc_get_price_decimals() );
 					}
+				} else {
+					$offered_price = revenue()->calculate_campaign_offered_price(
+						$offer_type,
+						$offer_value,
+						$filtered_price
+					);
+				}
 
-					// Apply tax to final offered price based on WooCommerce setting.
-					if ( 'incl' === $tax_display ) {
-						$offered_price = wc_get_price_including_tax( $product, array( 'price' => $offered_price ) );
-					} else {
-						$offered_price = wc_get_price_excluding_tax( $product, array( 'price' => $offered_price ) );
-					}
+				// Apply tax to final offered price based on WooCommerce setting.
+				if ( 'incl' === $tax_display ) {
+					$offered_price = wc_get_price_including_tax( $product, array( 'price' => $offered_price ) );
+				} else {
+					$offered_price = wc_get_price_excluding_tax( $product, array( 'price' => $offered_price ) );
 				}
 			}
 

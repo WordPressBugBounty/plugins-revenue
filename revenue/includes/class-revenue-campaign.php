@@ -375,6 +375,8 @@ class Revenue_Campaign {
 		wp_enqueue_style( 'revenue-campaign-mix_match' );
 		wp_enqueue_style( 'revenue-utility' );
 		wp_enqueue_style( 'revenue-responsive' );
+		wp_enqueue_style( 'revenue-animated-add-to-cart' );
+		wp_enqueue_style( 'revenue-campaign-spending_goal' );
 		wp_enqueue_script( 'revenue-block-integration' );
 		wp_enqueue_script( 'revenue-campaign' );
 		wp_enqueue_script( 'revenue-slider' );
@@ -385,7 +387,7 @@ class Revenue_Campaign {
 		wp_enqueue_script( 'revenue-campaign-total' );
 		wp_enqueue_script( 'revenue-countdown' );
 		wp_enqueue_script( 'revenue-animated-add-to-cart' );
-		wp_enqueue_style( 'revenue-animated-add-to-cart' );
+		wp_enqueue_script( 'revenue-spending-goal' );
 		$this->localize_script();
 
 		$position = $blocks_map[ $block['blockName'] ];
@@ -1344,7 +1346,173 @@ class Revenue_Campaign {
 			$valid = true;
 		}
 
-		return $valid && ! revenue()->is_hide_campaign( $campaign['id'], $campaign['campaign_type'] );
+		if ( ! $valid || revenue()->is_hide_campaign( $campaign['id'], $campaign['campaign_type'] ) ) {
+			return false;
+		}
+
+		switch ( $campaign['campaign_type'] ) {
+			case 'bundle_discount':
+				return $this->is_bundle_discount_campaign_stock_valid( $campaign );
+
+			case 'buy_x_get_y':
+				return $this->is_buy_x_get_y_campaign_stock_valid( $campaign );
+
+			case 'frequently_bought_together':
+				return $this->is_frequently_bought_together_campaign_stock_valid( $campaign );
+
+			case 'mix_match':
+				return $this->is_mix_match_campaign_stock_valid( $campaign );
+
+			default:
+				return true;
+		}
+	}
+
+	/**
+	 * Check bundle discount campaign stock validity.
+	 *
+	 * @param array $campaign Campaign data.
+	 * @return bool
+	 */
+	private function is_bundle_discount_campaign_stock_valid( $campaign ) {
+		$product_ids = array();
+
+		$offers = $campaign['offers'] ?? revenue()->get_campaign_meta( $campaign['id'], 'offers', true );
+		if ( is_array( $offers ) ) {
+			foreach ( $offers as $offer ) {
+				if ( ! empty( $offer['products'] ) && is_array( $offer['products'] ) ) {
+					$product_ids = array_merge( $product_ids, $offer['products'] );
+				}
+			}
+		}
+
+		$include_required_products = isset( $campaign['bundle_with_trigger_products_enabled'] ) && 'yes' === $campaign['bundle_with_trigger_products_enabled'];
+		if ( $include_required_products && ! empty( $campaign['campaign_trigger_items'] ) && is_array( $campaign['campaign_trigger_items'] ) ) {
+			foreach ( $campaign['campaign_trigger_items'] as $trigger_item ) {
+				if ( isset( $trigger_item['item_id'] ) && $trigger_item['item_id'] ) {
+					$product_ids[] = $trigger_item['item_id'];
+				}
+			}
+		}
+
+		return $this->are_all_products_in_stock( $product_ids );
+	}
+
+	/**
+	 * Check buy x get y campaign stock validity.
+	 *
+	 * @param array $campaign Campaign data.
+	 * @return bool
+	 */
+	private function is_buy_x_get_y_campaign_stock_valid( $campaign ) {
+		$required_product_ids = $this->get_required_product_ids_from_campaign( $campaign );
+		return $this->are_all_products_in_stock( $required_product_ids );
+	}
+
+	/**
+	 * Check frequently bought together campaign stock validity.
+	 *
+	 * @param array $campaign Campaign data.
+	 * @return bool
+	 */
+	private function is_frequently_bought_together_campaign_stock_valid( $campaign ) {
+		$required_product_ids = $this->get_required_product_ids_from_campaign( $campaign );
+		return $this->are_all_products_in_stock( $required_product_ids );
+	}
+
+	/**
+	 * Check mix and match campaign stock validity.
+	 *
+	 * @param array $campaign Campaign data.
+	 * @return bool
+	 */
+	private function is_mix_match_campaign_stock_valid( $campaign ) {
+		$required_product_ids = $this->get_required_product_ids_from_campaign( $campaign );
+		return $this->are_all_products_in_stock( $required_product_ids );
+	}
+
+	/**
+	 * Get required product IDs from campaign trigger items.
+	 *
+	 * @param array $campaign Campaign data.
+	 * @return array
+	 */
+	private function get_required_product_ids_from_campaign( $campaign ) {
+		$required_product_ids = array();
+
+		if ( empty( $campaign['campaign_trigger_items'] ) || ! is_array( $campaign['campaign_trigger_items'] ) ) {
+			return $required_product_ids;
+		}
+
+		$trigger_relation = isset( $campaign['campaign_trigger_relation'] ) ? $campaign['campaign_trigger_relation'] : 'or';
+		$trigger_relation = strtolower( (string) $trigger_relation );
+
+		if ( 'and' !== $trigger_relation ) {
+			$trigger_product_id = $this->get_triggering_product_id_for_or_relation( $campaign );
+
+			if ( $trigger_product_id ) {
+				return array( $trigger_product_id );
+			}
+
+			return $required_product_ids;
+		}
+
+		foreach ( $campaign['campaign_trigger_items'] as $trigger_item ) {
+			if ( isset( $trigger_item['item_id'] ) && $trigger_item['item_id'] ) {
+				$required_product_ids[] = $trigger_item['item_id'];
+			}
+		}
+
+		return $required_product_ids;
+	}
+
+	/**
+	 * Get currently triggering product id for OR trigger relation.
+	 *
+	 * @param array $campaign Campaign data.
+	 * @return int
+	 */
+	private function get_triggering_product_id_for_or_relation( $campaign ) {
+		$current_product_id = Revenue_Product_Context::get_product_context_id();
+
+		foreach ( $campaign['campaign_trigger_items'] as $trigger_item ) {
+			if (
+				isset( $trigger_item['item_id'] ) &&
+				$trigger_item['item_id'] &&
+				(int) $trigger_item['item_id'] === $current_product_id
+			) {
+				return $current_product_id;
+			}
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Check if all given products are in stock.
+	 *
+	 * @param array $product_ids Product IDs.
+	 * @return bool
+	 */
+	private function are_all_products_in_stock( $product_ids ) {
+		if ( empty( $product_ids ) || ! \function_exists( 'wc_get_product' ) ) {
+			return true;
+		}
+
+		$product_ids = array_unique( array_map( 'intval', $product_ids ) );
+
+		foreach ( $product_ids as $product_id ) {
+			if ( ! $product_id ) {
+				continue;
+			}
+
+			$product = \wc_get_product( $product_id );
+			if ( ! $product || ! $product->is_in_stock() ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
