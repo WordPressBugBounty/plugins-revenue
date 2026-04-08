@@ -812,7 +812,7 @@ class Revenue_Campaign {
 
 				Revenue_Product_Context::set_product_context( $product_id );
 
-				$campaigns  = revenue()->get_available_campaigns( $product_id, $which_page, 'inpage', $position );
+				$campaigns = revenue()->get_available_campaigns( $product_id, $which_page, 'inpage', $position );
 				if ( ! empty( $campaigns ) ) {
 					// Run campaigns for the product in the checkout page.
 					$this->run_campaigns( $campaigns, 'inpage', $which_page, $position );
@@ -976,6 +976,9 @@ class Revenue_Campaign {
 	 */
 	public function localize_script() {
 
+		if ( $this->is_enqueue_data_already ) {
+			return;
+		}
 		$campaign_localize_data = array(
 			'ajax'                         => admin_url( 'admin-ajax.php' ),
 			'nonce'                        => wp_create_nonce( 'revenue-add-to-cart' ),
@@ -991,6 +994,13 @@ class Revenue_Campaign {
 			'adding'                       => __( 'Adding...', 'revenue' ),
 			'free_gift_added_to_cart'      => __( 'Free gift added to cart', 'revenue' ),
 			'free_gifts_added_to_cart'     => __( 'Free gifts added to cart', 'revenue' ),
+			'select_all_attributes'        => __( 'Please select all required attributes', 'revenue' ),
+			'free_gift_removed'            => __( 'Free gift removed', 'revenue' ),
+			'required_product_missing'     => __( 'Error adding to cart, A required product is missing!', 'revenue' ),
+			'required_products_missing'    => __( 'Error adding to cart, Some required products are missing!', 'revenue' ),
+			'select_items_first'           => __( 'Please select the item(s) first', 'revenue' ),
+			'error_adding_to_cart'         => __( 'Error adding to cart', 'revenue' ),
+			'select_at_least_one_product'  => __( 'Please select at least one product to add', 'revenue' ),
 		);
 
 		if ( ! empty( $this->campaign_additional_data ) ) {
@@ -1722,28 +1732,8 @@ class Revenue_Campaign {
 				);
 			}
 		}
-		$campaign_localize_data = array(
-			'ajax'                         => admin_url( 'admin-ajax.php' ),
-			'nonce'                        => wp_create_nonce( 'revenue-add-to-cart' ),
-			'user'                         => get_current_user_id(),
-			'data'                         => $this->campaign_additional_data,
-			'currency_format_num_decimals' => wc_get_price_decimals(),
-			'currency_format_symbol'       => get_woocommerce_currency_symbol(),
-			'currency_format_decimal_sep'  => wc_get_price_decimal_separator(),
-			'currency_format_thousand_sep' => wc_get_price_thousand_separator(),
-			'currency_format'              => get_woocommerce_price_format(),
-			'checkout_page_url'            => wc_get_checkout_url(),
-			'revenue_campaign_id'          => $campaign_id,
-			'added_to_cart'                => __( 'Added to Cart', 'revenue' ),
-			'adding'                       => __( 'Adding...', 'revenue' ),
-			'free_gift_added_to_cart'      => __( 'Free gift added to cart', 'revenue' ),
-			'free_gifts_added_to_cart'     => __( 'Free gifts added to cart', 'revenue' ),
-		);
 
-		if ( ! $this->is_enqueue_data_already ) {
-			wp_localize_script( 'revenue-campaign', 'revenue_campaign', $campaign_localize_data );
-			wp_localize_script( 'revenue-v1-campaign', 'revenue_campaign', $campaign_localize_data );
-		}
+		$this->localize_script();
 
 		$display_type_methods = array(
 			'inpage'   => 'output_inpage_views',
@@ -3072,7 +3062,7 @@ class Revenue_Campaign {
 	 *
 	 * @param array $campaign Campaign.
 	 * @param array $data Data.
-	 * @param bool $should_echo Should echo.
+	 * @param bool  $should_echo Should echo.
 	 *
 	 * @return mixed
 	 */
@@ -3236,28 +3226,8 @@ class Revenue_Campaign {
 				'hover_animation' => $animation_type,
 			);
 		}
-		$campaign_localize_data = array(
-			'ajax'                         => admin_url( 'admin-ajax.php' ),
-			'nonce'                        => wp_create_nonce( 'revenue-add-to-cart' ),
-			'user'                         => get_current_user_id(),
-			'data'                         => $this->campaign_additional_data,
-			'currency_format_num_decimals' => wc_get_price_decimals(),
-			'currency_format_symbol'       => get_woocommerce_currency_symbol(),
-			'currency_format_decimal_sep'  => wc_get_price_decimal_separator(),
-			'currency_format_thousand_sep' => wc_get_price_thousand_separator(),
-			'currency_format'              => get_woocommerce_price_format(),
-			'checkout_page_url'            => wc_get_checkout_url(),
-			'revenue_campaign_id'          => $campaign_id,
-			'added_to_cart'                => __( 'Added to Cart', 'revenue' ),
-			'adding'                       => __( 'Adding...', 'revenue' ),
-			'free_gift_added_to_cart'      => __( 'Free gift added to cart', 'revenue' ),
-			'free_gifts_added_to_cart'     => __( 'Free gifts added to cart', 'revenue' ),
-		);
 
-		if ( ! $this->is_enqueue_data_already ) {
-			wp_localize_script( 'revenue-campaign', 'revenue_campaign', $campaign_localize_data );
-			wp_localize_script( 'revenue-v1-campaign', 'revenue_campaign', $campaign_localize_data );
-		}
+		$this->localize_script();
 
 		// Replace underscores with hyphens in the campaign type.
 		$campaign_type = isset( $campaign['campaign_type'] ) ? str_replace( '_', '-', $campaign['campaign_type'] ) : 'normal-discount';

@@ -68,15 +68,24 @@ jQuery( function ( $ ) {
 			);
 
 			if ( missingProducts.length > 0 ) {
-				showToast(
-					'Error adding to cart, Some required product is missing!',
-					'error'
-				);
+				const message =
+					missingProducts.length === 1
+						? revenue_campaign?.required_product_missing
+						: revenue_campaign?.required_products_missing;
+				const defaultMessage =
+					missingProducts.length === 1
+						? 'Error adding to cart, A required product is missing!'
+						: 'Error adding to cart, Some required products are missing!';
+				showToast( message || defaultMessage, 'error' );
 				return;
 			}
 		} else if ( 'frequently_bought_together' === campaignType ) {
 			if ( Object.keys( data.fbt_data ).length === 0 ) {
-				showToast( 'Please select the item(s) first', 'error' );
+				showToast(
+					revenue_campaign?.select_items_first ||
+						'Please select the item(s) first',
+					'error'
+				);
 				return;
 			}
 		}
@@ -85,6 +94,10 @@ jQuery( function ( $ ) {
 		}
 
 		return data;
+	};
+
+	const validateData = ( data ) => {
+		return data?.productId && data?.campaignId && data?._wpnonce;
 	};
 
 	const getBxgyData = ( campaignId ) => {
@@ -220,7 +233,11 @@ jQuery( function ( $ ) {
 		}
 
 		if ( hasMissingAttributes ) {
-			showToast( 'Please select all required attributes', 'error' );
+			showToast(
+				revenue_campaign?.select_all_attributes ||
+					'Please select all required attributes',
+				'error'
+			);
 			return;
 		}
 
@@ -360,7 +377,11 @@ jQuery( function ( $ ) {
 		}
 
 		if ( hasMissingAttributes ) {
-			showToast( 'Please select all required attributes', 'error' );
+			showToast(
+				revenue_campaign?.select_all_attributes ||
+					'Please select all required attributes',
+				'error'
+			);
 			return;
 		}
 
@@ -646,7 +667,11 @@ jQuery( function ( $ ) {
 		} );
 
 		if ( hasMissingAttributes ) {
-			showToast( 'Please select all required attributes', 'error' );
+			showToast(
+				revenue_campaign?.select_all_attributes ||
+					'Please select all required attributes',
+				'error'
+			);
 			return;
 		}
 
@@ -933,7 +958,11 @@ jQuery( function ( $ ) {
 		} );
 
 		if ( hasMissingAttributes ) {
-			showToast( 'Please select all required attributes', 'error' );
+			showToast(
+				revenue_campaign?.select_all_attributes ||
+					'Please select all required attributes',
+				'error'
+			);
 			return;
 		}
 
@@ -1007,7 +1036,10 @@ jQuery( function ( $ ) {
 	const handleError = ( $button ) => {
 		toggleLoading( $button, false );
 		console.error( 'Error adding to cart' );
-		showToast( 'Error adding to cart', 'error' );
+		showToast(
+			revenue_campaign?.error_adding_to_cart || 'Error adding to cart',
+			'error'
+		);
 	};
 
 	const handleAddToCartSuccess = ( response, $button, data ) => {
@@ -1302,12 +1334,20 @@ jQuery( function ( $ ) {
 			.filter( Boolean );
 
 		if ( hasEmptyAttributes ) {
-			showToast( 'Please select all required attributes', 'error' );
+			showToast(
+				revenue_campaign?.select_all_attributes ||
+					'Please select all required attributes',
+				'error'
+			);
 			return;
 		}
 
 		if ( productsData.length === 0 ) {
-			showToast( 'Please select at least one product to add', 'error' );
+			showToast(
+				revenue_campaign?.select_at_least_one_product ||
+					'Please select at least one product to add',
+				'error'
+			);
 			return;
 		}
 
@@ -1390,7 +1430,11 @@ jQuery( function ( $ ) {
 					val === '' || val === null || typeof val === 'undefined'
 			);
 			if ( hasEmptyAttr ) {
-				showToast( 'Please select all required attributes', 'error' );
+				showToast(
+					revenue_campaign?.select_all_attributes ||
+						'Please select all required attributes',
+					'error'
+				);
 				return;
 			}
 
@@ -1464,7 +1508,11 @@ jQuery( function ( $ ) {
 					val === '' || val === null || typeof val === 'undefined'
 			);
 			if ( hasEmptyAttr ) {
-				showToast( 'Please select all required attributes', 'error' );
+				showToast(
+					revenue_campaign?.select_all_attributes ||
+						'Please select all required attributes',
+					'error'
+				);
 				return;
 			}
 

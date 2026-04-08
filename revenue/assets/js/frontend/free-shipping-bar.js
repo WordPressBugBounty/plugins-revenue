@@ -424,7 +424,11 @@
 					'revenue_fsb_check_confetti',
 					'yes'
 				);
-				window.location.reload();
+				// DEV NOTE: (Shihab)
+				// removing, because it caused issue on user site,
+				// it was reloading the page and users shipping method was getting reset.
+				// if found it is needed, trying searching for a way to handle it withouut ful pagge load.
+				// window.location.reload();
 
 				return;
 			}

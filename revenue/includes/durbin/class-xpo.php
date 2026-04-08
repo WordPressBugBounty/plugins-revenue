@@ -205,12 +205,12 @@ class Xpo {
 
 	public static function generate_utm_link( $params = array() ) {
 		$default_config = array(
-			'flash_sale' => array(
+			'flash_sale'       => array(
 				'source'   => 'db-revenue-featurearea',
 				'medium'   => 'flash_sale',
 				'campaign' => 'revenue-dashboard',
 			),
-			'final_hour' => array(
+			'final_hour'       => array(
 				'source'   => 'db-revenue-notice-text',
 				'medium'   => 'final_hour',
 				'campaign' => 'revenue-dashboard',
@@ -295,20 +295,22 @@ class Xpo {
 	public static function get_wow_products_details() {
 		return array(
 			'products'        => array(
-				'post_x'      => file_exists( WP_PLUGIN_DIR . '/ultimate-post/ultimate-post.php' ),
-				'wow_store'   => file_exists( WP_PLUGIN_DIR . '/product-blocks/product-blocks.php' ),
-				'wow_optin'   => file_exists( WP_PLUGIN_DIR . '/optin/optin.php' ),
-				'wow_revenue' => file_exists( WP_PLUGIN_DIR . '/revenue/revenue.php' ),
-				'wholesale_x' => file_exists( WP_PLUGIN_DIR . '/wholesalex/wholesalex.php' ),
-				'wow_addon'   => file_exists( WP_PLUGIN_DIR . '/product-addons/product-addons.php' ),
+				'wow_shipping' => file_exists( WP_PLUGIN_DIR . '/wow-table-rate-shipping/wow-table-rate-shipping.php' ),
+				'post_x'       => file_exists( WP_PLUGIN_DIR . '/ultimate-post/ultimate-post.php' ),
+				'wow_store'    => file_exists( WP_PLUGIN_DIR . '/product-blocks/product-blocks.php' ),
+				'wow_optin'    => file_exists( WP_PLUGIN_DIR . '/optin/optin.php' ),
+				'wow_revenue'  => file_exists( WP_PLUGIN_DIR . '/revenue/revenue.php' ),
+				'wholesale_x'  => file_exists( WP_PLUGIN_DIR . '/wholesalex/wholesalex.php' ),
+				'wow_addon'    => file_exists( WP_PLUGIN_DIR . '/product-addons/product-addons.php' ),
 			),
 			'products_active' => array(
-				'post_x'      => defined( 'ULTP_VER' ),
-				'wow_store'   => defined( 'WOPB_VER' ),
-				'wow_optin'   => defined( 'OPTN_VERSION' ),
-				'wow_revenue' => defined( 'REVENUE_VER' ),
-				'wholesale_x' => defined( 'WHOLESALEX_VER' ),
-				'wow_addon'   => defined( 'PRAD_VER' ),
+				'wow_shipping' => defined( 'WTRS_VER' ),
+				'post_x'       => defined( 'ULTP_VER' ),
+				'wow_store'    => defined( 'WOPB_VER' ),
+				'wow_optin'    => defined( 'OPTN_VERSION' ),
+				'wow_revenue'  => defined( 'REVENUE_VER' ),
+				'wholesale_x'  => defined( 'WHOLESALEX_VER' ),
+				'wow_addon'    => defined( 'PRAD_VER' ),
 			),
 		);
 	}
@@ -323,6 +325,9 @@ class Xpo {
 		$to_r        = array( 'done' => true );
 		$plugin_slug = $name;
 		switch ( $name ) {
+			case 'wow_shipping':
+				$plugin_slug = 'wow-table-rate-shipping';
+				break;
 			case 'post_x':
 				$plugin_slug = 'ultimate-post';
 				break;

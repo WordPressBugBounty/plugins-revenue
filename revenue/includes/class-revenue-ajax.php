@@ -288,6 +288,7 @@ class Revenue_Ajax {
 	 * @return mixed
 	 */
 	public function get_search_suggestion() {
+
 		$nonce = isset( $_GET['security'] ) ? sanitize_key( $_GET['security'] ) : '';
 		if ( ! wp_verify_nonce( $nonce, 'revenue-dashboard' ) ) {
 			die();
@@ -303,9 +304,10 @@ class Revenue_Ajax {
 
 		if ( 'products' === $type ) {
 			$args = array(
-				'limit'   => 10, // Fetch more than necessary to account for exclusions.
-				'orderby' => 'date',
-				'order'   => 'ASC',
+				'limit'        => 10, // Fetch more than necessary to account for exclusions.
+				'orderby'      => 'date',
+				'order'        => 'ASC',
+				'stock_status' => 'instock',
 			);
 
 			// Only fetch published products

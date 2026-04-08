@@ -4,7 +4,7 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 6.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.1.9
+Stable tag: 2.2.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -226,6 +226,12 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page
 
 == Changelog ==
+
+= 2.2.0 – 08 April 2026 = 
+* Improvement: Added translation support for frontend toast notifications with localized messages.
+* Improvement: Refactored script localization for better reuse and maintainability.
+* Improvement: Added fallback messages for toast notifications to ensure consistent user feedback.
+* Fix: Prevented unnecessary page reload when no data is found in the Free Shipping Bar.
 
 = 2.1.9 – 30 March 2026 = 
 * Improvement: Improved tooltip behavior in Spending Goal campaigns for more consistent interaction in block based cart and checkout.

@@ -957,7 +957,11 @@
 				},
 				success: ( response ) => {
 					if ( response.success && response.data.status ) {
-						Revenue.showToast( 'Free gift removed', 'warning' );
+						Revenue.showToast(
+							revenue_campaign?.free_gift_removed ||
+								'Free gift removed',
+							'warning'
+						);
 						// Update mini cart, cart and checkout sequentially.
 						// add more events as required.
 						[

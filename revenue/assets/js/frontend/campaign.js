@@ -310,14 +310,17 @@
 
 		const parts = fixedPrice.split( '.' );
 		let integerPart = parts[ 0 ];
-		const decimalPart = parts[ 1 ] || '00';
+		let decimalSepAndNum = '';
+		if ( numDecimals > 0 ) {
+			decimalSepAndNum = decimalSeparator + ( parts[ 1 ] || '00' );
+		}
 
 		integerPart = integerPart.replace(
 			/\B(?=(\d{3})+(?!\d))/g,
 			thousandSeparator
 		);
 
-		const formattedPrice = integerPart + decimalSeparator + decimalPart;
+		const formattedPrice = integerPart + decimalSepAndNum;
 
 		return currencyFormat
 			.replace( '%1$s', currencySymbol )
@@ -840,7 +843,8 @@
 				if ( ! selectedData ) {
 					// throw new Error( 'Selected data is undefined or null.' );
 					showToast(
-						'Please select all product attributes before adding to cart.',
+						revenue_campaign?.select_all_attributes ||
+							'Please select all product attributes before adding to cart.',
 						'error',
 						3000
 					);
@@ -855,7 +859,8 @@
 						value === undefined
 					) {
 						showToast(
-							`please select all the options`,
+							revenue_campaign?.select_all_attributes ||
+								'Please select all required attributes',
 							'error',
 							3000
 						);
