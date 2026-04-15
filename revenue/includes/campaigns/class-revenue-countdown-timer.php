@@ -70,6 +70,7 @@ class Revenue_Countdown_Timer {
 	 * @return array
 	 */
 	public function wsx_store_campaign_data_for_cart( $cart_item_data, $product_id ) {
+		// countdown timer.
 		$positions = array(
 			'before_add_to_cart_form',
 			'after_add_to_cart_form',

@@ -197,6 +197,7 @@ class Revenue_Next_Order_Coupon {
 	 */
 	public function revx_store_campaign_data_for_cart_next_order( $cart_item_data, $product_id ) {
 
+		// next order coupon.
 		$positions = array(
 			'before_thankyou',
 			'thankyou',

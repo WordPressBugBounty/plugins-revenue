@@ -4,7 +4,7 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 6.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -154,6 +154,10 @@ With WowRevenue, you have full control over how you create and launch campaigns 
 
 We have more useful plugins for WooCommerce and WordPress users. Take a look at them:
 
+🚚 [**WowShipping 🔥**](https://wordpress.org/plugins/wow-table-rate-shipping/): A complete table rate shipping solution for WooCommerce, allowing you to set flexible delivery rates using 30+ conditions and get live rates from popular carriers like UPS, USPS, DHL, Sendle, and more.
+
+➕ [**WowAddons 🔥**](https://wordpress.org/plugins/product-addons/): The most advanced and flexible plugin to sell customizable products by creating a personalized shopping experience with product addons and 25+ extra options.
+
 💝 [**WowStore**](https://wordpress.org/plugins/product-blocks/): An all-in-one solution to build gorgeous-looking and professional WooCommerce stores with various conversion-focused features.
 
 📦 [**WholesaleX**](https://wordpress.org/plugins/wholesalex/): A collection of dynamic features for setting advanced pricing and discounts based on user roles. You can use it for creating complete B2B or B2B+B2C hybrid stores.
@@ -226,6 +230,9 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page
 
 == Changelog ==
+
+= 2.2.1 – 15 April 2026 = 
+* Improvement: Converted modern array syntax to traditional array for improved multisite compatibility.
 
 = 2.2.0 – 08 April 2026 = 
 * Improvement: Added translation support for frontend toast notifications with localized messages.

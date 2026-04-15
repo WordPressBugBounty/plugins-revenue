@@ -130,7 +130,7 @@ class Revenue_Stock_Scarcity {
 	 * @return array
 	 */
 	public function wsx_store_campaign_data_for_cart( $cart_item_data, $product_id ) {
-
+		// stock scarcity.
 		$positions = array(
 			'rvex_below_the_product_title',
 			'rvex_below_the_product_price',

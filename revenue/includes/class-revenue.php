@@ -430,7 +430,7 @@ final class Revenue {
 
 		if ( is_multisite() && $network_wide ) {
 
-			$sites = get_sites( [ 'number' => 0 ] );
+			$sites = get_sites( array( 'number' => 0 ) );
 
 			foreach ( $sites as $site ) {
 
@@ -440,15 +440,14 @@ final class Revenue {
 
 				restore_current_blog();
 			}
-
 		} else {
-			// Single site activation
+			// Single site activation.
 			$installer->install();
 		}
 	}
 
 	public function new_site_activate_revenue( $new_site ) {
-		// Only run if the plugin is network-activated
+		// Only run if the plugin is network-activated.
 		if ( ! is_plugin_active_for_network( 'revenue/revenue.php' ) ) {
 			return;
 		}
