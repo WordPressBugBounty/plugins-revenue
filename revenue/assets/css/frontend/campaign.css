@@ -15,6 +15,19 @@
 	width: 100%;
 }
 
+/* hides the child items line total price */
+.is-bundle-child .wc-block-cart-item__total,
+.is-bundle-child .wc-block-components-order-summary-item__total-price {
+    visibility: hidden !important;
+}
+/* 
+	hides the parent items line total price and subtotal price
+	as we show the bundle price using the js filter in block-integration.js 
+*/
+.is-bundle-parent .wc-block-components-product-price__value {
+	display: none !important;
+}
+
 /*================================
     Specific use case on stock scarcity 
 	trigger = variation product

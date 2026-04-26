@@ -976,9 +976,6 @@ class Revenue_Campaign {
 	 */
 	public function localize_script() {
 
-		if ( $this->is_enqueue_data_already ) {
-			return;
-		}
 		$campaign_localize_data = array(
 			'ajax'                         => admin_url( 'admin-ajax.php' ),
 			'nonce'                        => wp_create_nonce( 'revenue-add-to-cart' ),
@@ -1003,9 +1000,6 @@ class Revenue_Campaign {
 			'select_at_least_one_product'  => __( 'Please select at least one product to add', 'revenue' ),
 		);
 
-		if ( ! empty( $this->campaign_additional_data ) ) {
-			$this->is_enqueue_data_already = true;
-		}
 		wp_localize_script( 'revenue-campaign', 'revenue_campaign', $campaign_localize_data );
 		wp_localize_script( 'revenue-v1-campaign', 'revenue_campaign', $campaign_localize_data );
 	}

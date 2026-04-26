@@ -248,7 +248,7 @@ class Revenue_Template_Utils {
 			$type  = isset( $offer['type'] ) ? sanitize_text_field( $offer['type'] ) : '';
 			$value = isset( $offer['value'] ) ? floatval( $offer['value'] ) : 0;
 
-			$save_text  = $template_data['saveBadgeWrapper']['text'] ?? '';
+			$save_text = $template_data['saveBadgeWrapper']['text'] ?? '';
 
 			// Extension Filter: Sale Price Addon.
 			// filtered price by sale price addon to get sale price otherwise regular price.
@@ -431,7 +431,7 @@ class Revenue_Template_Utils {
 			$type  = isset( $offer['type'] ) ? sanitize_text_field( $offer['type'] ) : '';
 			$value = isset( $offer['value'] ) ? floatval( $offer['value'] ) : 0;
 
-			$save_text  = $template_data['saveBadgeWrapper']['text'] ?? '';
+			$save_text = $template_data['saveBadgeWrapper']['text'] ?? '';
 
 			// Extension Filter: Sale Price Addon.
 			$filtered_price = apply_filters( 'revenue_base_price_for_discount_filter', $regular_price, $sale_price );
@@ -2719,7 +2719,12 @@ class Revenue_Template_Utils {
 		$product_id     = $pd['id'] ?? '';
 		$is_enable_tag  = isset( $pd['isEnableTag'] ) && 'yes' === $pd['isEnableTag'];
 		$is_list_layout = 'list' === $layout;
-		$is_offer_price = isset( $pd['offered_price'] );
+		// corner case of more decimal numbers in actual price than the display settings.
+		// example: regular price 10.64583 and display decimal number up to 2 decimal.
+		// in this case, regular price is still 10.64583 but displayed offer price is 10.65.
+		// so, we need to compare the prices after rounding both prices to the display decimal number settings.
+		$is_offer_price = isset( $pd['offered_price'] ) &&
+			wc_format_decimal( $pd['regular_price'], '' ) !== wc_format_decimal( $pd['offered_price'], '' );
 		$quantity       = (int) ( $pd['quantity'] ?? 1 );
 		$regular_price  = $pd['regular_price'];
 		$is_sale_price  = false;
@@ -3118,7 +3123,7 @@ class Revenue_Template_Utils {
 		if ( ! $product_ instanceof \WC_Product ) {
 			return $data_price_attributes;
 		}
-		$tax_display  = get_option( 'woocommerce_tax_display_shop', 'incl' );
+		$tax_display = get_option( 'woocommerce_tax_display_shop', 'incl' );
 		// @todo refactor to simpler variable checking code.
 		$product_type = $product_->get_type();
 		if ( 'variable' === $product_type ) {
@@ -3195,7 +3200,7 @@ class Revenue_Template_Utils {
 			$sale_price    = 'incl' === $tax_display
 								? wc_get_price_including_tax( $product_, array( 'price' => $product_->get_sale_price() ) )
 								: $product_->get_sale_price();
-			
+
 			// Extension Filter: Sale Price Addon.
 			$filtered_price = apply_filters( 'revenue_base_price_for_discount_filter', $regular_price, $sale_price );
 			// keeping both filtered price and offered price for clarity. and future use.
@@ -3291,7 +3296,7 @@ class Revenue_Template_Utils {
 					$variation_first_regular = $filtered_mix_match_regular_price;
 				}
 			}
-			$data_price_attributes  = 'data-variations=\'' . esc_attr( wp_json_encode( $variation_data ) ) . '\'';
+			$data_price_attributes = 'data-variations=\'' . esc_attr( wp_json_encode( $variation_data ) ) . '\'';
 		} else {
 			$regular_price = 'incl' === $tax_display
 								? wc_get_price_including_tax( $product_, array( 'price' => $product_->get_regular_price() ) )
@@ -3630,12 +3635,16 @@ class Revenue_Template_Utils {
 		$campaign_id      = $campaign['id'];
 		$campaign_type    = $campaign['campaign_type'];
 		$is_only_regular  = floatval( $pd['regular_price'] ) === floatval( $pd['offered_price'] );
+		// corner case of mis match tax settings.
+		$display_offered_price = 'incl' === get_option( 'woocommerce_tax_display_shop', 'incl' )
+			? wc_get_price_including_tax( $product_, array( 'price' => $pd['offered_price'] ) )
+			: wc_get_price_excluding_tax( $product_, array( 'price' => $pd['offered_price'] ) );
 		?>
 			<div data-product-id="<?php echo esc_attr( $product_id ); ?>"
 				data-variation-id="0"
 				data-is-trigger="<?php echo esc_attr( $is_trigger ? 'yes' : 'no' ); ?>"
 				data-product-index="<?php echo esc_attr( $product_index ); ?>"
-				data-product-offered-price="<?php echo esc_attr( $pd['offered_price'] ); ?>"
+				data-product-offered-price="<?php echo esc_attr( $display_offered_price ); ?>"
 				campaign_id="<?php echo esc_attr( $campaign_id ); ?>"
 				campaign_type="<?php echo esc_attr( $campaign_type ); ?>"
 				product_type="<?php echo esc_attr( $product_type ); ?>"
@@ -5585,7 +5594,7 @@ class Revenue_Template_Utils {
 				></path>
 			</svg>
 			</div>
-			<?php
+		<?php
 		return ob_get_clean();
 	}
 

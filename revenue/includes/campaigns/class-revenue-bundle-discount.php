@@ -5,6 +5,8 @@
 
 namespace Revenue;
 
+use Automattic\WooCommerce\StoreApi\Schemas\V1\CartItemSchema;
+
 //phpcs:disable WordPress.PHP.StrictInArray.MissingTrueStrict, WordPress.PHP.StrictComparisons.LooseComparison
 
 /**
@@ -82,10 +84,13 @@ class Revenue_Bundle_Discount {
 
 		add_filter( "revenue_campaign_{$this->campaign_type}_cart_item_remove_link", array( $this, 'cart_item_remove_link' ), 10, 2 );
 		add_filter( "revenue_campaign_{$this->campaign_type}_cart_item_quantity", array( $this, 'cart_item_quantity' ), 10, 2 );
+		add_filter( "revenue_campaign_{$this->campaign_type}_store_api_product_quantity_minimum", array( $this, 'cart_item_quantity' ), 10, 2 );
+		add_filter( "revenue_campaign_{$this->campaign_type}_store_api_product_quantity_maximum", array( $this, 'cart_item_quantity' ), 10, 2 );
 		add_filter( "revenue_campaign_{$this->campaign_type}_cart_item_class", array( $this, 'cart_item_class' ), 10, 2 );
 		add_filter( "revenue_campaign_{$this->campaign_type}_cart_item_subtotal", array( $this, 'cart_item_subtotal' ), 10, 2 );
 		add_filter( "revenue_campaign_{$this->campaign_type}_cart_item_price", array( $this, 'cart_item_price' ), 9999, 2 );
 		add_filter( "revenue_campaign_{$this->campaign_type}_cart_item_data", array( $this, 'cart_item_data' ), 10, 2 );
+		add_filter( 'woocommerce_store_api_cart_item_is_removable', array( $this, 'cart_item_is_removable' ), 10, 2 );
 
 		add_action( "revenue_campaign_{$this->campaign_type}_remove_cart_item", array( $this, 'remove_cart_item' ), 10, 2 );
 		add_action( "revenue_campaign_{$this->campaign_type}_restore_cart_item", array( $this, 'restore_cart_item' ), 10, 2 );
@@ -95,6 +100,126 @@ class Revenue_Bundle_Discount {
 		add_action( "revenue_campaign_{$this->campaign_type}_before_calculate_cart_totals", array( $this, 'before_calculate_cart_totals' ), 10, 3 );
 		add_filter( 'woocommerce_order_formatted_line_subtotal', array( $this, 'order_formatted_line_subtotal' ), 10, 3 );
 		add_action( 'revenue_rest_insert_campaign', array( $this, 'on_campaign_rest_insert' ), 10, 3 );
+
+		$this->register_wc_endpoint_bundle_parent_and_child();
+	}
+
+	/**
+	 * Register Store API endpoint data for bundle parent/child cart items.
+	 *
+	 * Registers additional data and schema callbacks for the cart item
+	 * store API endpoint so the front-end can determine whether an item is
+	 * a bundle parent or child and read computed prices for bundle parents.
+	 *
+	 * Uses `CartItemSchema::IDENTIFIER` and the `revenue` namespace.
+	 *
+	 * @return void
+	 */
+	private function register_wc_endpoint_bundle_parent_and_child() {
+		woocommerce_store_api_register_endpoint_data(
+			array(
+				'endpoint'        => CartItemSchema::IDENTIFIER,
+				'namespace'       => 'revenue',
+				'data_callback'   => array( $this, 'get_cart_item_endpoint_data' ),
+				'schema_callback' => array( $this, 'get_cart_item_endpoint_schema' ),
+			)
+		);
+	}
+
+	/**
+	 * Build the endpoint data for a cart item for the store API.
+	 *
+	 * Checks whether the provided cart item belongs to this campaign and
+	 * returns bundle-related flags and computed prices for bundle parent items.
+	 *
+	 * @param array $cart_item Cart item array as provided by WooCommerce.
+	 *
+	 * @return array Associative array of endpoint properties.
+	 */
+	public function get_cart_item_endpoint_data( $cart_item ) {
+		if ( ! $this->is_this_campaign( $cart_item ) ) {
+			return array();
+		}
+
+		$is_bundle_child = isset( $cart_item['revx_bundled_by'] );
+		if ( $is_bundle_child ) {
+			return array( 'is_bundle_child' => $is_bundle_child );
+		}
+
+		$is_bundle_parent = ! $is_bundle_child && isset( $cart_item['revx_bundle_id'] );
+
+		if ( $is_bundle_parent ) {
+			$line_total_price    = $this->get_child_total( $cart_item );
+			$line_subtotal_price = $line_total_price / $cart_item['quantity'];
+			return array(
+				'is_bundle_child'     => $is_bundle_child,
+				'is_bundle_parent'    => $is_bundle_parent,
+				'line_total_price'    => wc_format_decimal( $line_total_price ),
+				'line_subtotal_price' => wc_format_decimal( $line_subtotal_price ),
+			);
+		}
+
+		return array();
+	}
+
+	/**
+	 * Provide the schema for the cart item endpoint properties.
+	 *
+	 * @return array JSON schema array describing returned properties.
+	 */
+	public function get_cart_item_endpoint_schema() {
+		return array(
+			'properties' => array(
+				'is_bundle_child'     => array( 'type' => 'boolean' ),
+				'is_bundle_parent'    => array( 'type' => 'boolean' ),
+				'line_total_price'    => array( 'type' => 'number' ),
+				'line_subtotal_price' => array( 'type' => 'number' ),
+			),
+		);
+	}
+
+	/**
+	 * Check if a given cart item belongs to the current campaign.
+	 *
+	 * Compares the cart item's 'revx_campaign_type' against the object's
+	 * `$campaign_type` property to determine if it matches the current campaign.
+	 *
+	 * @param array $cart_item The cart item array.
+	 *
+	 * @return bool True if the cart item belongs to this campaign, false otherwise.
+	 */
+	private function is_this_campaign( $cart_item ) {
+		if ( ! isset( $cart_item['revx_campaign_type'] ) || $this->campaign_type !== $cart_item['revx_campaign_type'] ) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Calculate the combined line total of all bundled (child) cart items.
+	 *
+	 * Iterates over the bundled child cart item keys stored in the parent
+	 * cart item and sums their `line_total` values.
+	 *
+	 * - `line_total` represents the discounted subtotal for the cart item
+	 *   (excluding tax).
+	 * - This is typically used when the bundle parent price should reflect
+	 *   the total of its child items, while individual child subtotals
+	 *   are hidden in the cart/checkout UI.
+	 *
+	 * @param array $cart_item Parent cart item containing `revx_bundled_items`.
+	 *
+	 * @return float Total combined line total of all bundled child items.
+	 */
+	private function get_child_total( $cart_item ) {
+		$total = 0;
+		foreach ( $cart_item['revx_bundled_items'] as $child_key ) {
+			$child_item = WC()->cart->get_cart_item( $child_key );
+			if ( $child_item ) {
+				$total += $child_item['line_total'] ?? 0;
+			}
+		}
+		return $total;
 	}
 
 	/**
@@ -429,13 +554,33 @@ class Revenue_Bundle_Discount {
 	 * @return void
 	 */
 	public function after_item_quantity_update( $cart_item, $cart_item_key, $quantity ) {
-		if ( 0 == $quantity || $quantity < 0 ) {
-			$quantity = 0;
-		} else {
-			$quantity = $cart_item['quantity'];
-		}
+		// If a bundle child item was updated directly, revert it to the computed value
+		// so themes that allow editing child quantities cannot desync the bundle. (ex: optimizer mini cart issue)
+		if ( self::is_bundle_child_item( $cart_item ) ) {
+			// If this change is part of parent removal flow, ignore.
+			if ( ! empty( self::$removing_parent_key ) && isset( $cart_item['revx_bundled_by'] ) && self::$removing_parent_key === $cart_item['revx_bundled_by'] ) {
+				return;
+			}
 
-		if ( self::is_bundle_parent_item( $cart_item ) && isset( $cart_item['revx_bundled_items'] ) ) {
+			$cart       = WC()->cart;
+			$parent_key = isset( $cart_item['revx_bundled_by'] ) ? $cart_item['revx_bundled_by'] : null;
+			if ( empty( $parent_key ) ) {
+				$container = self::get_bundled_parent_cart_item_container( $cart_item );
+				if ( is_array( $container ) && isset( $container['key'] ) ) {
+					$parent_key = $container['key'];
+				}
+			}
+
+			if ( $parent_key && isset( $cart->cart_contents[ $parent_key ] ) ) {
+				$parent_qty   = $cart->cart_contents[ $parent_key ]['quantity'];
+				$expected_qty = isset( $cart_item['revx_min_qty'] ) ? intval( $cart_item['revx_min_qty'] ) * $parent_qty : $cart_item['quantity'];
+
+				if ( $cart_item['quantity'] !== $expected_qty ) {
+					WC()->cart->set_quantity( $cart_item_key, $expected_qty, false );
+				}
+			}
+		} elseif ( self::is_bundle_parent_item( $cart_item ) && isset( $cart_item['revx_bundled_items'] ) ) {
+			// Parent update: update children quantities to match parent.
 			// Get bundled cart items.
 			$bundled_cart_items = revenue()->get_bundled_cart_items( $cart_item );
 			$bundle_qty         = $cart_item['quantity'];
@@ -464,6 +609,7 @@ class Revenue_Bundle_Discount {
 	 * @return void
 	 */
 	public function before_calculate_cart_totals( $cart_item, $campaign_id, $cart ) {
+
 		$cart_quantity = false;
 		foreach ( $cart->get_cart() as $cart_item ) {
 			if ( ! isset( $cart_item['revx_campaign_id'] ) ) {
@@ -481,7 +627,7 @@ class Revenue_Bundle_Discount {
 			// Extension Filter: Sale Price Addon.
 			$filtered_price = apply_filters( 'revenue_base_price_for_discount_filter', $regular_price, $sale_price );
 			// keeping both filtered price and offered price for clarity. and future use.
-			$offered_price  = $filtered_price;
+			$offered_price = $filtered_price;
 
 			if ( is_array( $offers ) ) {
 				$offer_type  = '';
@@ -581,7 +727,7 @@ class Revenue_Bundle_Discount {
 		if ( ! empty( $this->campaigns['inpage'][ $this->current_position ] ) ) {
 			$campaigns = $this->campaigns['inpage'][ $this->current_position ];
 			foreach ( $campaigns as $campaign ) {
-				revenue()->update_campaign_impression( $campaign['id']);
+				revenue()->update_campaign_impression( $campaign['id'] );
 
 				// get campaign view file path.
 				$file_path = revenue()->get_campaign_path( $campaign, 'inpage', 'bundle-discount' );
@@ -873,11 +1019,20 @@ class Revenue_Bundle_Discount {
 		if ( self::is_bundle_parent_item( $cart_item ) ) {
 			$regular_price    = self::get_parent_cart_item_regular_price( $subtotal, $cart_item, true );
 			$discounted_price = self::get_parent_cart_item_price( $subtotal, $cart_item, true );
-			if ( $regular_price != $discounted_price ) {
+			// for unit prices, we need to divide the price by the quantity.
+			$regular_price    /= $cart_item['quantity'];
+			$discounted_price /= $cart_item['quantity'];
+
+			if ( wc_format_decimal( $regular_price ) !== wc_format_decimal( $discounted_price ) ) {
 				$subtotal = '<del>' . wc_price( $regular_price ) . '</del>' . wc_price( $discounted_price );
 			}
 		} elseif ( self::is_part_of_bundle( $cart_item ) ) {
-			$subtotal = wc_price( self::get_bundle_item_price( $cart_item ) );
+			$regular_price    = $cart_item['data']->get_regular_price();
+			$discounted_price = self::get_bundle_item_price( $cart_item );
+
+			if ( wc_format_decimal( $regular_price ) !== wc_format_decimal( $discounted_price ) ) {
+				$subtotal = '<del>' . wc_price( $regular_price ) . '</del>' . wc_price( $discounted_price );
+			}
 		}
 		return $subtotal;
 	}
@@ -901,7 +1056,7 @@ class Revenue_Bundle_Discount {
 		// Extension Filter: Sale Price Addon.
 		$filtered_price = apply_filters( 'revenue_base_price_for_discount_filter', $regular_price, $sale_price );
 		// based on extension filter use sale price or regular price for calculation.
-		$offered_price  = $filtered_price;
+		$offered_price = $filtered_price;
 
 		if ( is_array( $offers ) ) {
 			$offer_type  = '';
@@ -952,6 +1107,19 @@ class Revenue_Bundle_Discount {
 		return $data;
 	}
 
+	public function cart_item_is_removable( $is_removable, $cart_item, $cart_item_key ) {
+		if ( isset( $cart_item['revx_campaign_id'], $cart_item['revx_campaign_type'] ) ) {
+			$campaign_id   = $cart_item['revx_campaign_id'];
+			$campaign_type = $cart_item['revx_campaign_type'];
+
+			if ( 'bundle_discount' !== $campaign_type && self::is_bundle_child_item( $cart_item ) ) {
+				return false;
+			}
+		}
+
+		return $is_removable;
+	}
+
 	/**
 	 * Remove Cart Item
 	 * When Parent Item is being removed, then Remove all child item of this parent
@@ -962,26 +1130,34 @@ class Revenue_Bundle_Discount {
 	 */
 	public function remove_cart_item( $remove_item_key, $cart_item ) {
 
+		// If parent is being removed ->
+		// remove its children bypassing WC_Cart::remove_cart_item.
 		if ( self::is_bundle_parent_item( $cart_item ) && ! self::is_removing_bundle_parent_item( $remove_item_key ) ) {
 			$cart     = WC()->cart;
 			$children = self::get_bundled_child_cart_items( $cart_item, $cart->cart_contents, true );
+
+			// mark the parent being removed,
+			// so child handlers can detect parent-initiated removals.
+			self::$removing_parent_key = $remove_item_key;
+
 			foreach ( $children as $child_key ) {
+				if ( ! isset( $cart->cart_contents[ $child_key ] ) ) {
+					continue;
+				}
 
 				$will_be_remove_key = $cart->cart_contents[ $child_key ];
 
 				$cart->removed_cart_contents[ $child_key ] = $will_be_remove_key;
 
-				unset( $cart->cart_contents[ $child_key ]['data'] );
-
-				// Prevent Infinite Loop
-				// @alert: Be careful, any changes might be occure infine loop.
-				self::$removing_parent_key = $remove_item_key;
+				if ( isset( $cart->cart_contents[ $child_key ]['data'] ) ) {
+					unset( $cart->cart_contents[ $child_key ]['data'] );
+				}
 
 				do_action( 'woocommerce_remove_cart_item', $child_key, $cart ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-				self::$removing_parent_key = null;
-
-				unset( $cart->cart_contents[ $child_key ] );
+				if ( isset( $cart->cart_contents[ $child_key ] ) ) {
+					unset( $cart->cart_contents[ $child_key ] );
+				}
 
 				/** Triggered when bundled item is removed from the cart.
 				 *
@@ -994,6 +1170,36 @@ class Revenue_Bundle_Discount {
 				 */
 				do_action( 'revenue_bundled_cart_item_removed', $child_key, $cart );
 			}
+
+			// clear marker after all children processed.
+			self::$removing_parent_key = null;
+		}
+
+		// If a bundle child item is removed directly by the user, remove the whole bundle (parent + remaining children).
+		if ( self::is_bundle_child_item( $cart_item ) ) {
+			$cart = WC()->cart;
+
+			// If this child removal was initiated as part of parent removal, do nothing here.
+			if ( ! empty( self::$removing_parent_key ) && isset( $cart_item['revx_bundled_by'] ) && self::$removing_parent_key === $cart_item['revx_bundled_by'] ) {
+				return;
+			}
+
+			// Determine parent key.
+			$parent_key = isset( $cart_item['revx_bundled_by'] ) ? $cart_item['revx_bundled_by'] : null;
+
+			if ( empty( $parent_key ) && method_exists( $this, 'get_bundled_parent_cart_item_container' ) ) {
+				$container = self::get_bundled_parent_cart_item_container( $cart_item );
+				if ( is_array( $container ) && isset( $container['key'] ) ) {
+					$parent_key = $container['key'];
+				}
+			}
+
+			if ( $parent_key && isset( $cart->cart_contents[ $parent_key ] ) ) {
+				// Trigger parent removal - parent handler will remove the rest of children.
+				WC()->cart->remove_cart_item( $parent_key );
+			}
+
+			return;
 		}
 	}
 	/**

@@ -4,7 +4,7 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 6.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -230,6 +230,14 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page
 
 == Changelog ==
+
+= 2.2.2 – 26 April 2026 = 
+* Fix: New translation strings added.
+* Fix: Resolved price display inconsistencies caused by tax settings and decimal rounding.
+* Fix: Offer price respects tax settings in frequently bought together.
+* Improvement: Added bundle discount block based cart and checkout support.
+* New: Bundle Discount compatibility with shoptimizer theme mini cart.
+
 
 = 2.2.1 – 15 April 2026 = 
 * Improvement: Converted modern array syntax to traditional array for improved multisite compatibility.
