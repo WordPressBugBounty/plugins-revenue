@@ -87,6 +87,10 @@ class Notice {
 			'revx_helloBar_spring_sale_2026_1'     => Xpo::get_transient_without_cache( 'revx_helloBar_spring_sale_2026_1' ),
 			'revx_helloBar_spring_sale_2026_2'     => Xpo::get_transient_without_cache( 'revx_helloBar_spring_sale_2026_2' ),
 			'revx_helloBar_spring_sale_2026_3'     => Xpo::get_transient_without_cache( 'revx_helloBar_spring_sale_2026_3' ),
+			'revx_helloBar_flash_sale_2026_2'      => Xpo::get_transient_without_cache( 'revx_helloBar_flash_sale_2026_2' ),
+			'revx_helloBar_surprise_sale_2026_1'   => Xpo::get_transient_without_cache( 'revx_helloBar_surprise_sale_2026_1' ),
+			'revx_helloBar_massive_sale_2026_1'    => Xpo::get_transient_without_cache( 'revx_helloBar_massive_sale_2026_1' ),
+			'revx_helloBar_final_hour_sale_2026_1' => Xpo::get_transient_without_cache( 'revx_helloBar_final_hour_sale_2026_1' ),
 		);
 	}
 
@@ -197,6 +201,90 @@ class Notice {
 				'url'                => Xpo::generate_utm_link(
 					array(
 						'utmKey' => 'spring_sale',
+					)
+				),
+
+				'visibility'         => ! Xpo::is_lc_active(),
+			),
+			array(
+				'key'                => 'revx_flash_sale_2026_2',
+				'start'              => '2026-05-13 00:00 Asia/Dhaka',
+				'end'                => '2026-05-17 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
+
+				'brand_color'        => '#00a464',
+
+				'left_image'         => REVENUE_URL . '/assets/images/dashboard_banner/flash_sale/left_image.png',
+				'right_image'        => REVENUE_URL . '/assets/images/dashboard_banner/flash_sale/right_image.png',
+				'bg_image'           => REVENUE_URL . '/assets/images/dashboard_banner/flash_sale/bg.png',
+				'text'               => 'Hurry Before It Ends!',
+				'countdown_duration' => 259200, // Duration in seconds.
+				'countdown_color'    => '#fff',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'flash_sale',
+					)
+				),
+
+				'visibility'         => ! Xpo::is_lc_active(),
+			),
+			array(
+				'key'                => 'revx_surprise_sale_2026_1',
+				'start'              => '2026-05-26 00:00 Asia/Dhaka',
+				'end'                => '2026-05-28 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
+
+				'brand_color'        => '#00a464',
+
+				'left_image'         => REVENUE_URL . '/assets/images/dashboard_banner/surprise_sale/left_image.png',
+				'right_image'        => REVENUE_URL . '/assets/images/dashboard_banner/surprise_sale/right_image.png',
+				'bg_image'           => REVENUE_URL . '/assets/images/dashboard_banner/surprise_sale/bg.png',
+				'text'               => 'Hurry Before It Ends!',
+				'countdown_duration' => 259200, // Duration in seconds.
+				'countdown_color'    => '#fff',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'surprise_sale',
+					)
+				),
+
+				'visibility'         => ! Xpo::is_lc_active(),
+			),
+			array(
+				'key'                => 'revx_massive_sale_2026_1',
+				'start'              => '2026-06-11 00:00 Asia/Dhaka',
+				'end'                => '2026-06-16 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
+
+				'brand_color'        => '#00a464',
+
+				'left_image'         => REVENUE_URL . '/assets/images/dashboard_banner/massive_sale/left_image.png',
+				'right_image'        => REVENUE_URL . '/assets/images/dashboard_banner/massive_sale/right_image.png',
+				'bg_image'           => REVENUE_URL . '/assets/images/dashboard_banner/massive_sale/bg.png',
+				'text'               => 'Hurry Before It Ends!',
+				'countdown_duration' => 259200, // Duration in seconds.
+				'countdown_color'    => '#fff',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'massive_sale',
+					)
+				),
+
+				'visibility'         => ! Xpo::is_lc_active(),
+			),
+			array(
+				'key'                => 'revx_final_hour_sale_2026_1',
+				'start'              => '2026-06-25 00:00 Asia/Dhaka',
+				'end'                => '2026-06-27 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
+
+				'brand_color'        => '#00a464',
+
+				'left_image'         => REVENUE_URL . '/assets/images/dashboard_banner/final_hour_sale/left_image.png',
+				'right_image'        => REVENUE_URL . '/assets/images/dashboard_banner/final_hour_sale/right_image.png',
+				'bg_image'           => REVENUE_URL . '/assets/images/dashboard_banner/final_hour_sale/bg.png',
+				'text'               => 'Hurry Before It Ends!',
+				'countdown_duration' => 259200, // Duration in seconds.
+				'countdown_color'    => '#fff',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'final_hour_sale',
 					)
 				),
 
@@ -498,6 +586,150 @@ class Notice {
 				'discount_content'   => ' up to 55% OFF',
 				'border_color'       => '#00a464',
 				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/discount.svg',
+				'button_text'        => __( 'Upgrade Now', 'revenue' ),
+				'is_discount_logo'   => true,
+			),
+			array(
+				'key'                => 'revx_dashboard_content_notice_flash_sale_v1',
+				'start'              => '2026-05-07 00:00 Asia/Dhaka',
+				'end'                => '2026-05-12 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'flash_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Flash Sale:', 'revenue' ),
+				'content_subheading' => __( 'Enjoy up to %s off on WowRevenue Pro.', 'revenue' ),
+				'discount_content'   => ' up to 50% OFF',
+				'border_color'       => '#00a464',
+				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/flash_sale/discount.svg',
+				'button_text'        => __( 'Upgrade Now', 'revenue' ),
+				'is_discount_logo'   => true,
+			),
+			array(
+				'key'                => 'revx_dashboard_content_notice_flash_sale_v2',
+				'start'              => '2026-05-18 00:00 Asia/Dhaka',
+				'end'                => '2026-05-21 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'flash_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Flash Sale:', 'revenue' ),
+				'content_subheading' => __( 'Enjoy up to %s off on WowRevenue Pro.', 'revenue' ),
+				'discount_content'   => ' up to 50% OFF',
+				'border_color'       => '#00a464',
+				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/flash_sale/icon.svg',
+				'button_text'        => __( 'Upgrade Now', 'revenue' ),
+				'is_discount_logo'   => true,
+			),
+			array(
+				'key'                => 'revx_dashboard_content_notice_surprise_sale_v1',
+				'start'              => '2026-05-22 00:00 Asia/Dhaka',
+				'end'                => '2026-05-25 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'surprise_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Surprise Sale:', 'revenue' ),
+				'content_subheading' => __( 'Enjoy up to %s off on WowRevenue Pro.', 'revenue' ),
+				'discount_content'   => ' up to 55% OFF',
+				'border_color'       => '#00a464',
+				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/surprise_sale/discount.svg',
+				'button_text'        => __( 'Upgrade Now', 'revenue' ),
+				'is_discount_logo'   => true,
+			),
+			array(
+				'key'                => 'revx_dashboard_content_notice_surprise_sale_v2',
+				'start'              => '2026-05-29 00:00 Asia/Dhaka',
+				'end'                => '2026-06-01 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'surprise_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Surprise Sale:', 'revenue' ),
+				'content_subheading' => __( 'Enjoy up to %s off on WowRevenue Pro.', 'revenue' ),
+				'discount_content'   => ' up to 55% OFF',
+				'border_color'       => '#00a464',
+				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/surprise_sale/icon.svg',
+				'button_text'        => __( 'Upgrade Now', 'revenue' ),
+				'is_discount_logo'   => true,
+			),
+			array(
+				'key'                => 'revx_dashboard_content_notice_massive_sale_v1',
+				'start'              => '2026-06-02 00:00 Asia/Dhaka',
+				'end'                => '2026-06-10 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'massive_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Massive Sale:', 'revenue' ),
+				'content_subheading' => __( 'Enjoy up to %s off on WowRevenue Pro.', 'revenue' ),
+				'discount_content'   => ' up to 50% OFF',
+				'border_color'       => '#00a464',
+				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/massive_sale/discount.svg',
+				'button_text'        => __( 'Upgrade Now', 'revenue' ),
+				'is_discount_logo'   => true,
+			),
+			array(
+				'key'                => 'revx_dashboard_content_notice_massive_sale_v2',
+				'start'              => '2026-06-17 00:00 Asia/Dhaka',
+				'end'                => '2026-06-20 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'massive_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Massive Sale:', 'revenue' ),
+				'content_subheading' => __( 'Enjoy up to %s off on WowRevenue Pro.', 'revenue' ),
+				'discount_content'   => ' up to 50% OFF',
+				'border_color'       => '#00a464',
+				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/massive_sale/icon.svg',
+				'button_text'        => __( 'Upgrade Now', 'revenue' ),
+				'is_discount_logo'   => true,
+			),
+			array(
+				'key'                => 'revx_dashboard_content_notice_final_hour_sale_v1',
+				'start'              => '2026-06-21 00:00 Asia/Dhaka',
+				'end'                => '2026-06-25 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'final_hour_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Final Hour Sale:', 'revenue' ),
+				'content_subheading' => __( 'Enjoy up to %s off on WowRevenue Pro.', 'revenue' ),
+				'discount_content'   => ' up to 55% OFF',
+				'border_color'       => '#00a464',
+				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/final_hour_sale/discount.svg',
+				'button_text'        => __( 'Upgrade Now', 'revenue' ),
+				'is_discount_logo'   => true,
+			),
+			array(
+				'key'                => 'revx_dashboard_content_notice_final_hour_sale_v2',
+				'start'              => '2026-06-28 00:00 Asia/Dhaka',
+				'end'                => '2026-06-30 23:59 Asia/Dhaka',
+				'url'                => Xpo::generate_utm_link(
+					array(
+						'utmKey' => 'final_hour_sale',
+					)
+				),
+				'visibility'         => ! Xpo::is_lc_active(),
+				'content_heading'    => __( 'Final Hour Sale:', 'revenue' ),
+				'content_subheading' => __( 'Enjoy up to %s off on WowRevenue Pro.', 'revenue' ),
+				'discount_content'   => ' up to 55% OFF',
+				'border_color'       => '#00a464',
+				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/final_hour_sale/icon.svg',
 				'button_text'        => __( 'Upgrade Now', 'revenue' ),
 				'is_discount_logo'   => true,
 			),

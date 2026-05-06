@@ -500,6 +500,42 @@ final class Revenue {
 				),
 				'utmKey' => 'spring_sale_meta',
 			),
+			array(
+				'start'  => '2026-05-07 00:00 Asia/Dhaka',
+				'end'    => '2026-05-21 23:59 Asia/Dhaka',
+				'text'   => __(
+					'Flash Sale - Up to 50% OFF',
+					'revenue'
+				),
+				'utmKey' => 'flash_sale_meta',
+			),
+			array(
+				'start'  => '2026-05-22 00:00 Asia/Dhaka',
+				'end'    => '2026-06-01 23:59 Asia/Dhaka',
+				'text'   => __(
+					'Surprise Sale - Up to 55% OFF',
+					'revenue'
+				),
+				'utmKey' => 'surprise_sale_meta',
+			),
+			array(
+				'start'  => '2026-06-02 00:00 Asia/Dhaka',
+				'end'    => '2026-06-20 23:59 Asia/Dhaka',
+				'text'   => __(
+					'Massive Sale - Up to 50% OFF',
+					'revenue'
+				),
+				'utmKey' => 'massive_sale_meta',
+			),
+			array(
+				'start'  => '2026-06-21 00:00 Asia/Dhaka',
+				'end'    => '2026-06-30 23:59 Asia/Dhaka',
+				'text'   => __(
+					'Final Hour Sale - Up to 55% OFF',
+					'revenue'
+				),
+				'utmKey' => 'final_hour_sale_meta',
+			),
 		);
 
 		// Create the base URL for campaigns admin page.
