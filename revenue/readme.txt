@@ -4,7 +4,7 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 6.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.2.3
+Stable tag: 2.2.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -227,9 +227,13 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 8. Product Mix and Match
 9. Normal Discount
 10. Capture repeat customers in Thank You Page
-11. Cross-selling on Cart Page
+11. Cross-selling on Cart Page 
 
 == Changelog ==
+
+= 2.2.4 – 18 May 2026 = 
+* New: Video tutorial for campaigns inside editor.
+* Fix: Attribute select option now supports different languages (e.g Hebrew).
 
 = 2.2.3 – 6 May 2026 = 
 * Fix: Added missing condition check. 

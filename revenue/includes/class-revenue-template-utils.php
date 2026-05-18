@@ -3035,12 +3035,43 @@ class Revenue_Template_Utils {
 						data-options="<?php echo esc_attr( wp_json_encode( $options ) ); ?>" 
 					>
 						<option value="" ><?php echo esc_html__( 'Select', 'revenue' ); ?> <?php echo esc_html( $label ); ?></option>
-						<?php foreach ( $options as $option ) : ?>
+						<?php foreach ( $options as $option ) :
+							$option_value = $option;
+							$option_label = $option;
+
+							// Try to map option to a taxonomy term so we can
+							// use the term slug as the value and the term name
+							// as the visible label. Check common candidates
+							// (pa_{attribute} and the raw attribute name).
+							$tax_candidates = array( 'pa_' . $attr_key, $attr_key );
+							foreach ( $tax_candidates as $tax ) {
+								if ( taxonomy_exists( $tax ) ) {
+									// Try by slug first (option might already be a slug).
+									$term = get_term_by( 'slug', sanitize_title( $option ), $tax );
+									if ( ! $term ) {
+										// Fall back to matching by name.
+										$term = get_term_by( 'name', $option, $tax );
+									}
+									if ( $term && ! is_wp_error( $term ) ) {
+										$option_value = $term->slug;
+										$option_label = $term->name;
+										break;
+									}
+								}
+							}
+
+							// Ensure the selected check compares against the
+							// actual option value that will be submitted.
+							$is_selected = '';
+							if ( isset( $default_option ) && ( $default_option == $option_value || $default_option == $option_label ) ) {
+								$is_selected = 'selected';
+							}
+						?>
 							<option 
-								value="<?php echo esc_attr( $option ); ?>" 
-								<?php selected( $default_option ?? '', $option ); ?>
+								value="<?php echo esc_attr( $option_value ); ?>" 
+								<?php echo $is_selected; ?>
 							>
-								<?php echo esc_html( $option ); ?>
+								<?php echo esc_html( $option_label ); ?>
 							</option>
 						<?php endforeach; ?>
 					</select>

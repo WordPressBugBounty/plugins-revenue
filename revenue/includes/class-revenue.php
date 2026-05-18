@@ -19,6 +19,7 @@ use Revenue\Revenue_Server;
 use Revenue\Revenue_Install;
 use Revenue\Revenue_Normal_Discount;
 use Revenue\Revenue_Volume_Discount;
+use Revenue\WowAddonsPromotion;
 use REVX\Includes\Durbin\Xpo;
 
 // use Revenue\Revenue_Notice;
@@ -83,6 +84,18 @@ final class Revenue {
 
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
 		add_action( 'wp_head', array( $this, 'inline_critical_css' ), 0 );
+
+		$this->include_promotions();
+	}
+
+	/**
+	 * Summary of include_promotions
+	 *
+	 * @return void
+	 */
+	public function include_promotions() {
+		require_once REVENUE_PATH . 'includes/class-wow-addons-promotion.php';
+		new WowAddonsPromotion();
 	}
 	// NOTE: If faced with fatal error and page does not show, comment the above action with this function.
 	public function inline_critical_css() {
