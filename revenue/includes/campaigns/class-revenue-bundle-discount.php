@@ -101,6 +101,42 @@ class Revenue_Bundle_Discount {
 		add_filter( 'woocommerce_order_formatted_line_subtotal', array( $this, 'order_formatted_line_subtotal' ), 10, 3 );
 		add_action( 'revenue_rest_insert_campaign', array( $this, 'on_campaign_rest_insert' ), 10, 3 );
 
+		// WPML quick fix for cart key change on cart/checkout page. for user. dummy product will be removed anyways.
+		add_action(
+			'woocommerce_cart_loaded_from_session',
+			function ( $cart ) {
+				$bundle_parents  = array();
+				$bundle_children = array();
+				foreach ( $cart->cart_contents as $key => $item ) {
+					$bid = $item['revx_bundle_id'] ?? '';
+					if ( ! $bid ) {
+						continue;
+					}
+					if ( self::is_bundle_parent_item( $item ) ) {
+						$bundle_parents[ $bid ] = $key;
+					} elseif ( self::is_bundle_child_item( $item ) ) {
+						$bundle_children[ $bid ][] = $key;
+					}
+				}
+
+				// Re-sync stored keys to current cart keys.
+				foreach ( $cart->cart_contents as $key => &$item ) {
+					$bid = $item['revx_bundle_id'] ?? '';
+					if ( ! $bid ) {
+						continue;
+					}
+
+					if ( self::is_bundle_parent_item( $item ) ) {
+						$item['revx_bundled_items'] = $bundle_children[ $bid ] ?? array();
+					} elseif ( self::is_bundle_child_item( $item ) ) {
+						$item['revx_bundled_by'] = $bundle_parents[ $bid ] ?? '';
+					}
+				}
+				unset( $item );
+			},
+			99
+		); // priority 99 → runs after WPML has potentially modified cart keys.
+
 		$this->register_wc_endpoint_bundle_parent_and_child();
 	}
 
@@ -808,6 +844,11 @@ class Revenue_Bundle_Discount {
 		$product_id = $this->get_bundle_product_id();
 		if ( $product->get_id() == $product_id ) {
 			$status = true;
+		}
+
+		// Fallback: SKU is language-independent and never changes across WPML translations.
+		if ( 'revenue_bundle_product' === $product->get_sku() ) {
+			return true;
 		}
 
 		return $status;

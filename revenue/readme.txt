@@ -2,9 +2,9 @@
 Contributors: wpxpo, anik4e, jakirhasan
 Tags: product bundles, bogo, bulk discount, bought together, upsells  
 Requires at least: 6.8
-Tested up to: 6.9
+Tested up to: 7
 Requires PHP: 7.4
-Stable tag: 2.2.4
+Stable tag: 2.2.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -154,6 +154,8 @@ With WowRevenue, you have full control over how you create and launch campaigns 
 
 We have more useful plugins for WooCommerce and WordPress users. Take a look at them:
 
+📄 [**WowInvoice**](https://wordpress.org/plugins/wow-pdf-invoices-packing-slips/) The PDF invoices & packing slips plugin for WooCommerce that streamlines invoice, packing slip, and shipping label creation.
+
 🚚 [**WowShipping 🔥**](https://wordpress.org/plugins/wow-table-rate-shipping/): A complete table rate shipping solution for WooCommerce, allowing you to set flexible delivery rates using 30+ conditions and get live rates from popular carriers like UPS, USPS, DHL, Sendle, and more.
 
 ➕ [**WowAddons 🔥**](https://wordpress.org/plugins/product-addons/): The most advanced and flexible plugin to sell customizable products by creating a personalized shopping experience with product addons and 25+ extra options.
@@ -230,6 +232,10 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page 
 
 == Changelog ==
+= 2.2.5 – 08 June 2026 = 
+* New: Bundle Discount Campaign is now compatible with WPML.
+* Fix: FluentCRM preview does not enqueue revenue frontend script anymore.
+* Improvement: Spending goal support for cart and checkokut page.
 
 = 2.2.4 – 18 May 2026 = 
 * New: Video tutorial for campaigns inside editor.

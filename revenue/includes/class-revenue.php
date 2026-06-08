@@ -208,6 +208,8 @@ final class Revenue {
 
 		// require_once REVENUE_PATH . 'includes/class-revenue-notice.php';
 
+		// load class only on frontend and rest api request.
+		// same condition used in wp_enqueue_scripts action, so that scripts are not loaded unnecessarily.
 		if ( $this->is_request( 'frontend' ) || $this->is_rest_api_request() ) {
 			$this->frontend_includes();
 		}
@@ -252,7 +254,11 @@ final class Revenue {
 	 * @return void
 	 */
 	public function frontend_includes() {
-		require_once REVENUE_PATH . 'includes/class-revenue-frontend-scripts.php';
+		// Only require file on frontend and rest api request.
+		// Same condition used in includes function, so that scripts are not loaded unnecessarily.
+		if ( $this->is_request( 'frontend' ) || $this->is_rest_api_request() ) {
+			require_once REVENUE_PATH . 'includes/class-revenue-frontend-scripts.php';
+		}
 	}
 	/**
 	 * Initialize the actions

@@ -303,6 +303,7 @@
 			};
 
 			this.confetti = new ConfettiManager();
+			this.unsubscribeCartStore = null;
 			this.initializeOffers();
 		}
 
@@ -333,7 +334,10 @@
 
 			this.cacheDOM();
 			this.calculateTotalGoal();
+			// works for classic carts where cart updates trigger wc events.
 			this.bindEvents();
+			// for block carts and checkouts.
+			this.subscribeToCartTotal();
 			this.initSliderIfNeeded();
 
 			// Ensure the gift heading is correct on initial load
@@ -385,11 +389,47 @@
 			);
 		}
 
+		// for block based cart price tracking.
+		// subscribe to cart totals.
+		// This is required as blocks cart updates do not trigger traditional wc events.
+		// the subscribe handle the cart total change and trigger the progress update.
+		subscribeToCartTotal() {
+			if ( ! wp?.data?.select || ! wp?.data?.subscribe ) {
+				return;
+			}
+			const { select, subscribe } = wp.data;
+
+			let previousTotals = null;
+
+			// woocommerce store subscribe to cart changes.
+			this.unsubscribeCartStore = subscribe( () => {
+				const cart = select( 'wc/store/cart' );
+
+				if ( ! cart ) {
+					return;
+				}
+
+				const totals = cart.getCartTotals?.();
+
+				if ( totals?.total_price !== previousTotals?.total_price ) {
+					previousTotals = totals;
+
+					this.handleCartUpdate();
+				}
+			} );
+		}
+
 		bindEvents() {
 			// Common events
-			$( document.body ).on(
-				'updated_cart_totals added_to_cart removed_from_cart wc-blocks_added_to_cart wc-blocks_removed_from_cart',
-				() => this.handleCartUpdate()
+			const cartEvents = [
+				'updated_cart_totals',
+				'added_to_cart',
+				'removed_from_cart',
+				'wc-blocks_added_to_cart',
+				'wc-blocks_removed_from_cart',
+			];
+			$( document.body ).on( cartEvents.join( ' ' ), () =>
+				this.handleCartUpdate()
 			);
 
 			// Toggle display for gift item remove buttons based on on-cart class
@@ -1118,6 +1158,10 @@
 				'added_to_cart.revenueX removed_from_cart.revenueX updated_cart_totals.revenueX'
 			);
 			$( '.revx-spending-goal-add-cart' ).off();
+
+			if ( this.unsubscribeCartStore ) {
+				this.unsubscribeCartStore();
+			}
 		}
 	}
 
@@ -1159,7 +1203,7 @@
 		init();
 		// tried to fix the issue of after cart reload
 		// Re-run every time checkout updates (AJAX reload)
-		$( document.body ).on( 'updated_checkout', function () {
+		$( document ).on( 'updated_checkout', function () {
 			init();
 		} );
 	} );

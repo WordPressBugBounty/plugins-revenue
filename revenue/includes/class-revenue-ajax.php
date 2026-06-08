@@ -1000,7 +1000,7 @@ class Revenue_Ajax {
 			$required_products = array_map( 'absint', $required_products );
 			$required_products = array_filter( $required_products ); // remove invalid/empty
 
-			$fbt_data          = isset( $_POST['fbt_data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['fbt_data'] ) ) : array();
+			$fbt_data = isset( $_POST['fbt_data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['fbt_data'] ) ) : array();
 
 			$is_required_trigger_product = revenue()->get_campaign_meta( $campaign_id, 'fbt_is_trigger_product_required', true );
 
@@ -1008,9 +1008,12 @@ class Revenue_Ajax {
 				// check if required trigger product is set in fbt data
 				foreach ( $required_products as $required_product ) {
 					if ( ! isset( $fbt_data[ $required_product ] ) ) {
-						return wp_send_json_error( array(
-							'message' => 'Required trigger product not found.',
-						), 400 );
+						return wp_send_json_error(
+							array(
+								'message' => 'Required trigger product not found.',
+							),
+							400
+						);
 					}
 				}
 			}
@@ -1031,8 +1034,8 @@ class Revenue_Ajax {
 				// New version: Use products array with variable support.
 				$products                             = $_POST['products'];
 				$cart_item_data['revx_products_data'] = $products;
-				$revx_fbt_all_triggers_key = [];
-				$revx_fbt_all_items_key    = [];
+				$revx_fbt_all_triggers_key            = array();
+				$revx_fbt_all_items_key               = array();
 				foreach ( $products as $_pd ) {
 					$variation_id = isset( $_pd['variation_id'] ) ? $_pd['variation_id'] : 0;
 					$attributes   = isset( $_pd['selected_attributes'] ) ? $_pd['selected_attributes'] : array();
@@ -1044,7 +1047,7 @@ class Revenue_Ajax {
 						$cart_item_data
 					);
 					if ( $status ) {
-						if( in_array( $_pd['product_id'], $required_products ) ) {
+						if ( in_array( $_pd['product_id'], $required_products ) ) {
 							$revx_fbt_all_triggers_key[] = $status;
 						} else {
 							$revx_fbt_all_items_key[] = $status;
