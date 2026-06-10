@@ -2,9 +2,9 @@
 Contributors: wpxpo, anik4e, jakirhasan
 Tags: product bundles, bogo, bulk discount, bought together, upsells  
 Requires at least: 6.8
-Tested up to: 7
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.2.5
+Stable tag: 2.2.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -232,6 +232,10 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page 
 
 == Changelog ==
+
+= 2.2.6 – 09 June 2026 = 
+* New: Tested with new wordpress version.
+
 = 2.2.5 – 08 June 2026 = 
 * New: Bundle Discount Campaign is now compatible with WPML.
 * Fix: FluentCRM preview does not enqueue revenue frontend script anymore.
