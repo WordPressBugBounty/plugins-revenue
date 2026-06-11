@@ -6,6 +6,8 @@
  */
 namespace Revenue;
 
+use REVX\Includes\Durbin\Xpo;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -13,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
  */
 class WowAddonsPromotion {
 
-	private const VERSION              = '10'; // Cache buster.
+	private const VERSION              = '20'; // Cache buster.
 	private const PRODUCTS_MENU_SLUG   = 'prad-promo-products-options';
 	private const PROMOTED_PLUGIN_SLUG = 'product-addons';
 	private const PROMOTED_PLUGIN_FILE = 'product-addons/product-addons.php';
@@ -32,8 +34,10 @@ class WowAddonsPromotion {
 	 * @return void
 	 */
 	public function run_promotions() {
-		if ( ! class_exists( '\WooCommerce' ) ||
-			defined( 'PRAD_VER' )
+		if (
+			! class_exists( '\WooCommerce' ) ||
+			defined( 'PRAD_VER' ) ||
+			Xpo::is_lc_active()
 		) {
 			return;
 		}
@@ -82,7 +86,7 @@ class WowAddonsPromotion {
 			// ------------------.
 
 			// Add Options Tab.
-			add_filter( 'woocommerce_product_data_tabs', array( $this, 'register_product_options_tab' ) );
+			add_filter( 'woocommerce_product_data_tabs', array( $this, 'register_product_options_tab' ), 999 );
 			add_action( 'woocommerce_product_data_panels', array( $this, 'render_product_options_panel' ) );
 
 			// Variation tab notice.
@@ -138,7 +142,7 @@ class WowAddonsPromotion {
 			'label'    => 'Add Product Options',
 			'target'   => 'prad-promo-add-product-options',
 			'class'    => array( 'hide_if_grouped' ),
-			'priority' => 65,
+			'priority' => 60,
 		);
 
 		return $tabs;
@@ -188,7 +192,7 @@ class WowAddonsPromotion {
 						</li>
 					</ul>
 				',
-				'margin-inline: 20px;',
+				'margin-inline: 20px;background:#f2f2f2;',
 				true,
 				array(
 					'default' => 'Start Now',
@@ -237,7 +241,7 @@ class WowAddonsPromotion {
 			'prad-promo-variations-tab',
 			'variations_tab',
 			'Create Unlimited Product Variations in a Few Clicks',
-			'margin:16px 12px 16px 12px;border: 1px solid #c3c4c7;border-left-width: 4px;border-left-color: #72aee6;width:fit-content;',
+			'margin:16px 12px 16px 12px;border: 1px solid #c3c4c7;border-left-width: 4px;border-left-color: #72aee6;width:fit-content;padding-right:50px;',
 			true,
 			array(
 				'default' => 'Configure Now',
@@ -457,10 +461,84 @@ class WowAddonsPromotion {
 				}
 
 			}
+
+			@media (max-height: 760px) {
+				.prad-promo-products-modal__dialog {
+					padding: 22px 22px 18px;
+				}
+
+				.prad-promo-products-modal__img {
+					max-height: 160px;
+					margin-bottom: 18px;
+				}
+
+				.prad-promo-products-modal__title {
+					font-size: 28px;
+					margin-bottom: 8px;
+				}
+
+				.prad-promo-products-modal__text {
+					margin-bottom: 16px;
+					font-size: 14px;
+					line-height: 1.45;
+				}
+
+				.prad-promo-products-modal__list {
+					margin-bottom: 18px;
+				}
+
+				.prad-promo-products-modal__list li {
+					gap: 10px;
+					padding: 8px 0;
+					font-size: 13px;
+				}
+
+				.prad-promo-products-modal__button {
+					padding: 13px 16px;
+					font-size: 14px;
+				}
+			}
+
+			@media (max-height: 680px) {
+				.prad-promo-products-modal__dialog {
+					padding: 18px 18px 16px;
+				}
+
+				.prad-promo-products-modal__img {
+					max-height: 120px;
+					margin-bottom: 14px;
+				}
+
+				.prad-promo-products-modal__title {
+					font-size: 24px;
+				}
+
+				.prad-promo-products-modal__text {
+					max-width: 100%;
+					margin-bottom: 12px;
+					font-size: 13px;
+				}
+
+				.prad-promo-products-modal__list {
+					margin-bottom: 14px;
+				}
+
+				.prad-promo-products-modal__list li {
+					padding: 6px 0;
+					font-size: 12px;
+				}
+
+				.prad-promo-products-modal__button {
+					padding: 12px 14px;
+					font-size: 13px;
+				}
+			}
+
 			.prad-promo-products-modal__img {
 				max-width: 100%;
 				height: auto;
 				margin-bottom: 24px;
+				margin-inline: auto;
 			}
 		</style>
 

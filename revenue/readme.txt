@@ -4,7 +4,7 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.2.6
+Stable tag: 2.2.7
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -181,8 +181,8 @@ You can Translate Revenue on [translate.wordpress.org](https://translate.wordpre
 
 = Minimum Requirements =
 
-* WordPress 5.0.0 or greater
-* PHP version 7.3 or greater
+* WordPress 6.8 or greater
+* PHP version 7.4 or greater
 * MySQL version 5.6 or greater
 
 = Automatic installation =
@@ -232,6 +232,9 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page 
 
 == Changelog ==
+
+= 2.2.7 – 11 June 2026 = 
+* Fix: Performance Improved.
 
 = 2.2.6 – 09 June 2026 = 
 * New: Tested with new wordpress version.

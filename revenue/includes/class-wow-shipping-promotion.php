@@ -6,6 +6,8 @@
  */
 namespace Revenue; // CHANGE THIS.
 
+use REVX\Includes\Durbin\Xpo;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -13,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
  */
 class WowShippingPromotion {
 
-	private const VERSION              = '20'; // Cache buster.
+	private const VERSION              = '30'; // Cache buster.
 	private const MENU_SLUG            = 'revenue'; // CHANGE THIS.
 	private const PROMOTED_PLUGIN_SLUG = 'wow-table-rate-shipping';
 	private const PROMOTED_PLUGIN_FILE = 'wow-table-rate-shipping/wow-table-rate-shipping.php';
@@ -32,7 +34,11 @@ class WowShippingPromotion {
 	 * @return void
 	 */
 	public function run_promotions() {
-		if ( ! class_exists( '\WooCommerce' ) || defined( 'WTRS_VER' ) ) {
+		if (
+			! class_exists( '\WooCommerce' ) ||
+			defined( 'WTRS_VER' ) ||
+			Xpo::is_lc_active()
+		) {
 			return;
 		}
 
@@ -244,7 +250,7 @@ class WowShippingPromotion {
 			'wtrs-product-shipping',
 			'shipping_options',
 			'Set shipping rates based on <strong>Cart Weight</strong> and <strong>Dimension</strong>',
-			'margin-inline:10px;',
+			'margin-inline:10px;background:#f2f2f2;',
 			true,
 			array(
 				'default' => 'Get Started',
