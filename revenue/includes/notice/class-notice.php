@@ -28,6 +28,20 @@ class Notice {
 	 */
 	private $notice_js_css_applied = false;
 
+	/**
+	 * Notice Priority
+	 *
+	 * @var string $plugin_notice_priority
+	 */
+	private $plugin_notice_priority = 4;
+	
+	/**
+	 * Notice Priority
+	 *
+	 * @var string $plugin_notice_priority
+	 */
+	private $plugin_notice_priority_key = 'wowrevenue';
+
 
 	/**
 	 * Notice Constructor
@@ -41,6 +55,37 @@ class Notice {
 
 		// Woocommerce Install Action.
 		add_action( 'wp_ajax_revx_install', array( $this, 'install_activate_plugin' ) );
+		add_filter('xpo_active_notice_lists', array( $this, 'handle_xpo_active_notice_lists' ), 99, 1 );
+	}
+
+	/**
+	 * Handle Plugin Notice for all plugins
+	 * @param array $active_lists Lists of all active plugin notice.
+	 * @return array
+	 */
+	public function handle_xpo_active_notice_lists( $active_lists ) {
+		
+		if ( $this->revx_dashboard_banner_notice(true) || $this->revx_dashboard_content_notice(true) ) {
+			$active_lists[$this->plugin_notice_priority_key] = $this->plugin_notice_priority;
+		}
+
+		return $active_lists;
+	}
+
+	/**
+	 * Handle Plugin Notice for all plugins
+	 * @return bool
+	 */
+	public function is_available_for_notice() {
+		$active_notices = apply_filters( 'xpo_active_notice_lists', array() );
+
+		if ( empty( $active_notices ) ) {
+			return true;
+		}
+
+		asort( $active_notices );
+
+		return array_key_first( $active_notices ) === $this->plugin_notice_priority_key;
 	}
 
 
@@ -173,8 +218,10 @@ class Notice {
 	 * @return void
 	 */
 	public function revx_dashboard_notice_callback() {
-		$this->revx_dashboard_banner_notice();
-		$this->revx_dashboard_content_notice();
+		if ( $this->is_available_for_notice() ) {
+			$this->revx_dashboard_banner_notice();
+			$this->revx_dashboard_content_notice();
+		}
 	}
 
 	/**
@@ -182,7 +229,7 @@ class Notice {
 	 *
 	 * @return void
 	 */
-	public function revx_dashboard_banner_notice() {
+	public function revx_dashboard_banner_notice($return_bool=false) {
 		$revx_db_nonce  = wp_create_nonce( 'revx-nonce' );
 		$banner_notices = array(
 			array(
@@ -309,6 +356,10 @@ class Notice {
 					return;
 				}
 
+				if ( $return_bool ) { // Early return for Other plugin notice.
+					return true;
+				}
+
 				if ( ! $this->notice_js_css_applied ) {
 					$this->revx_banner_notice_js();
 					$this->notice_js_css_applied = true;
@@ -324,7 +375,6 @@ class Notice {
 				<style type="text/css">
 					.revx-notice-wrapper.revx-banner-notice {
 						height: auto !important;
-						min-height: 90px;
 						padding: 0 !important;
 						position: relative;
 						box-sizing: border-box;
@@ -341,7 +391,7 @@ class Notice {
 						display: flex;
 						justify-content: space-between;
 						align-items: center;
-						max-width: 1358px;
+						max-width: 700px;
 						margin: 0 auto;
 						padding: 10px 16px;
 						gap: 16px;
@@ -350,6 +400,7 @@ class Notice {
 						display: block;
 						max-width: 100%;
 						height: auto;
+						max-height: 32px;
 					}
 					.revx-notice-wrapper.revx-banner-notice .revx-banner-main {
 						display: flex;
@@ -358,15 +409,24 @@ class Notice {
 						align-items: center;
 						justify-content: center;
 						font-weight: 700;
-						font-size: 28px;
+						font-size: 18px;
 						color: #00a464;
-						line-height: 32px;
+						line-height: 1.2;
 						text-align: center;
 					}
 
 					@media screen and (max-width: 1100px) {
-						.revx-notice-wrapper.revx-banner-notice .revx-banner-content {
+						/* .revx-notice-wrapper.revx-banner-notice .revx-banner-content {
 							flex-direction: column;
+						} */
+						.revx-notice-wrapper.revx-banner-notice .revx-banner-content .revx-banner-main-text {
+							display: none;
+						}
+					}
+
+					@media screen and (max-width: 490px) {
+						.revx-notice-wrapper.revx-banner-notice {
+							display: none;
 						}
 					}
 
@@ -550,7 +610,7 @@ class Notice {
 	 *
 	 * @return void
 	 */
-	public function revx_dashboard_content_notice() {
+	public function revx_dashboard_content_notice($return_bool=false) {
 
 		$content_notices = array(
 			array(
@@ -752,6 +812,10 @@ class Notice {
 					$notice_transient = Xpo::get_transient_without_cache( 'revx_get_pro_notice_' . $notice_key );
 
 					if ( 'off' !== $notice_transient ) {
+
+						if ( $return_bool ) { // Early return for Other plugin notice.
+							return true;
+						}
 
 						$query_args = array(
 							'disable_revx_notice' => $notice_key,

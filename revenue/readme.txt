@@ -4,7 +4,7 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.2.7
+Stable tag: 2.2.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -233,8 +233,11 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 
 == Changelog ==
 
+= 2.2.8 – 18 June 2026 = 
+* Improvement: Improved the Bundle Discount campaign functionality.
+
 = 2.2.7 – 11 June 2026 = 
-* Fix: Performance Improved.
+* Improvement: Performance Improved.
 
 = 2.2.6 – 09 June 2026 = 
 * New: Tested with new wordpress version.
