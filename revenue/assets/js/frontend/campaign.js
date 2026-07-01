@@ -1183,6 +1183,19 @@
 			`.revx-campaign-${ campaignId } .revx-price-container`
 		);
 		const itemCounts = Object.keys( prevData ).length;
+		// Eligibility basis: 'total' sums offered-product quantities, otherwise count distinct products.
+		const countMode =
+			typeof revenue_campaign !== 'undefined' &&
+			revenue_campaign.mix_match_count_mode === 'total'
+				? 'total'
+				: 'unique';
+		const eligibleQty =
+			countMode === 'total'
+				? Object.values( prevData ).reduce(
+						( sum, i ) => sum + parseInt( i.quantity ),
+						0
+				  )
+				: itemCounts;
 		let $selectedTier = null;
 		$( '.revx-tier-button' ).each( function () {
 			// Extract the item count from the mix-match-title text
@@ -1192,7 +1205,7 @@
 				.trim();
 			const itemCount = parseInt( titleText.split( ' ' )[ 0 ], 10 ); // Extract number from "X item"
 
-			if ( itemCounts >= itemCount ) {
+			if ( eligibleQty >= itemCount ) {
 				$selectedTier = $( this );
 			}
 		} );
@@ -1245,7 +1258,7 @@
 		// } else if(item_counts>0) {
 		//     $(`.revx-campaign-add-to-cart-btn[data-campaign-id=${campaign_id}]`).removeClass('revx-d-none');
 		// }
-		header.find( '.revx-selected-product-count' ).html( itemCounts );
+		header.find( '.revx-selected-product-count' ).html( eligibleQty );
 
 		let totalRegularPrice = 0;
 		let totalSalePrice = 0;
@@ -1258,7 +1271,7 @@
 
 		let selectedIndex = -1;
 		jsonQtyData.forEach( ( item, idx ) => {
-			if ( itemCounts >= item.quantity ) {
+			if ( eligibleQty >= item.quantity ) {
 				selectedIndex = idx;
 
 				switch ( item.type ) {

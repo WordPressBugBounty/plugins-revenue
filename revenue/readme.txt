@@ -4,7 +4,7 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.2.8
+Stable tag: 2.2.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -232,6 +232,10 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 11. Cross-selling on Cart Page 
 
 == Changelog ==
+
+= 2.2.9 – 01 July 2026 = 
+* Improvement: UI widget dynamic updates alignment with custom hooks and filters.
+* Fix: Mobile menu error on navbar button.
 
 = 2.2.8 – 18 June 2026 = 
 * Improvement: Improved the Bundle Discount campaign functionality.

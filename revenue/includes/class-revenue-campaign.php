@@ -998,6 +998,7 @@ class Revenue_Campaign {
 			'select_items_first'           => __( 'Please select the item(s) first', 'revenue' ),
 			'error_adding_to_cart'         => __( 'Error adding to cart', 'revenue' ),
 			'select_at_least_one_product'  => __( 'Please select at least one product to add', 'revenue' ),
+			'mix_match_count_mode'         => apply_filters( 'revenue_mix_match_count_mode', 'unique' ),
 		);
 
 		wp_localize_script( 'revenue-campaign', 'revenue_campaign', $campaign_localize_data );

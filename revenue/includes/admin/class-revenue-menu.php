@@ -259,6 +259,7 @@ class Revenue_Menu {
 			'campaign_counts' => revenue()->get_campaign_counts(),
 			'helloBar' => Notice::get_hellobar_config(),
 			'license' => Xpo::get_lc_key(),
+			'is_expired' => Xpo::is_lc_expired(),
 			'current_locale' => get_locale(),
 			'userInfo' => array(
 				'name' => $user_info->first_name ? $user_info->first_name . ($user_info->last_name ? ' ' . $user_info->last_name : '') : $user_info->user_login,

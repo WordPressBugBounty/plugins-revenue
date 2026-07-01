@@ -747,6 +747,17 @@
 			`.revx-campaign-${ campaign_id } .revx-selected-product-header`
 		);
 		const item_counts = Object.keys( prevData ).length;
+		const total_qty = Object.values( prevData ).reduce(
+			( sum, i ) => sum + parseInt( i.quantity ),
+			0
+		);
+		// Eligibility basis: 'total' sums offered-product quantities, otherwise count distinct products.
+		const count_mode =
+			typeof revenue_campaign !== 'undefined' &&
+			revenue_campaign.mix_match_count_mode === 'total'
+				? 'total'
+				: 'unique';
+		const eligible_qty = count_mode === 'total' ? total_qty : item_counts;
 		const qtyData = $( `input[name=revx-qty-data-${ campaign_id }]` ).val();
 		jsonQtyData = qtyData ? JSON.parse( qtyData ) : [];
 
@@ -761,7 +772,7 @@
 		// } else if(item_counts>0) {
 		//     $(`.revx-campaign-add-to-cart-btn[data-campaign-id=${campaign_id}]`).removeClass('revx-d-none');
 		// }
-		header.find( '.revx-selected-product-count' ).html( item_counts );
+		header.find( '.revx-selected-product-count' ).html( eligible_qty );
 
 		let totalRegularPrice = 0;
 		let totalSalePrice = 0;
@@ -773,7 +784,7 @@
 
 		let selectedIndex = -1;
 		jsonQtyData.forEach( ( item, idx ) => {
-			if ( item_counts >= item.quantity ) {
+			if ( eligible_qty >= item.quantity ) {
 				selectedIndex = idx;
 
 				switch ( item.type ) {

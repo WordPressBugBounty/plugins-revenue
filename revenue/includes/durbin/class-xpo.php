@@ -42,6 +42,8 @@ class Xpo {
 	 */
 	public static function is_lc_expired() {
 		$license_data = get_option( 'edd_revenue_license_data', array() );
+		// // return true for testing purpose of renew license notification.
+		// return true;
 		return isset( $license_data['license'] ) && 'expired' === $license_data['license'];
 	}
 

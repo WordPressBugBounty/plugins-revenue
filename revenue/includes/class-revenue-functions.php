@@ -2656,6 +2656,42 @@ class Revenue_Functions {
 		return $product_ids;
 	}
 
+	/**
+	 * Get a map of cart product IDs to their summed quantities.
+	 *
+	 * Unlike get_cart_product_ids(), this preserves the quantity of each cart line so
+	 * callers can reason about the total quantity of a product in the cart rather than
+	 * just its presence. Multiple cart lines for the same product/variation are summed.
+	 *
+	 * @param bool $contain_parent_id Whether to key by parent product ID instead of variation ID.
+	 *
+	 * @return array<int,int> Map of product/variation ID => total quantity in cart.
+	 */
+	public function get_cart_product_quantities( $contain_parent_id = false ) {
+		if ( ! isset( WC()->cart ) ) {
+			return array();
+		}
+
+		$quantities = array();
+		foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+			if ( $contain_parent_id ) {
+				$id = $cart_item['product_id'];
+			} else {
+				$id = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+			}
+
+			$qty = isset( $cart_item['quantity'] ) ? intval( $cart_item['quantity'] ) : 0;
+
+			if ( isset( $quantities[ $id ] ) ) {
+				$quantities[ $id ] += $qty;
+			} else {
+				$quantities[ $id ] = $qty;
+			}
+		}
+
+		return $quantities;
+	}
+
 	public function campaign_style_generator( $type = 'inpage', $campaign = array(), $placement = '' ) {
 		$view_mode = revenue()->get_placement_settings( $campaign['id'], $placement, 'builder_view' ) ?? 'list';
 		if ( 'drawer' === $type ) {
