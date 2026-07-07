@@ -207,72 +207,11 @@ class Xpo {
 
 	public static function generate_utm_link( $params = array() ) {
 		$default_config = array(
-			// notice part.
-			'flash_sale'       => array(
+			'summer_db'       => array(
 				'source'   => 'db-revenue-notice',
-				'medium'   => 'flash-sale',
+				'medium'   => 'summer-sale',
 				'campaign' => 'revenue-dashboard',
 			),
-			'surprise_sale'       => array(
-				'source'   => 'db-revenue-notice',
-				'medium'   => 'surprise-sale',
-				'campaign' => 'revenue-dashboard',
-			),
-			'massive_sale'       => array(
-				'source'   => 'db-revenue-notice',
-				'medium'   => 'massive-sale',
-				'campaign' => 'revenue-dashboard',
-			),
-			'final_hour_sale'       => array(
-				'source'   => 'db-revenue-notice',
-				'medium'   => 'final-hour-sale',
-				'campaign' => 'revenue-dashboard',
-			),
-			// meta part.
-			// snotice part.
-			'flash_sale_meta'       => array(
-				'source'   => 'db-revenue-plugin-meta',
-				'medium'   => 'flash-sale',
-				'campaign' => 'revenue-dashboard',
-			),
-			'surprise_sale_meta'       => array(
-				'source'   => 'db-revenue-plugin-meta',
-				'medium'   => 'surprise-sale',
-				'campaign' => 'revenue-dashboard',
-			),
-			'massive_sale_meta'       => array(
-				'source'   => 'db-revenue-plugin-meta',
-				'medium'   => 'massive-sale',
-				'campaign' => 'revenue-dashboard',
-			),
-			'final_hour_sale_meta'       => array(
-				'source'   => 'db-revenue-plugin-meta',
-				'medium'   => 'final-hour-sale',
-				'campaign' => 'revenue-dashboard',
-			),
-			// ......................
-			'final_hour'       => array(
-				'source'   => 'db-revenue-notice',
-				'medium'   => 'final-hour',
-				'campaign' => 'revenue-dashboard',
-			),
-			// spring sale 2026.
-			'spring_sale_meta' => array(
-				'source'   => 'db-revenue-plugin-meta',
-				'medium'   => 'spring-sale',
-				'campaign' => 'revenue-dashboard',
-			),
-			'spring_sale'      => array(
-				'source'   => 'db-revenue-notice',
-				'medium'   => 'spring-sale',
-				'campaign' => 'revenue-dashboard',
-			),
-			'content_notice'   => array(
-				'source'   => 'db-revenue-notice',
-				'medium'   => 'spring-sale',
-				'campaign' => 'revenue-dashboard',
-			),
-			// -------------------------------------
 		);
 
 		// Step 1: Get parameters.

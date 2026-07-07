@@ -809,7 +809,7 @@
 			const campaignId = $( this ).data( 'campaign-id' );
 			const item = $( this ).closest( '.revx-mix_match-add-to-cart' );
 			let productId = item.data( 'product-id' );
-			const productType = item.attr( 'product_type' );
+			let productType = item.attr( 'product_type' );
 
 			const quantity =
 				item.find( `input[data-name="revx_quantity"]` ).val() ?? 1;
@@ -831,7 +831,36 @@
 			let variationAttributes = null;
 			let selectedData = null;
 
-			if ( productType === 'variable' ) {
+			// Addon: split single-attribute variation card. The card already carries the fixed
+			// variation context, so add it directly without resolving a dropdown selection.
+			const splitRaw = item.attr( 'data-split-variation' );
+			const isSplitVariation = !! splitRaw;
+			if ( isSplitVariation ) {
+				const split = JSON.parse( splitRaw );
+				productId = split.variation_id;
+				parentId = split.parent_id;
+				selectedData = split.attributes || {};
+				variationAttributes = Object.values( selectedData ).join( ' - ' );
+				variationProductDetails = {
+					regular_price: split.regular_price,
+					sale_price: split.sale_price,
+					image_url: split.thumbnail,
+				};
+				// Downstream selected-item clone + add-to-cart expect the 'variable' branch.
+				productType = 'variable';
+				// Ensure the parent name prefix resolves even though offer data omits variations.
+				if ( ! jsonData[ parentId ] ) {
+					jsonData[ parentId ] = { item_name: split.item_name };
+				}
+				jsonData[ productId ] = {
+					item_name: split.item_name,
+					regular_price: split.regular_price,
+					sale_price: split.sale_price,
+					thumbnail: split.thumbnail,
+				};
+			}
+
+			if ( productType === 'variable' && ! isSplitVariation ) {
 				const variationMap = item
 					.find( '[data-variation-map]' )
 					.data( 'variation-map' );
@@ -912,14 +941,15 @@
 
 			const data = {
 				id: productId,
-				productName:
-					productType === 'variable'
-						? `${ jsonData[ parentId ]?.item_name || '' }${
-								variationAttributes
-									? ' - ' + variationAttributes
-									: ''
-						  }`
-						: jsonData[ productId ]?.item_name,
+				productName: isSplitVariation
+					? jsonData[ productId ]?.item_name
+					: productType === 'variable'
+					? `${ jsonData[ parentId ]?.item_name || '' }${
+							variationAttributes
+								? ' - ' + variationAttributes
+								: ''
+					  }`
+					: jsonData[ productId ]?.item_name,
 				regularPrice:
 					productType === 'variable'
 						? variationProductDetails.regular_price
@@ -1251,6 +1281,17 @@
 		jsonQtyData = qtyData ? JSON.parse( qtyData ) : [];
 
 		header.toggleClass( 'revx-d-none', ! itemCounts ); // remove none if more than 0, adds none when item count is 0
+
+		// Addon: hide the whole footer (selected list + total + add to cart) until a product is added.
+		if (
+			typeof revenue_campaign !== 'undefined' &&
+			revenue_campaign.mix_match_hide_footer_until_selected
+		) {
+			$( `.revx-mixmatch-footer[revx-campaign-id="${ campaignId }"]` ).toggleClass(
+				'revx-d-none',
+				! itemCounts
+			);
+		}
 
 		// const addToCart = $(`.revx-campaign-add-to-cart-btn[data-campaign-id=${campaign_id}]`);
 		// if(item_counts==0 && !addToCart.hasClass('revx-d-none') ) {

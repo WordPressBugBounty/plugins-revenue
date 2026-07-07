@@ -999,6 +999,7 @@ class Revenue_Campaign {
 			'error_adding_to_cart'         => __( 'Error adding to cart', 'revenue' ),
 			'select_at_least_one_product'  => __( 'Please select at least one product to add', 'revenue' ),
 			'mix_match_count_mode'         => apply_filters( 'revenue_mix_match_count_mode', 'unique' ),
+			'mix_match_hide_footer_until_selected' => (bool) apply_filters( 'revenue_mix_match_hide_footer_until_selected', false ),
 		);
 
 		wp_localize_script( 'revenue-campaign', 'revenue_campaign', $campaign_localize_data );

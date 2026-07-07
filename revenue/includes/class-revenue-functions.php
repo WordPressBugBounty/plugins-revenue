@@ -2667,13 +2667,24 @@ class Revenue_Functions {
 	 *
 	 * @return array<int,int> Map of product/variation ID => total quantity in cart.
 	 */
-	public function get_cart_product_quantities( $contain_parent_id = false ) {
+	public function get_cart_product_quantities( $contain_parent_id = false, $campaign_id = 0 ) {
 		if ( ! isset( WC()->cart ) ) {
 			return array();
 		}
 
+		$campaign_id = absint( $campaign_id );
+
 		$quantities = array();
 		foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+			// When a campaign is specified, only count items that were actually added by that
+			// campaign (identified by the revx_campaign_id tag). This prevents the same product
+			// added manually or by another campaign from being counted toward this campaign.
+			if ( $campaign_id ) {
+				if ( ! isset( $cart_item['revx_campaign_id'] ) || absint( $cart_item['revx_campaign_id'] ) !== $campaign_id ) {
+					continue;
+				}
+			}
+
 			if ( $contain_parent_id ) {
 				$id = $cart_item['product_id'];
 			} else {

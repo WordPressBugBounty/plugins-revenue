@@ -766,6 +766,17 @@
 		} else if ( item_counts == 0 ) {
 			header.addClass( 'revx-d-none' );
 		}
+
+		// Addon: hide the whole footer (selected list + total + add to cart) until a product is added.
+		if (
+			typeof revenue_campaign !== 'undefined' &&
+			revenue_campaign.mix_match_hide_footer_until_selected
+		) {
+			$( `.revx-mixmatch-footer[revx-campaign-id="${ campaign_id }"]` ).toggleClass(
+				'revx-d-none',
+				! item_counts
+			);
+		}
 		// const addToCart = $(`.revx-campaign-add-to-cart-btn[data-campaign-id=${campaign_id}]`);
 		// if(item_counts==0 && !addToCart.hasClass('revx-d-none') ) {
 		//     $(`.revx-campaign-add-to-cart-btn[data-campaign-id=${campaign_id}]`).addClass('revx-d-none');

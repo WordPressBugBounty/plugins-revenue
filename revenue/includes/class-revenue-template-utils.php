@@ -552,8 +552,117 @@ class Revenue_Template_Utils {
 		$after_price  = 0;
 		$before_price = 0;
 
+		// Addon: optionally split single-attribute variable products into separate cards
+		// (one per in-stock variation) instead of one grouped card with a dropdown.
+		$split_variations = apply_filters( 'revenue_mix_match_split_variations', false );
+
 		foreach ( $render_products as $product_index => $product_data ) {
 			$is_variable_product = ! empty( $product_data['parent_id'] );
+
+			if ( $is_variable_product && $split_variations && $is_mix_match ) {
+				$parent_product = wc_get_product( $product_data['parent_id'] );
+				// Only split when the variable product uses exactly one attribute.
+				if ( $parent_product && 1 === count( $parent_product->get_variation_attributes() ) ) {
+					$in_stock_variations = array_filter(
+						$product_data['variations'],
+						fn( $v ) => $v['is_in_stock']
+					);
+
+					$tax_display = get_option( 'woocommerce_tax_display_shop', 'incl' );
+
+					foreach ( $in_stock_variations as $variation_data ) {
+						$var_id  = $variation_data['item_id'];
+						$var_obj = wc_get_product( $var_id );
+						if ( ! $var_obj || revenue()->is_hide_product( $campaign['id'], $var_id ) ) {
+							continue;
+						}
+
+						$var_regular = $variation_data['regular_price'];
+						// Match the dropdown paths: skip variations without a price.
+						if ( '' === $var_regular || null === $var_regular ) {
+							continue;
+						}
+
+						$var_sale = ( isset( $variation_data['sale_price'] ) && $variation_data['sale_price'] > 0 )
+							? $variation_data['sale_price']
+							: $var_regular;
+
+						// NOTE on tax: keep card-display prices RAW — revenue_render_product_price()
+						// applies the woocommerce_tax_display_shop conversion itself, exactly like the
+						// non-split grouped card path. Taxed copies go ONLY into the split payload below,
+						// because the JS cookie/footer path does no conversion and must sum consistently
+						// with the taxed offer_data built in template1.php.
+
+						// Extension Filter: Sale Price Addon.
+						$var_filtered   = apply_filters( 'revenue_base_price_for_discount_filter', $var_regular, $var_sale );
+						$var_price_data = revenue()->calculate_campaign_offered_price( '', 0, $var_filtered, true );
+						$var_offered    = ( is_array( $var_price_data ) && isset( $var_price_data['price'] ) )
+							? floatval( $var_price_data['price'] )
+							: floatval( $var_price_data );
+
+						$var_image = wp_get_attachment_image_src( get_post_thumbnail_id( $var_id ), 'single-post-thumbnail' )
+							?: ( wp_get_attachment_image_src( get_post_thumbnail_id( $product_data['parent_id'] ), 'single-post-thumbnail' )
+								?: array( wc_placeholder_img_src() ) );
+						$var_thumb = $var_image[0] ?? wc_placeholder_img_src();
+
+						$var_regular_display = apply_filters( 'revenue_base_price_for_mix_match', $var_regular, $var_sale );
+						$var_sale_display    = apply_filters( 'revenue_sale_price_for_mix_match', '', $var_sale );
+
+						// Taxed copies for the payload only (cookie/footer JS path), mirroring
+						// how template1.php taxes offer_data for simple products.
+						if ( 'incl' === $tax_display ) {
+							$payload_regular = wc_get_price_including_tax( $var_obj, array( 'price' => $var_regular_display ) );
+							$payload_sale    = '' !== $var_sale_display
+								? wc_get_price_including_tax( $var_obj, array( 'price' => $var_sale_display ) )
+								: '';
+						} else {
+							$payload_regular = wc_get_price_excluding_tax( $var_obj, array( 'price' => $var_regular_display ) );
+							$payload_sale    = '' !== $var_sale_display
+								? wc_get_price_excluding_tax( $var_obj, array( 'price' => $var_sale_display ) )
+								: '';
+						}
+
+						// Everything the frontend needs to add this fixed variation without a dropdown.
+						$split_payload = array(
+							'parent_id'     => (int) $product_data['parent_id'],
+							'variation_id'  => (int) $var_id,
+							'attributes'    => $var_obj->get_variation_attributes(), // keys like attribute_pa_size.
+							'item_name'     => $var_obj->get_name(),
+							'regular_price' => $payload_regular,
+							'sale_price'    => $payload_sale,
+							'thumbnail'     => $var_thumb,
+						);
+
+						$product_array = array(
+							'id'              => $var_id,
+							'title'           => $var_obj->get_name(),
+							'image'           => $var_image,
+							'regular_price'   => $var_regular_display,
+							'sale_price'      => $var_sale_display,
+							'offered_price'   => $var_offered,
+							'quantity'        => $offer['quantity'] ?? '',
+							'price_data'      => $var_price_data,
+							'isEnableTag'     => 'no',
+							'split_variation' => $split_payload,
+						);
+
+						++$render_index;
+						++$total_offer_products;
+						self::revenue_render_mix_match_product_card(
+							$product_array,
+							$view_mode,
+							$campaign,
+							$template_data,
+							false,
+							'addProductWrapper',
+							$var_id,
+						);
+						++$total_rendered_products;
+					}
+
+					continue; // Skip the default grouped card for this variable product.
+				}
+			}
 
 			if ( $is_variable_product ) {
 				$product_id     = $product_data['parent_id'];
@@ -2265,9 +2374,14 @@ class Revenue_Template_Utils {
 
 		$template_data = revenue()->get_campaign_meta( $campaign['id'], 'builder', true );
 
+		// Addon: optionally keep the footer (selected list + total + add to cart) hidden until
+		// the shopper adds at least one product. Default off, so core behavior is unchanged.
+		$hide_footer_until_selected = apply_filters( 'revenue_mix_match_hide_footer_until_selected', false );
+		$footer_hidden_class        = ( $hide_footer_until_selected && $selected_product_count < 1 ) ? ' revx-d-none' : '';
+
 		?>
 	<div
-		class="<?php echo esc_attr( self::get_element_class( $template_data, $footer_id ) ); ?> revx-d-flex revx-flex-column"
+		class="<?php echo esc_attr( self::get_element_class( $template_data, $footer_id ) ); ?> revx-d-flex revx-flex-column revx-mixmatch-footer<?php echo esc_attr( $footer_hidden_class ); ?>"
 		revx-campaign-id="<?php echo esc_attr( $campaign['id'] ); ?>"
 	>
 		<div class="revx-d-flex revx-item-center revx-gap-10">
@@ -3882,12 +3996,21 @@ class Revenue_Template_Utils {
 		$product_quantity = isset( $pd['quantity'] ) ? $pd['quantity'] : '';
 		$campaign_id      = $campaign['id'];
 		$campaign_type    = $campaign['campaign_type'];
+
+		// Addon: split single-attribute variation cards carry the full variation context so the
+		// frontend can add the fixed variation directly (no dropdown). See render_mix_match_product_item.
+		$split_variation_attr = ( ! empty( $pd['split_variation'] ) && is_array( $pd['split_variation'] ) )
+			? wp_json_encode( $pd['split_variation'] )
+			: '';
 		// @todo refactor lines and remove extra sapces
 		?>
 			<div data-product-id="<?php echo esc_attr( $product_id ); ?>"
 				date-variation-id="0"
+				<?php if ( $split_variation_attr ) : ?>
+				data-split-variation='<?php echo esc_attr( $split_variation_attr ); ?>'
+				<?php endif; ?>
 				<?php echo wp_kses( $data_price_attributes, array() ); ?>
-				data-product-index="<?php echo esc_attr( $product_index ); ?>"  
+				data-product-index="<?php echo esc_attr( $product_index ); ?>"
 				campaign_id="<?php echo esc_attr( $campaign_id ); ?>"   
 				campaign_type="<?php echo esc_attr( $campaign_type ); ?>"   
 				product_type="<?php echo esc_attr( $product_type ); ?>"   

@@ -166,3 +166,7 @@
 .revx-mix-match-list .revx-empty-selected-items .revx-empty {
 	background-color: #CDD0D5 !important;
 }
+
+.revx-mixmatch-footer.revx-d-none {
+	display: none !important;
+}

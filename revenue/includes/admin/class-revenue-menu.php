@@ -156,7 +156,10 @@ class Revenue_Menu {
 					Xpo::is_lc_expired() ? __('Renew License', 'revenue') : $text
 				);
 				$license_key = Xpo::get_lc_key();
-				$pro_link = !Xpo::is_lc_expired() ? 'https://www.wowrevenue.com/?utm_source=db-revenue-plugin&utm_medium=sub-menu&utm_campaign=revenue-dashboard#pricing' : 'https://account.wpxpo.com/checkout/?edd_license_key=' . $license_key;
+				$pro_link = !Xpo::is_lc_expired()
+					? 'https://www.wowrevenue.com/?utm_source=db-revenue-plugin&utm_medium=sub-menu&utm_campaign=revenue-dashboard#pricing'
+					: 'https://account.wpxpo.com/checkout/?edd_license_key=' . $license_key . '&renew=1';
+
 				$submenu[$slug][] = array($name, $capability, $pro_link);
 			}
 

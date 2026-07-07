@@ -511,49 +511,13 @@ final class Revenue {
 	public function plugin_list_action_links( $links ) {
 		$offer_config = array(
 			array(
-				'start'  => '2026-03-16 00:00 Asia/Dhaka',
-				'end'    => '2026-04-14 23:59 Asia/Dhaka',
+				'start'  => '2026-07-06 00:00 Asia/Dhaka',
+				'end'    => '2026-08-01 23:59 Asia/Dhaka',
 				'text'   => __(
-					'Spring Sale - Up to 55% OFF',
+					'Summer Sale - Up to 55% OFF',
 					'revenue'
 				),
-				'utmKey' => 'spring_sale_meta',
-			),
-			array(
-				'start'  => '2026-05-07 00:00 Asia/Dhaka',
-				'end'    => '2026-05-21 23:59 Asia/Dhaka',
-				'text'   => __(
-					'Flash Sale - Up to 50% OFF',
-					'revenue'
-				),
-				'utmKey' => 'flash_sale_meta',
-			),
-			array(
-				'start'  => '2026-05-22 00:00 Asia/Dhaka',
-				'end'    => '2026-06-01 23:59 Asia/Dhaka',
-				'text'   => __(
-					'Surprise Sale - Up to 55% OFF',
-					'revenue'
-				),
-				'utmKey' => 'surprise_sale_meta',
-			),
-			array(
-				'start'  => '2026-06-02 00:00 Asia/Dhaka',
-				'end'    => '2026-06-20 23:59 Asia/Dhaka',
-				'text'   => __(
-					'Massive Sale - Up to 50% OFF',
-					'revenue'
-				),
-				'utmKey' => 'massive_sale_meta',
-			),
-			array(
-				'start'  => '2026-06-21 00:00 Asia/Dhaka',
-				'end'    => '2026-06-30 23:59 Asia/Dhaka',
-				'text'   => __(
-					'Final Hour Sale - Up to 55% OFF',
-					'revenue'
-				),
-				'utmKey' => 'final_hour_sale_meta',
+				'utmKey' => 'summer_db',
 			),
 		);
 
@@ -572,21 +536,26 @@ final class Revenue {
 
 		if ( ! revenue()->is_pro_active() ) {
 
-			$text = esc_html__( 'Upgrade to Pro', 'revenue' );
-			$url  = Xpo::generate_utm_link();
+			if ( Xpo::is_lc_expired() ) {
+				$text = esc_html__( 'Renew License', 'revenue' );
+				$url  = 'https://account.wpxpo.com/checkout/?edd_license_key=' . Xpo::get_lc_key() . '&renew=1';
+			} else {
+				$text = esc_html__( 'Upgrade to Pro', 'revenue' );
+				$url  = Xpo::generate_utm_link();
 
-			foreach ( $offer_config as $offer ) {
-				$current_time = gmdate( 'U' );
-				$notice_start = gmdate( 'U', strtotime( $offer['start'] ) );
-				$notice_end   = gmdate( 'U', strtotime( $offer['end'] ) );
-				if ( $current_time >= $notice_start && $current_time <= $notice_end ) {
-					$url      = Xpo::generate_utm_link(
-						array(
-							'utmKey' => $offer['utmKey'],
-						)
-					);
+				foreach ( $offer_config as $offer ) {
+					$current_time = gmdate( 'U' );
+					$notice_start = gmdate( 'U', strtotime( $offer['start'] ) );
+					$notice_end   = gmdate( 'U', strtotime( $offer['end'] ) );
+					if ( $current_time >= $notice_start && $current_time <= $notice_end ) {
+						$url  = Xpo::generate_utm_link(
+							array(
+								'utmKey' => $offer['utmKey'],
+							)
+						);
 						$text = $offer['text'];
 						break;
+					}
 				}
 			}
 
