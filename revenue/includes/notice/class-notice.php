@@ -9,64 +9,226 @@ use REVX\Includes\Durbin\DurbinClient;
 
 
 /**
- * Plugin Notice
+ * Promo system facade. Data lives in promos/, one file per surface; all
+ * surfaces share config() and the promo_is_live() date gate.
+ *
+ *   promos/notice.php       -> rendered here on admin_notices, via templates/<type>.php
+ *   promos/hellobar.php     -> get_hellobar_config(), localized for React
+ *   promos/plugin-meta.php  -> get_active_promo(), called by the plugin's
+ *                              plugin_action_links / plugin_row_meta handler
+ *
+ * render_durbin_consent_box() is NOT promo-driven; it just lives here too.
  */
 class Notice {
 
 
 	/**
-	 * Notice version
+	 * Per-plugin identity. See config.php.
 	 *
-	 * @var string
+	 * @var array
 	 */
-	private $notice_version = 'v103';
+	private $config = array();
 
 	/**
-	 * Notice JS/CSS applied
+	 * The complete set of promo surfaces: every place in wp-admin a promo can
+	 * appear. Deliberately a closed, hand-written list, unlike templates/ which
+	 * is open-ended by design — see get_promos() and template_for().
 	 *
-	 * @var boolean
+	 * @var array<string, string> surface slug => file under promos/.
 	 */
-	private $notice_js_css_applied = false;
-
-	/**
-	 * Notice Priority
-	 *
-	 * @var string $plugin_notice_priority
-	 */
-	private $plugin_notice_priority = 4;
-	
-	/**
-	 * Notice Priority
-	 *
-	 * @var string $plugin_notice_priority
-	 */
-	private $plugin_notice_priority_key = 'wowrevenue';
+	private const SURFACES = array(
+		'notice'      => 'notice.php',
+		'hellobar'    => 'hellobar.php',
+		'plugin-meta' => 'plugin-meta.php',
+	);
 
 
 	/**
 	 * Notice Constructor
 	 */
 	public function __construct() {
+		$this->config = self::config();
+
 		add_action( 'admin_notices', array( $this, 'admin_notices_callback' ) );
 		add_action( 'admin_init', array( $this, 'set_dismiss_notice_callback' ) );
 
 		// REST API routes.
 		add_action( 'rest_api_init', array( $this, 'register_rest_route' ) );
 
-		// Woocommerce Install Action.
-		add_action( 'wp_ajax_revx_install', array( $this, 'install_activate_plugin' ) );
-		add_filter('xpo_active_notice_lists', array( $this, 'handle_xpo_active_notice_lists' ), 99, 1 );
+		add_filter( 'xpo_active_notice_lists', array( $this, 'handle_xpo_active_notice_lists' ), 99, 1 );
+	}
+
+	/**
+	 * Per-plugin identity, shared by every promo surface.
+	 *
+	 * Always read config.php through here: it RETURNS an array, so a caller
+	 * using require_once would get `true` on the second call.
+	 *
+	 * @return array
+	 */
+	public static function config() {
+		static $config = null;
+
+		if ( null === $config ) {
+			$config = require __DIR__ . '/config.php';
+		}
+
+		return $config;
+	}
+
+	/**
+	 * A developer typo: throw in dev so it's caught, ignore in production so a
+	 * shipped mistake can't white-screen every admin page.
+	 *
+	 * @param string $message What was wrong.
+	 * @return void
+	 */
+	private static function fail_in_dev( $message ) {
+		if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || defined( 'XPO_DEV_MODE' ) ) {
+			$config = self::config();
+			throw new \RuntimeException( $config['brand_name'] . ' promos: ' . $message );
+		}
+	}
+
+	/**
+	 * Load one surface's promo list from promos/.
+	 *
+	 * The filename comes from the fixed SURFACES map, not from $surface: the
+	 * surface set is closed, unlike templates/. See "Adding a fourth surface"
+	 * in README.md.
+	 *
+	 * The locals below are inherited by the included file — that is how promos/
+	 * files reach $prefix, $asset_url, etc. without requiring config.php.
+	 *
+	 * @param string $surface One of the SURFACES keys.
+	 * @return array
+	 */
+	public static function get_promos( $surface = 'notice' ) {
+		$config      = self::config();
+		$prefix      = $config['prefix'];
+		$asset_url   = $config['asset_url'];
+		$brand_name  = $config['brand_name'];
+		$brand_color = $config['brand_color'];
+
+		if ( ! isset( self::SURFACES[ $surface ] ) ) {
+			self::fail_in_dev( sprintf( 'unknown surface "%s" (known: %s)', $surface, implode( ', ', array_keys( self::SURFACES ) ) ) );
+			return array();
+		}
+
+		// A known surface with no file is legitimate, not a typo: a plugin
+		// without a hello bar just deletes promos/hellobar.php.
+		$file = __DIR__ . '/promos/' . self::SURFACES[ $surface ];
+		if ( ! is_readable( $file ) ) {
+			return array();
+		}
+
+		// phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable -- filename comes from SURFACES.
+		$promos = include $file;
+
+		return is_array( $promos ) ? $promos : array();
+	}
+
+	/**
+	 * First live promo on a surface, for the surfaces that show only one thing.
+	 * The notice surface shows one per type, so it loops in render_notices().
+	 *
+	 * @param string $surface Surface slug.
+	 * @return array|null Promo entry, or null when nothing is live.
+	 */
+	public static function get_active_promo( $surface ) {
+		foreach ( self::get_promos( $surface ) as $promo ) {
+			if ( self::promo_is_live( $promo ) ) {
+				return $promo;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Resolve a promo's `type` to templates/<type>.php. No map to maintain:
+	 * adding a design means dropping in a template and naming the type after it.
+	 *
+	 * @param string $type Promo type, from a promos/ entry (never user input).
+	 * @return string Absolute template path, or '' if the type is unknown.
+	 */
+	private function template_for( $type ) {
+		if ( is_string( $type ) && preg_match( '/^[a-z0-9_-]+$/', $type ) ) {
+			$template = __DIR__ . '/templates/' . $type . '.php';
+			if ( is_readable( $template ) ) {
+				return $template;
+			}
+		}
+
+		self::fail_in_dev( sprintf( 'no template for type "%s" (expected templates/%s.php)', $type, $type ) );
+		return '';
+	}
+
+	/**
+	 * The one date gate, shared by all three surfaces: dismiss-in-flight
+	 * ($_GET), date window, visibility, dismissed transient.
+	 *
+	 * XPO_DEV_MODE forces every start date to 2026-01-01, so upcoming promos
+	 * are visible without editing promos/.
+	 *
+	 * @param array $notice Promo entry.
+	 * @return bool
+	 */
+	private static function promo_is_live( $notice ) {
+		$config = self::config();
+
+		if ( empty( $notice['key'] ) ) {
+			return false;
+		}
+		$notice_key  = $notice['key'];
+		$dismiss_arg = 'disable_' . $config['prefix'] . '_notice';
+
+		if ( isset( $_GET[ $dismiss_arg ] ) && $notice_key === sanitize_text_field( wp_unslash( $_GET[ $dismiss_arg ] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return false;
+		}
+
+		$current_time = gmdate( 'U' );
+		$start = defined( 'XPO_DEV_MODE' ) ? '2026-01-01 00:00 Asia/Dhaka' : $notice['start'];
+		$notice_start = gmdate( 'U', strtotime( $start ) );
+		$notice_end   = gmdate( 'U', strtotime( $notice['end'] ) );
+
+		if ( $current_time < $notice_start || $current_time > $notice_end || empty( $notice['visibility'] ) ) {
+			return false;
+		}
+
+		if ( 'off' === Xpo::get_transient_without_cache( $config['prefix'] . '_get_pro_notice_' . $notice_key ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Does this plugin have at least one promo eligible to show right now?
+	 *
+	 * @return bool
+	 */
+	private function has_active_promo() {
+		foreach ( self::get_promos( 'notice' ) as $notice ) {
+			$type = isset( $notice['type'] ) ? $notice['type'] : '';
+			if ( $this->template_for( $type ) && self::promo_is_live( $notice ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
 	 * Handle Plugin Notice for all plugins
+	 *
 	 * @param array $active_lists Lists of all active plugin notice.
 	 * @return array
 	 */
 	public function handle_xpo_active_notice_lists( $active_lists ) {
 
-		if ( $this->revx_dashboard_banner_notice(true) || $this->revx_dashboard_content_notice(true) || $this->revx_dashboard_image_banner_notice(true) ) {
-			$active_lists[$this->plugin_notice_priority_key] = $this->plugin_notice_priority;
+		if ( $this->has_active_promo() ) {
+			$active_lists[ $this->config['priority_key'] ] = $this->config['priority'];
 		}
 
 		return $active_lists;
@@ -74,6 +236,7 @@ class Notice {
 
 	/**
 	 * Handle Plugin Notice for all plugins
+	 *
 	 * @return bool
 	 */
 	public function is_available_for_notice() {
@@ -85,7 +248,7 @@ class Notice {
 
 		asort( $active_notices );
 
-		return array_key_first( $active_notices ) === $this->plugin_notice_priority_key;
+		return array_key_first( $active_notices ) === $this->config['priority_key'];
 	}
 
 
@@ -107,9 +270,14 @@ class Notice {
 			),
 		);
 
+		// Namespace tracks config.php's prefix, so this file carries no plugin
+		// literal. The React side must use the same string — see README.
+		// example api revx/v1/hello_bar
+		$rest_namespace = $this->config['prefix'] . '/v1';
+
 		foreach ( $routes as $route ) {
 			register_rest_route(
-				'revx/v1',
+				$rest_namespace,
 				$route['endpoint'],
 				array(
 					array(
@@ -123,13 +291,43 @@ class Notice {
 	}
 
 	/**
-	 * Hellobar config
+	 * The live hello-bar promo, ready to render. The plugin's admin-menu class
+	 * localizes this into its JS object under `helloBar`. PHP resolves which
+	 * promo is live and builds its URL, so the React bundle holds no promo list
+	 * or date logic.
 	 *
-	 * @return array
+	 * @return array|null Null when no promo is live (React renders nothing).
 	 */
 	public static function get_hellobar_config() {
+		$promo = null;
+
+		foreach ( self::get_promos( 'hellobar' ) as $candidate ) {
+			// Hello-bar dismissal writes 'hide' under the promo key itself, not
+			// the notices' transient. Don't unify: it would un-dismiss the bar
+			// for everyone who already closed it.
+			if ( 'hide' === Xpo::get_transient_without_cache( $candidate['key'] ) ) {
+				continue;
+			}
+
+			if ( self::promo_is_live( $candidate ) ) {
+				$promo = $candidate;
+				break;
+			}
+		}
+
+		if ( ! $promo ) {
+			return null;
+		}
+
+		$config = self::config();
+
 		return array(
-			'revx_helloBar_summer_sale_2026_123'     => Xpo::get_transient_without_cache( 'revx_helloBar_summer_sale_2026_123' ),
+			'id'                => $promo['key'],
+			'brandColor'        => $config['brand_color'],
+			'text'              => isset( $promo['text'] ) ? $promo['text'] : '',
+			'highlight'         => isset( $promo['highlight'] ) ? $promo['highlight'] : '',
+			'url'               => isset( $promo['url'] ) ? $promo['url'] : '',
+			'countdownDuration' => isset( $promo['countdown_duration'] ) ? (int) $promo['countdown_duration'] : 0,
 		);
 	}
 
@@ -145,7 +343,8 @@ class Notice {
 		$id             = isset( $request_params['id'] ) ? $request_params['id'] : '';
 
 		if ( 'hello_bar' === $type && ! empty( $id ) ) {
-			Xpo::set_transient_without_cache( $id, 'hide', 1296000 );
+			// we are setting the transient for 15 days to hide the hello bar.
+			Xpo::set_transient_without_cache( $id, 'hide', 15 * DAY_IN_SECONDS );
 		}
 
 		return new \WP_REST_Response(
@@ -163,35 +362,36 @@ class Notice {
 	 * @return void
 	 */
 	public function set_dismiss_notice_callback() {
+		$prefix = $this->config['prefix'];
 
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['wpnonce'] ?? '' ) ), 'revx-nonce' ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['wpnonce'] ?? '' ) ), $prefix . '-nonce' ) ) {
 			return;
 		}
 
-		$durbin_key = sanitize_text_field( wp_unslash( $_GET['revx_durbin_key'] ?? '' ) );
+		$durbin_key = sanitize_text_field( wp_unslash( $_GET[ $prefix . '_durbin_key' ] ?? '' ) );
 
 		// Durbin notice dismiss.
 		if ( ! empty( $durbin_key ) ) {
-			Xpo::set_transient_without_cache( 'revx_durbin_notice_' . $durbin_key, 'off' );
+			Xpo::set_transient_without_cache( $prefix . '_durbin_notice_' . $durbin_key, 'off' );
 
-			if ( 'get' === sanitize_text_field( wp_unslash( $_GET['revx_get_durbin'] ?? '' ) ) ) {
+			if ( 'get' === sanitize_text_field( wp_unslash( $_GET[ $prefix . '_get_durbin' ] ?? '' ) ) ) {
 				DurbinClient::send( DurbinClient::ACTIVATE_ACTION );
 			}
 		}
 
 		// Install notice dismiss.
-		$install_key = sanitize_text_field( wp_unslash( $_GET['revx_install_key'] ?? '' ) );
+		$install_key = sanitize_text_field( wp_unslash( $_GET[ $prefix . '_install_key' ] ?? '' ) );
 		if ( ! empty( $install_key ) ) {
-			Xpo::set_transient_without_cache( 'revx_install_notice_' . $install_key, 'off' );
+			Xpo::set_transient_without_cache( $prefix . '_install_notice_' . $install_key, 'off' );
 		}
 
-		$notice_key = sanitize_text_field( wp_unslash( $_GET['disable_revx_notice'] ?? '' ) );
+		$notice_key = sanitize_text_field( wp_unslash( $_GET[ 'disable_' . $prefix . '_notice' ] ?? '' ) );
 		if ( ! empty( $notice_key ) ) {
-			$interval = (int) sanitize_text_field( wp_unslash( $_GET['revx_interval'] ?? '' ) );
+			$interval = (int) sanitize_text_field( wp_unslash( $_GET[ $prefix . '_interval' ] ?? '' ) );
 			if ( ! empty( $interval ) ) {
-				Xpo::set_transient_without_cache( 'revx_get_pro_notice_' . $notice_key, 'off', $interval );
+				Xpo::set_transient_without_cache( $prefix . '_get_pro_notice_' . $notice_key, 'off', $interval );
 			} else {
-				Xpo::set_transient_without_cache( 'revx_get_pro_notice_' . $notice_key, 'off' );
+				Xpo::set_transient_without_cache( $prefix . '_get_pro_notice_' . $notice_key, 'off' );
 			}
 		}
 	}
@@ -202,666 +402,50 @@ class Notice {
 	 * @return void
 	 */
 	public function admin_notices_callback() {
-		$this->revx_dashboard_notice_callback();
-		$this->revx_dashboard_durbin_notice_callback();
-	}
-
-	/**
-	 * Admin Dashboard Notice Callback
-	 *
-	 * @return void
-	 */
-	public function revx_dashboard_notice_callback() {
 		if ( $this->is_available_for_notice() ) {
-			$this->revx_dashboard_banner_notice();
-			$this->revx_dashboard_content_notice();
-			$this->revx_dashboard_image_banner_notice();
+			$this->render_notices( self::get_promos( 'notice' ) );
 		}
+		$this->render_durbin_consent_box();
 	}
 
 	/**
-	 * Dashboard Banner Notice
+	 * Render at most one live promo per type (first match wins), each through
+	 * its own template. XPO_DEV_MODE drops the one-per-type limit so every
+	 * design can be checked at once.
 	 *
+	 * @param array $promos List of promo entries.
 	 * @return void
 	 */
-	public function revx_dashboard_banner_notice($return_bool=false) {
-		$revx_db_nonce  = wp_create_nonce( 'revx-nonce' );
-		$banner_notices = array(
-			// old data for left right image banner notice.
-			array(
-				'key'                => 'revx_spring_sale_2026_1',
-				'start'              => '2026-04-05 00:00 Asia/Dhaka',
-				'end'                => '2026-04-14 23:59 Asia/Dhaka', // format YY-MM-DD always set time 23:59 and zone Asia/Dhaka.
+	private function render_notices( $promos ) {
+		$shown = array();
+		$enforce_one_per_type = ! defined( 'XPO_DEV_MODE' );
+		$prefix      = $this->config['prefix'];
+		$brand_color = $this->config['brand_color'];
 
-				'brand_color'        => '#00a464',
+		foreach ( $promos as $notice ) {
+			$type = isset( $notice['type'] ) ? $notice['type'] : '';
 
-				'left_image'         => REVENUE_URL . '/assets/images/dashboard_banner/spring_sale/left_image.png',
-				'right_image'        => REVENUE_URL . '/assets/images/dashboard_banner/spring_sale/right_image.png',
-				'bg_image'           => REVENUE_URL . '/assets/images/dashboard_banner/spring_sale/bg.png',
-				'text'               => 'Hurry Before It Ends!',
-				'countdown_duration' => 259200, // Duration in seconds.
-				'countdown_color'    => '#000',
-				'url'                => Xpo::generate_utm_link(
-					array(
-						'utmKey' => 'spring_sale',
-					)
-				),
-
-				'visibility'         => ! Xpo::is_lc_active(),
-			),
-		);
-
-		foreach ( $banner_notices as $notice ) {
-			$notice_key = isset( $notice['key'] ) ? $notice['key'] : $this->notice_version;
-			if ( isset( $_GET['disable_revx_notice'] ) && $notice_key === sanitize_text_field(wp_unslash($_GET['disable_revx_notice'])) ) { // phpcs:ignore
-				return;
-			}
-
-			$current_time = gmdate( 'U' );
-			$notice_start = gmdate( 'U', strtotime( $notice['start'] ) );
-			$notice_end   = gmdate( 'U', strtotime( $notice['end'] ) );
-			if ( $current_time >= $notice_start && $current_time <= $notice_end && $notice['visibility'] ) {
-
-				$notice_transient = Xpo::get_transient_without_cache( 'revx_get_pro_notice_' . $notice_key );
-
-				if ( 'off' === $notice_transient ) {
-					return;
-				}
-
-				if ( $return_bool ) { // Early return for Other plugin notice.
-					return true;
-				}
-
-				if ( ! $this->notice_js_css_applied ) {
-					$this->revx_banner_notice_js();
-					$this->notice_js_css_applied = true;
-				}
-				$query_args = array(
-					'disable_revx_notice' => $notice_key,
-					'wpnonce'             => $revx_db_nonce,
-				);
-				if ( isset( $notice['repeat_interval'] ) && $notice['repeat_interval'] ) {
-					$query_args['revx_interval'] = $notice['repeat_interval'];
-				}
-				?>
-				<style type="text/css">
-					.revx-notice-wrapper.revx-banner-notice {
-						height: auto !important;
-						padding: 0 !important;
-						position: relative;
-						box-sizing: border-box;
-						background-repeat: no-repeat;
-						background-size: cover;
-						background-position: center;
-					}
-					.revx-notice-wrapper.revx-banner-notice .revx-banner-link {
-						width: 100%;
-						text-decoration: none;
-						display: block;
-					}
-					.revx-notice-wrapper.revx-banner-notice .revx-banner-content {
-						display: flex;
-						justify-content: space-between;
-						align-items: center;
-						max-width: 700px;
-						margin: 0 auto;
-						padding: 10px 16px;
-						gap: 16px;
-					}
-					.revx-notice-wrapper.revx-banner-notice .revx-banner-side-image {
-						display: block;
-						max-width: 100%;
-						height: auto;
-						max-height: 32px;
-					}
-					.revx-notice-wrapper.revx-banner-notice .revx-banner-main {
-						display: flex;
-						flex-direction: column;
-						gap: 4px;
-						align-items: center;
-						justify-content: center;
-						font-weight: 700;
-						font-size: 18px;
-						color: #00a464;
-						line-height: 1.2;
-						text-align: center;
-					}
-
-					@media screen and (max-width: 1100px) {
-						/* .revx-notice-wrapper.revx-banner-notice .revx-banner-content {
-							flex-direction: column;
-						} */
-						.revx-notice-wrapper.revx-banner-notice .revx-banner-content .revx-banner-main-text {
-							display: none;
-						}
-					}
-
-					@media screen and (max-width: 490px) {
-						.revx-notice-wrapper.revx-banner-notice {
-							display: none;
-						}
-					}
-
-					@media screen and (max-width: 782px) {
-						.revx-notice-wrapper.revx-banner-notice .revx-banner-content {
-							justify-content: center;
-							padding: 12px 32px 12px 12px;
-						}
-						.revx-notice-wrapper.revx-banner-notice .revx-banner-main {
-							font-size: 22px;
-							line-height: 28px;
-						}
-					}
-					@media screen and (max-width: 480px) {
-						.revx-notice-wrapper.revx-banner-notice .revx-banner-content {
-							padding: 10px 32px 10px 10px;
-						}
-						.revx-notice-wrapper.revx-banner-notice .revx-banner-main {
-							font-size: 18px;
-							line-height: 24px;
-						}
-					}
-				</style>
-				<div 
-					class="revx-notice-wrapper revx-banner-notice notice" 
-					style="
-						border-left: 3px solid <?php echo esc_attr( $notice['brand_color'] ); ?>;
-						background-image: url('<?php echo esc_attr( $notice['bg_image'] ); ?>');
-				">
-					<a 
-						class="wc-dismiss-notice dashicons dashicons-no-alt" 
-						style="
-							position: absolute;
-							top: 1px;
-							right: 1px;
-							border-radius: 50%;
-							background-color: black;
-							color: white;
-							font-size: 14px;
-							display: flex;
-							align-items: center;
-							justify-content: center;
-						"
-						aria-label="<?php esc_html_e( 'Close Banner', 'wow-table-rate-shipping' ); ?>"
-						href="<?php echo esc_url( add_query_arg( $query_args ) ); ?>">
-					</a>
-
-					<a class="revx-banner-link" target="_blank" href="<?php echo esc_url( $notice['url'] ); ?>">
-						<div class="revx-banner-content">
-							<img class="revx-banner-side-image" loading="lazy" src="<?php echo esc_url( $notice['left_image'] ); ?>" />
-							<div class="revx-banner-main">
-								<span>
-									<?php echo esc_html( $notice['text'] ); ?>
-								</span>	
-								<div 
-									class="revx-notice-countdown" 
-									style="
-										color: <?php echo esc_attr( $notice['countdown_color'] ); ?>;
-									"
-									data-notice-key="<?php echo esc_attr( $notice_key . '-countdown' ); ?>" 
-									data-duration="<?php echo esc_attr( $notice['countdown_duration'] ); ?>">
-									00:00:00:00
-								</div>
-							</div>
-							<img class="revx-banner-side-image" loading="lazy" src="<?php echo esc_url( $notice['right_image'] ); ?>" />
-						</div>
-					</a>
-				</div>
-				<?php
-			}
-		}
-	}
-
-	/**
-	 * Banner JS
-	 *
-	 * @return void
-	 */
-	public function revx_banner_notice_js() {
-		?>
-		<script type="text/javascript">
-			jQuery(function($) {
-				'use strict';
-
-				const storagePrefix = 'revx_notice_countdown_';
-
-				const formatCountdown = function(seconds) {
-					const days = Math.floor(seconds / 86400);
-					const hours = Math.floor((seconds % 86400) / 3600);
-					const minutes = Math.floor((seconds % 3600) / 60);
-					const secs = seconds % 60;
-
-					return String(days).padStart(2, '0') + ':' + String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
-				};
-
-				const parseDurationToSeconds = function(duration) {
-					if (typeof duration === 'number' && Number.isFinite(duration) && duration > 0) {
-						return Math.floor(duration);
-					}
-
-					const durationString = String(duration || '').trim();
-					if (/^\d+$/.test(durationString)) {
-						return parseInt(durationString, 10);
-					}
-
-					return 0;
-				};
-
-				const nowInSeconds = function() {
-					return Math.floor(Date.now() / 1000);
-				};
-
-				$('.revx-notice-countdown').each(function() {
-					const countdownElement = $(this);
-					const noticeKey = String(countdownElement.data('noticeKey') || '');
-					const duration = parseDurationToSeconds(countdownElement.data('duration'));
-
-					if (!noticeKey || duration <= 0) {
-						return;
-					}
-
-					const storageKey = storagePrefix + noticeKey;
-					let endAt = 0;
-
-					try {
-						const storedDataRaw = window.localStorage.getItem(storageKey);
-						if (storedDataRaw) {
-							const storedData = JSON.parse(storedDataRaw);
-							if (storedData && parseInt(storedData.duration, 10) === duration) {
-								endAt = parseInt(storedData.endAt, 10) || 0;
-							}
-						}
-					} catch (error) {
-						endAt = 0;
-					}
-
-					const saveTimerState = function(nextEndAt) {
-						try {
-							window.localStorage.setItem(
-								storageKey,
-								JSON.stringify({
-									endAt: nextEndAt,
-									duration: duration,
-								})
-							);
-						} catch (error) {
-							// No-op.
-						}
-					};
-
-					const resetTimer = function(currentTime) {
-						endAt = currentTime + duration;
-						saveTimerState(endAt);
-					};
-
-					const tick = function() {
-						const currentTime = nowInSeconds();
-
-						if (endAt <= currentTime) {
-							resetTimer(currentTime);
-						}
-
-						const remaining = Math.max(endAt - currentTime, 0);
-						countdownElement.text(formatCountdown(remaining));
-					};
-
-					if (endAt <= nowInSeconds()) {
-						resetTimer(nowInSeconds());
-					}
-
-					tick();
-					window.setInterval(tick, 1000);
-				});
-			});
-		</script>
-		<?php
-	}
-
-	/**
-	 * Dashboard Content Notice
-	 *
-	 * @return void
-	 */
-	public function revx_dashboard_content_notice($return_bool=false) {
-
-		$content_notices = array(
-			array(
-				'key'                => 'revx_dashboard_content_notice_summer_sale_vv1',
-				'start'              => defined( 'REVENUE_DEV_MODE' )
-											? '2026-05-20 00:00 Asia/Dhaka'
-											: '2026-07-20 00:00 Asia/Dhaka',
-				'end'                => '2026-08-01 23:59 Asia/Dhaka',
-				'url'                => Xpo::generate_utm_link(
-					array(
-						'utmKey' => 'summer_db',
-					)
-				),
-				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( '', 'revenue' ),
-				'content_subheading' => __( 'WowRevenue Summer Sale Offer is Live - Enjoy Up to %s NOW.', 'revenue' ),
-				'discount_content'   => ' 55% Off',
-				'border_color'       => '#00a464',
-				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/logo.svg',
-				'button_text'        => __( 'Upgrade Now', 'revenue' ),
-				'is_discount_logo'   => true,
-			),
-			array(
-				'key'                => 'revx_dashboard_content_notice_summer_sale_vv2',
-				'start'              => defined( 'REVENUE_DEV_MODE' )
-											? '2026-05-20 00:00 Asia/Dhaka'
-											: '2026-07-06 00:00 Asia/Dhaka',
-				'end'                => '2026-07-12 23:59 Asia/Dhaka',
-				'url'                => Xpo::generate_utm_link(
-					array(
-						'utmKey' => 'summer_db',
-					)
-				),
-				'visibility'         => ! Xpo::is_lc_active(),
-				'content_heading'    => __( '', 'revenue' ),
-				'content_subheading' => __( 'WowRevenue Summer Sale Offer is Live - Enjoy Up to %s NOW.', 'revenue' ),
-				'discount_content'   => ' 55% Off',
-				'border_color'       => '#00a464',
-				'icon'               => REVENUE_URL . 'assets/images/dashboard_banner/discount.svg',
-				'button_text'        => __( 'Upgrade Now', 'revenue' ),
-				'is_discount_logo'   => true,
-			),
-
-		);
-
-		$revx_db_nonce = wp_create_nonce( 'revx-nonce' );
-
-		foreach ( $content_notices as $key => $notice ) {
-			$notice_key = isset( $notice['key'] ) ? $notice['key'] : $this->notice_version;
-			if ( isset( $_GET['disable_revx_notice'] ) && $notice_key === $_GET['disable_revx_notice'] ) {
-				continue;
-			} else {
-				$border_color = $notice['border_color'];
-
-				$current_time = gmdate( 'U' );
-				$notice_start = gmdate( 'U', strtotime( $notice['start'] ) );
-				$notice_end   = gmdate( 'U', strtotime( $notice['end'] ) );
-				if ( $current_time >= $notice_start && $current_time <= $notice_end && $notice['visibility'] ) {
-					$notice_transient = Xpo::get_transient_without_cache( 'revx_get_pro_notice_' . $notice_key );
-
-					if ( 'off' !== $notice_transient ) {
-
-						if ( $return_bool ) { // Early return for Other plugin notice.
-							return true;
-						}
-
-						$query_args = array(
-							'disable_revx_notice' => $notice_key,
-							'wpnonce'             => $revx_db_nonce,
-						);
-						if ( isset( $notice['repeat_interval'] ) && $notice['repeat_interval'] ) {
-							$query_args['revx_interval'] = $notice['repeat_interval'];
-						}
-
-						$url = isset( $notice['url'] ) ? $notice['url'] : Xpo::generate_utm_link(
-							array(
-								'utmKey' => 'content_notice',
-							)
-						);
-
-						?>
-
-						<style id="revx-notice-css" type="text/css">
-							.revx-content-notice-wrapper {
-								border: 1px solid #c3c4c7;
-								border-left: 3px solid #00a464;
-								margin: 15px 0 !important;
-								display: flex;
-								align-items: center;
-								background: #F8FFF5;
-								width: 100%;
-								padding: 10px 0;
-								position: relative;
-								box-sizing: border-box;
-							}
-
-							.revx-content-notice-wrapper.notice {
-								margin: 10px 0;
-								width: calc(100% - 20px);
-							}
-
-							.wrap .revx-content-notice-wrapper.notice {
-								width: 100%;
-							}
-
-							.revx-content-notice-icon {
-								margin-left: 15px;
-							}
-
-							.revx-content-notice-discout-icon {
-								margin-left: 10px;
-							}
-
-							.revx-content-notice-icon img {
-								max-width: 42px;
-								height: 70px;
-							}
-
-							.revx-content-notice-discout-icon img {
-								height: 70px;
-								width: 70px;
-							}
-
-							.revx-notice-content-wrapper {
-								display: flex;
-								flex-direction: column;
-								gap: 8px;
-								font-size: 14px;
-								line-height: 20px;
-								margin-left: 15px;
-							}
-
-							.revx-content-notice-buttons {
-								display: flex;
-								align-items: center;
-								gap: 15px;
-							}
-
-							.revx-content-notice-btn {
-								font-weight: 600;
-								text-transform: uppercase !important;
-								padding: 2px 10px !important;
-								background-color: #00a464;
-								border: none !important;
-							}
-
-							.revx-content-discount_btn {
-								background-color: #ffffff;
-								text-decoration: none;
-								border: 1px solid #00a464;
-								padding: 5px 10px;
-								border-radius: 5px;
-								font-weight: 500;
-								text-transform: uppercase;
-								color: #00a464 !important;
-							}
-
-							.revx-content-notice-close {
-								position: absolute;
-								right: 2px;
-								top: 5px;
-								text-decoration: none;
-								color: #b6b6b6;
-								font-family: dashicons;
-								font-size: 16px;
-								line-height: 20px;
-							}
-
-							.revx-content-notice-close-icon {
-								font-size: 14px;
-							}
-						</style>
-					<div class="revx-content-notice-wrapper notice data_collection_notice" 
-					style="border-left: 3px solid <?php echo esc_attr( $border_color ); ?>;"
-					> 
-						<?php
-						if ( $notice['is_discount_logo'] ) {
-							?>
-								<div class="revx-content-notice-discout-icon"> <img src="<?php echo esc_url( $notice['icon'] ); ?>"/>  </div>
-							<?php
-						} else {
-							?>
-								<div class="revx-content-notice-icon"> <img src="<?php echo esc_url( $notice['icon'] ); ?>"/>  </div>
-							<?php
-						}
-						?>
-						
-						<div class="revx-notice-content-wrapper">
-							<div class="">
-								<strong><?php printf( esc_html( $notice['content_heading'] ) ); ?> </strong>
-						<?php
-						printf(
-							wp_kses_post( $notice['content_subheading'] ),
-							'<strong>' . esc_html( $notice['discount_content'] ) . '</strong>'
-						);
-						?>
-							</div>
-							<div class="revx-content-notice-buttons">
-							<?php if ( isset( $notice['is_discount_logo'] ) && $notice['is_discount_logo'] ) : ?>
-									<a class="revx-content-discount_btn" href="<?php echo esc_url( $url ); ?>" target="_blank">
-										<?php echo esc_html( $notice['button_text'] ); ?>
-									</a>
-								<?php else : ?>
-									<a class="revx-content-notice-btn button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank" style="background-color: <?php echo ! empty( $notice['background_color'] ) ? esc_attr( $notice['background_color'] ) : '#00a464'; ?>;">
-									<?php echo esc_html( $notice['button_text'] ); ?>
-										
-									</a>
-								<?php endif; ?>
-							</div>
-						</div>
-						<a href=
-							<?php
-							echo esc_url(
-								add_query_arg(
-									$query_args
-								)
-							);
-							?>
-						class="revx-content-notice-close"><span class="revx-content-notice-close-icon dashicons dashicons-dismiss"> </span></a>
-					</div>
-								<?php
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Dashboard Image Banner Notice
-	 *
-	 * @param boolean $return_bool Early return flag for other plugin notice.
-	 * @return void|bool
-	 */
-	public function revx_dashboard_image_banner_notice( $return_bool = false ) {
-		$revx_db_nonce  = wp_create_nonce( 'revx-nonce' );
-		$banner_notices = array(
-			array(
-				'key'         => 'revx_summer_sale_2026',
-				// testing in dev mode.
-				'start'       => defined( 'REVENUE_DEV_MODE' )
-									? '2026-05-20 00:00 Asia/Dhaka'
-									: '2026-07-13 00:00 Asia/Dhaka',
-				'end'         => '2026-07-19 23:59 Asia/Dhaka',
-				'banner_src'  => REVENUE_URL . 'assets/images/dashboard_banner/summer_sale/summer_sale_26.png',
-				'url'         => Xpo::generate_utm_link(
-					array(
-						'utmKey' => 'summer_db',
-					)
-				),
-				'close_color' => '#000000',
-				'visibility'  => ! Xpo::is_lc_active(),
-			),
-		);
-
-		foreach ( $banner_notices as $notice ) {
-			$notice_key = isset( $notice['key'] ) ? $notice['key'] : $this->notice_version;
-			if ( isset( $_GET['disable_revx_notice'] ) && $notice_key === sanitize_text_field( wp_unslash( $_GET['disable_revx_notice'] ) ) ) { // phpcs:ignore
+			if ( $enforce_one_per_type && isset( $shown[ $type ] ) ) {
 				continue;
 			}
 
-			$current_time = gmdate( 'U' );
-			$notice_start = gmdate( 'U', strtotime( $notice['start'] ) );
-			$notice_end   = gmdate( 'U', strtotime( $notice['end'] ) );
-			if ( $current_time >= $notice_start && $current_time <= $notice_end && $notice['visibility'] ) {
-
-				$notice_transient = Xpo::get_transient_without_cache( 'revx_get_pro_notice_' . $notice_key );
-
-				if ( 'off' === $notice_transient ) {
-					continue;
-				}
-
-				if ( $return_bool ) { // Early return for Other plugin notice.
-					return true;
-				}
-
-				$query_args = array(
-					'disable_revx_notice' => $notice_key,
-					'wpnonce'             => $revx_db_nonce,
-				);
-				if ( isset( $notice['repeat_interval'] ) && $notice['repeat_interval'] ) {
-					$query_args['revx_interval'] = $notice['repeat_interval'];
-				}
-				?>
-				<style type="text/css">
-					.revx-notice-wrapper.revx-image-notice-wrapper {
-						padding: 0 !important;
-						position: relative;
-						box-sizing: border-box;
-						overflow: hidden;
-						border-radius: 0px;
-						border: none !important;
-					}
-					.revx-notice-wrapper.revx-image-notice-wrapper .revx-image-banner {
-						position: relative;
-						line-height: 0;
-					}
-					.revx-notice-wrapper.revx-image-notice-wrapper .revx-btn-image {
-						display: block;
-					}
-					.revx-notice-wrapper.revx-image-notice-wrapper .revx-btn-image img {
-						display: block;
-						width: 100%;
-						height: auto;
-						border-radius: 0;
-					}
-					.revx-notice-wrapper.revx-image-notice-wrapper .revx-content-notice-close {
-						top: 4px;
-						right: 4px;
-						position: absolute;
-						z-index: 999;
-						text-decoration: none;
-					}
-					.revx-notice-wrapper.revx-image-notice-wrapper .revx-content-notice-close-icon {
-						font-size: 14px;
-					}
-					@media screen and (max-width: 650px) {
-						.revx-image-notice-wrapper {
-							display: none;
-						}
-					}
-				</style>
-				<div class="revx-notice-wrapper revx-image-notice-wrapper notice wc-install revx-free-notice">
-					<div class="revx-install-body revx-image-banner">
-						<a class="wc-dismiss-notice revx-content-notice-close" href="
-						<?php
-						echo esc_url(
-							add_query_arg(
-								$query_args
-							)
-						);
-						?>
-						"><span class="revx-content-notice-close-icon dashicons dashicons-dismiss" style="color: <?php echo esc_attr( $notice['close_color'] ); ?>;"> </span></a>
-						<a class="revx-btn-image" target="_blank" href="<?php echo esc_url( $notice['url'] ); ?>">
-							<img loading="lazy" src="<?php echo esc_url( $notice['banner_src'] ); ?>" alt="Discount Banner"/>
-						</a>
-					</div>
-				</div>
-				<?php
+			$template = $this->template_for( $type );
+			if ( ! $template || ! self::promo_is_live( $notice ) ) {
+				continue;
 			}
+
+			$query_args = array(
+				'disable_' . $prefix . '_notice' => $notice['key'],
+				'wpnonce'                        => wp_create_nonce( $prefix . '-nonce' ),
+			);
+			if ( ! empty( $notice['repeat_interval'] ) ) {
+				$query_args[ $prefix . '_interval' ] = $notice['repeat_interval'];
+			}
+
+			// $notice, $query_args, $prefix and $brand_color are in scope for the template.
+			include $template;
+
+			$shown[ $type ] = true;
 		}
 	}
 
@@ -870,25 +454,32 @@ class Notice {
 	 *
 	 * @return void
 	 */
-	public function revx_dashboard_durbin_notice_callback() {
-		$durbin_key = 'revx_durbin_dc1';
+	public function render_durbin_consent_box() {
+		$prefix       = $this->config['prefix'];
+		$durbin_key   = $prefix . '_durbin_dc1';
+		$consent_box  = $prefix . '-consent-box';
+		$consent_cont = $prefix . '-consent-content';
+		$text_first   = $prefix . '-consent-text-first';
+		$text_last    = $prefix . '-consent-text-last';
+		$accept_btn   = $prefix . '-consent-accept';
+		$close_link   = $prefix . '-notice-close';
+		$close_icon   = $prefix . '-notice-close-icon';
+		$text_group   = $prefix . '-consent-text';
+		$wrapper      = $prefix . '-notice-wrapper';
+		$brand_name   = $this->config['brand_name'];
 
 		if (
-			isset( $_GET['revx_durbin_key'] ) || // phpcs:ignore
-			'off' === Xpo::get_transient_without_cache( 'revx_durbin_notice_' . $durbin_key )
+			isset( $_GET[ $prefix . '_durbin_key' ] ) || // phpcs:ignore
+			'off' === Xpo::get_transient_without_cache( $prefix . '_durbin_notice_' . $durbin_key )
 		) {
 			return;
 		}
 
-		if ( ! $this->notice_js_css_applied ) {
-			$this->notice_js_css_applied = true;
-		}
-
-		$revx_db_nonce = wp_create_nonce( 'revx-nonce' );
+		$db_nonce = wp_create_nonce( $prefix . '-nonce' );
 
 		?>
 		<style>
-				.revx-consent-box {
+				.<?php echo esc_attr( $consent_box ); ?> {
 					width: 656px;
 					padding: 16px;
 					border: 1px solid #070707;
@@ -899,25 +490,25 @@ class Notice {
 					width: 100%;
 					box-sizing: border-box;
 				}
-				.revx-consent-content {
+				.<?php echo esc_attr( $consent_cont ); ?> {
 					display: flex;
 					justify-content: flex-start;
 					align-items: flex-end;
 					gap: 26px;
 				}
- 
-				.revx-consent-text-first {
+
+				.<?php echo esc_attr( $text_first ); ?> {
 					font-size: 14px;
 					font-weight: 600;
 					color: #070707;
 				}
-				.revx-consent-text-last {
+				.<?php echo esc_attr( $text_last ); ?> {
 					margin: 4px 0 0;
 					font-size: 14px;
 					color: #070707;
 				}
- 
-				.revx-consent-accept {
+
+				.<?php echo esc_attr( $accept_btn ); ?> {
 					background-color: #070707;
 					color: #fff;
 					border: none;
@@ -928,35 +519,40 @@ class Notice {
 					font-weight: 600;
 					text-decoration: none;
 				}
-				.revx-consent-accept:hover {
+				.<?php echo esc_attr( $accept_btn ); ?>:hover {
 					background-color:rgb(38, 38, 38);
 					color: #fff;
 				}
 			</style>
-			<div class="revx-consent-box revx-notice-wrapper notice data_collection_notice">
-			<div class="revx-consent-content">
-			<div class="revx-consent-text">
-			<div class="revx-consent-text-first"><?php esc_html_e( 'Want to help make WowShipping even more awesome?', 'revenue' ); ?></div>
-			<div class="revx-consent-text-last">
+			<div class="<?php echo esc_attr( $consent_box . ' ' . $wrapper ); ?> notice data_collection_notice">
+			<div class="<?php echo esc_attr( $consent_cont ); ?>">
+			<div class="<?php echo esc_attr( $text_group ); ?>">
+			<div class="<?php echo esc_attr( $text_first ); ?>">
+			<?php
+				/* translators: %s: plugin brand name, from config.php. */
+				printf( esc_html__( 'Want to help make %s even more awesome?', 'revenue' ), esc_html( $brand_name ) );
+			?>
+			</div>
+			<div class="<?php echo esc_attr( $text_last ); ?>">
 					<?php esc_html_e( 'Allow us to collect diagnostic data and usage information. see ', 'revenue' ); ?>
 			<a href="https://www.wpxpo.com/data-collection-policy/" target="_blank" ><?php esc_html_e( 'what we collect.', 'revenue' ); ?></a>
 			</div>
 			</div>
 			<a
-					class="revx-consent-accept"
+					class="<?php echo esc_attr( $accept_btn ); ?>"
 					href=
 					<?php
 									echo esc_url(
 										add_query_arg(
 											array(
-												'revx_durbin_key' => $durbin_key,
-												'revx_get_durbin' => 'get',
-												'wpnonce' => $revx_db_nonce,
+												$prefix . '_durbin_key' => $durbin_key,
+												$prefix . '_get_durbin' => 'get',
+												'wpnonce' => $db_nonce,
 											)
 										)
 									);
 					?>
-									class="revx-notice-close"
+									class="<?php echo esc_attr( $close_link ); ?>"
 			><?php esc_html_e( 'Accept & Close', 'revenue' ); ?></a>
 			</div>
 			<a href=
@@ -964,13 +560,13 @@ class Notice {
 							echo esc_url(
 								add_query_arg(
 									array(
-										'revx_durbin_key' => $durbin_key,
-										'wpnonce'         => $revx_db_nonce,
+										$prefix . '_durbin_key' => $durbin_key,
+										'wpnonce'                => $db_nonce,
 									)
 								)
 							);
 				?>
-				class="revx-notice-close"
+				class="<?php echo esc_attr( $close_link ); ?>"
 				style="
 					position: absolute;
 					right: 2px;
@@ -984,386 +580,10 @@ class Notice {
 					line-height: 20px;
 				"
 			>
-				<span 
+				<span
 				style="font-size: 14px;"
-				class="revx-notice-close-icon dashicons dashicons-dismiss"> </span></a>
+				class="<?php echo esc_attr( $close_icon ); ?> dashicons dashicons-dismiss"> </span></a>
 			</div>
-		<?php
-	}
-
-	/**
-	 * Plugin Install and Active Action
-	 *
-	 * @return void
-	 */
-	public function install_activate_plugin() {
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wpnonce'] ?? '' ) ), 'revx-nonce' ) ) {
-			wp_send_json_error( esc_html__( 'Invalid nonce.', 'revenue' ) );
-		}
-
-		if ( ! isset( $_POST['install_plugin'] ) || ! Flags::is_user_admin() ) {
-			wp_send_json_error( esc_html__( 'Invalid request.', 'revenue' ) );
-		}
-		$plugin_slug = sanitize_text_field( wp_unslash( $_POST['install_plugin'] ) );
-
-		Xpo::install_and_active_plugin( $plugin_slug );
-
-		$action = sanitize_text_field( wp_unslash( $_POST['action'] ?? '' ) ); // phpcs:ignore
-
-		if ( wp_doing_ajax() || is_network_admin() || isset( $_GET['activate-multi'] ) || 'activate-selected' === $action ) { //phpcs:ignore
-			die();
-		}
-
-		wp_send_json_success( admin_url( 'admin.php?page=revx-dashboard#dashboard' ) );
-	}
-
-	/**
-	 * Installation Notice CSS
-	 *
-	 * @return void
-	 */
-	public function install_notice_css() {
-		?>
-		<style type="text/css">
-			.revx-wc-install {
-				display: flex;
-				align-items: center;
-				background: #fff;
-				margin-top: 30px !important;
-				/*width: calc(100% - 65px);*/
-				border: 1px solid #ccd0d4;
-				padding: 4px !important;
-				border-radius: 4px;
-				border-left: 3px solid #46b450;
-				line-height: 0;
-				gap: 15px;
-				padding: 15px 10px !important;
-			}
-			.revx-wc-install img {
-				width: 100px;
-			}
-			.revx-install-body {
-				-ms-flex: 1;
-				flex: 1;
-			}
-			.revx-install-body.revx-image-banner {
-				padding: 0px !important;
-			}
-			.revx-install-body.revx-image-banner img {
-				width: 100%;
-			}
-			.revx-install-body>div {
-				max-width: 450px;
-				margin-bottom: 20px !important;
-			}
-			.revx-install-body h3 {
-				margin: 0 !important;
-				font-size: 20px;
-				margin-bottom: 10px !important;
-				line-height: 1;
-			}
-			.revx-pro-notice .wc-install-btn,
-			.wp-core-ui .revx-wc-active-btn {
-				display: inline-flex;
-				align-items: center;
-				padding: 3px 20px !important;
-			}
-			.revx-pro-notice.loading .wc-install-btn {
-				opacity: 0.7;
-				pointer-events: none;
-			}
-			.revx-wc-install.wc-install .dashicons {
-				display: none;
-				animation: dashicons-spin 1s infinite;
-				animation-timing-function: linear;
-			}
-			.revx-wc-install.wc-install.loading .dashicons {
-				display: inline-block;
-				margin-right: 5px !important;
-			}
-			@keyframes dashicons-spin {
-				0% {
-					transform: rotate(0deg);
-				}
-				100% {
-					transform: rotate(360deg);
-				}
-			}
-			.revx-wc-install .wc-dismiss-notice {
-				position: relative;
-				text-decoration: none;
-				float: right;
-				right: 5px;
-				display: flex;
-				align-items: center;
-			}
-			.revx-wc-install .wc-dismiss-notice .dashicons {
-				display: flex;
-				text-decoration: none;
-				animation: none;
-				align-items: center;
-			}
-			.revx-pro-notice {
-				position: relative;
-				border-left: 3px solid #00a464;
-			}
-			.revx-pro-notice .revx-install-body h3 {
-				font-size: 20px;
-				margin-bottom: 5px !important;
-			}
-			.revx-pro-notice .revx-install-body>div {
-				max-width: 800px;
-				margin-bottom: 0 !important;
-			}
-			.revx-pro-notice .button-hero {
-				padding: 8px 14px !important;
-				min-height: inherit !important;
-				line-height: 1 !important;
-				box-shadow: none;
-				border: none;
-				transition: 400ms;
-				background: #46b450;
-			}
-			.revx-pro-notice .button-hero:hover,
-			.wp-core-ui .revx-pro-notice .button-hero:active {
-				background: #389e41;
-			}
-			.revx-pro-notice .revx-btn-notice-pro {
-				background: #e5561e;
-				color: #fff;
-			}
-			.revx-pro-notice .revx-btn-notice-pro:hover,
-			.revx-pro-notice .revx-btn-notice-pro:focus {
-				background: #ce4b18;
-			}
-			.revx-pro-notice .button-hero:hover,
-			.revx-pro-notice .button-hero:focus {
-				border: none;
-				box-shadow: none;
-			}
-			.revx-pro-notice .revx-promotional-dismiss-notice {
-				background-color: #000000;
-				padding-top: 0px !important;
-				position: absolute;
-				right: 0;
-				top: 0px;
-				padding: 10px 10px 14px !important;
-				border-radius: 0 0 0 4px;
-				border: 1px solid;
-				display: inline-block;
-				color: #fff;
-			}
-			.revx-eid-notice p {
-				margin: 0 !important;
-				color: #f7f7f7;
-				font-size: 16px;
-			}
-			.revx-eid-notice p.revx-eid-offer {
-				color: #fff;
-				font-weight: 700;
-				font-size: 18px;
-			}
-			.revx-eid-notice p.revx-eid-offer a {
-				background-color: #ffc160;
-				padding: 8px 12px !important;
-				border-radius: 4px;
-				color: #000;
-				font-size: 14px;
-				margin-left: 3px !important;
-				text-decoration: none;
-				font-weight: 500;
-				position: relative;
-				top: -4px;
-			}
-			.revx-eid-notice p.revx-eid-offer a:hover {
-				background-color: #edaa42;
-			}
-			.revx-install-body .revx-promotional-dismiss-notice {
-				right: 4px;
-				top: 3px;
-				border-radius: unset !important;
-				padding: 10px 8px 12px !important;
-				text-decoration: none;
-			}
-			.revx-notice {
-				background: #fff;
-				border: 1px solid #c3c4c7;
-				border-left-color: #00a464 !important;
-				border-left-width: 4px;
-				border-radius: 4px 0px 0px 4px;
-				box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
-				padding: 0px !important;
-				margin: 40px 20px 0 2px !important;
-				clear: both;
-			}
-			.revx-notice .revx-notice-container {
-				display: flex;
-				width: 100%;
-			}
-			.revx-notice .revx-notice-container a {
-				text-decoration: none;
-			}
-			.revx-notice .revx-notice-container a:visited {
-				color: white;
-			}
-			.revx-notice .revx-notice-container img {
-				width: 100%;
-				max-width: 30px !important;
-				padding: 12px !important;
-			}
-			.revx-notice .revx-notice-image {
-				display: flex;
-				align-items: center;
-				flex-direction: column;
-				justify-content: center;
-				background-color: #f4f4ff;
-			}
-			.revx-notice .revx-notice-image img {
-				max-width: 100%;
-			}
-			.revx-notice .revx-notice-content {
-				width: 100%;
-				margin: 5px !important;
-				padding: 8px !important;
-				display: flex;
-				flex-direction: column;
-				gap: 0px;
-			}
-			.revx-notice .revx-notice-revx-button {
-				max-width: fit-content;
-				text-decoration: none;
-				padding: 7px 12px !important;
-				font-size: 12px;
-				color: white;
-				border: none;
-				border-radius: 2px;
-				cursor: pointer;
-				margin-top: 6px !important;
-				background-color: #e5561e;
-			}
-			.revx-notice-heading {
-				font-size: 18px;
-				font-weight: 500;
-				color: #1b2023;
-			}
-			.revx-notice-content-header {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-			}
-			.revx-notice-close .dashicons-no-alt {
-				font-size: 25px;
-				height: 26px;
-				width: 25px;
-				cursor: pointer;
-				color: #585858;
-			}
-			.revx-notice-close .dashicons-no-alt:hover {
-				color: red;
-			}
-			.revx-notice-content-body {
-				font-size: 12px;
-				color: #343b40;
-			}
-			.revx-bold {
-				font-weight: bold;
-			}
-			a.revx-pro-dismiss:focus {
-				outline: none;
-				box-shadow: unset;
-			}
-			.revx-free-notice .loading,
-			.revx-notice .loading {
-				width: 16px;
-				height: 16px;
-				border: 3px solid #FFF;
-				border-bottom-color: transparent;
-				border-radius: 50%;
-				display: inline-block;
-				box-sizing: border-box;
-				animation: rotation 1s linear infinite;
-				margin-left: 10px !important;
-			}
-			a.revx-notice-revx-button:hover {
-				color: #fff !important;
-			}
-			.revx-notice .revx-link-wrap {
-				margin-top: 10px !important;
-			}
-			.revx-notice .revx-link-wrap a {
-				margin-right: 4px !important;
-			}
-			.revx-notice .revx-link-wrap a:hover {
-				background-color: #ce4b18;
-			}
-			body .revx-notice .revx-link-wrap>a.revx-notice-skip {
-				background: none !important;
-				border: 1px solid #e5561e;
-				color: #e5561e;
-				padding: 6px 15px !important;
-			}
-			body .revx-notice .revx-link-wrap>a.revx-notice-skip:hover {
-				background: #ce4b18 !important;
-			}
-			@keyframes rotation {
-				0% {
-					transform: rotate(0deg);
-				}
-				100% {
-					transform: rotate(360deg);
-				}
-			}
-
-			.revx-install-btn-wrap {
-				display: flex;
-				align-items: stretch;
-				gap: 10px;
-			}
-			.revx-install-btn-wrap .revx-install-cancel {
-				position: static !important;
-				padding: 3px 20px;
-				border: 1px solid #a0a0a0;
-				border-radius: 2px;
-			}
-		</style>
-		<?php
-	}
-
-	/**
-	 * Installation Notice JS
-	 *
-	 * @return void
-	 */
-	public function install_notice_js() {
-		?>
-		<script type="text/javascript">
-			jQuery(document).ready(function($) {
-				'use strict';
-				$(document).on('click', '.wc-install-btn.revx-install-btn', function(e) {
-					e.preventDefault();
-					const $that = $(this);
-					console.log($that.attr('data-plugin-slug'));
-					$.ajax({
-						type: 'POST',
-						url: ajaxurl,
-						data: {
-							install_plugin: $that.attr('data-plugin-slug'),
-							action: 'revx_install',
-							wpnonce: '<?php echo esc_js( wp_create_nonce( 'revx-nonce' ) ); ?>',
-						},
-						beforeSend: function() {
-							$that.parents('.wc-install').addClass('loading');
-						},
-						success: function(response) {
-							window.location.reload()
-						},
-						complete: function() {
-							// $that.parents('.wc-install').removeClass('loading');
-						}
-					});
-				});
-			});
-		</script>
 		<?php
 	}
 }

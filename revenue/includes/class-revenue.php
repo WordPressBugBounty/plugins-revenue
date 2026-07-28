@@ -272,8 +272,6 @@ final class Revenue {
 		// initialize the classes.
 		add_action( 'init', array( $this, 'init_classes' ), 4 );
 
-		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
-
 		add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts' ) );
 	}
 
@@ -313,36 +311,14 @@ final class Revenue {
 	 * @return void
 	 */
 	public function load_scripts() {
-		Revenue_Frontend_Scripts::load_scripts();
-	}
-	/**
-	 * Plugin action links
-	 * Use custom links on Plugin actions
-	 *
-	 * @param array $links Links.
-	 *
-	 * @return array
-	 * @since 1.0.0
-	 */
-	public function plugin_action_links( $links ) {
-		$setting_link                     = array();
-		$setting_link['revenue_campaign'] = '<a href="' . esc_url( admin_url( 'admin.php?page=revenue#/campaigns' ) ) . '">' . esc_html__( 'Options', 'revenue' ) . '</a>';
-		$upgrade_link                     = array();
-		if ( ! defined( 'REVENUE_PRO_VER' ) || Xpo::is_lc_expired() ) {
-			// This will add product automatically to the cart.
-			// Discuss with Anik/TiBRO bro about this for your plugin.
-			$url = ! defined( 'REVENUE_PRO_VER' ) ? Xpo::generate_utm_link(
-				array(
-					'utmKey' => 'plugin_dir_pro',
-				)
-			)
-				: 'https://account.wpxpo.com/checkout/?edd_license_key=' . Xpo::get_lc_key();
-
-				$text                        = ! defined( 'REVENUE_PRO_VER' ) ? esc_html__( 'Switch to Pro', 'revenue' ) : esc_html__( 'Renew License', 'revenue' );
-				$upgrade_link['revenue_pro'] = '<a style="color: #e83838; font-weight: bold;" target="_blank" href="' . esc_url( $url ) . '">' . $text . '</a>';
+		// The frontend script class is only required on frontend and rest api requests.
+		// Third party plugins (e.g. FluentCRM email/block editor) fire wp_enqueue_scripts
+		// inside admin screens, where the class was never loaded, so bail out early.
+		if ( ! class_exists( 'Revenue_Frontend_Scripts' ) ) {
+			return;
 		}
-		return array_merge( $setting_link, $links, $upgrade_link );
-		// return $links;
+
+		Revenue_Frontend_Scripts::load_scripts();
 	}
 
 
@@ -509,17 +485,8 @@ final class Revenue {
 	 * @return array
 	 */
 	public function plugin_list_action_links( $links ) {
-		$offer_config = array(
-			array(
-				'start'  => '2026-07-06 00:00 Asia/Dhaka',
-				'end'    => '2026-08-01 23:59 Asia/Dhaka',
-				'text'   => __(
-					'Summer Sale - Up to 55% OFF',
-					'revenue'
-				),
-				'utmKey' => 'summer_db',
-			),
-		);
+		// Promo data + brand identity for every surface lives in includes/notice/.
+		$notice_config = \REVX\Includes\Notice\Notice::config();
 
 		// Create the base URL for campaigns admin page.
 		$campaign_url = esc_url( admin_url( 'admin.php?page=' . revenue()->get_admin_menu_slug() . '#/campaigns' ) );
@@ -540,30 +507,32 @@ final class Revenue {
 				$text = esc_html__( 'Renew License', 'revenue' );
 				$url  = 'https://account.wpxpo.com/checkout/?edd_license_key=' . Xpo::get_lc_key() . '&renew=1';
 			} else {
+				// Evergreen fallback, used whenever no dated promo is live.
 				$text = esc_html__( 'Upgrade to Pro', 'revenue' );
-				$url  = Xpo::generate_utm_link();
+				$url  = Xpo::generate_utm_link(
+					array(
+						'config' => array(
+							'source'   => $notice_config['utm_source_plugin_meta'],
+							'medium'   => 'upgrade-pro',
+							'campaign' => $notice_config['utm_campaign'],
+						),
+					)
+				);
 
-				foreach ( $offer_config as $offer ) {
-					$current_time = gmdate( 'U' );
-					$notice_start = gmdate( 'U', strtotime( $offer['start'] ) );
-					$notice_end   = gmdate( 'U', strtotime( $offer['end'] ) );
-					if ( $current_time >= $notice_start && $current_time <= $notice_end ) {
-						$url  = Xpo::generate_utm_link(
-							array(
-								'utmKey' => $offer['utmKey'],
-							)
-						);
-						$text = $offer['text'];
-						break;
-					}
+				// Dated overrides: includes/notice/promos/plugin-meta.php.
+				$promo = \REVX\Includes\Notice\Notice::get_active_promo( 'plugin-meta' );
+				if ( $promo ) {
+					$text = $promo['text'];
+					$url  = $promo['url'];
 				}
 			}
 
 			$last_part = array(
 				'get_discounts' => sprintf(
-					'<a style="color:#00a44a; font-weight: 700;" target="_blank" href="%s">%s</a>',
-					$url,
-					$text
+					'<a style="color:%s; font-weight: 700;" target="_blank" href="%s">%s</a>',
+					esc_attr( $notice_config['brand_color'] ),
+					esc_url( $url ),
+					esc_html( $text )
 				),
 			);
 

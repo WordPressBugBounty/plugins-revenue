@@ -260,6 +260,7 @@ class Revenue_Menu {
 			'campaign_list_trigger_row_message' => revenue()->get_campaign_list_trigger_row(),
 			'campaign_enabled_quantity_selector' => revenue()->show_quantity_selector_on_campaigns(),
 			'campaign_counts' => revenue()->get_campaign_counts(),
+			// The single live hello-bar promo, or null. Data: includes/notice/promos/hellobar.php.
 			'helloBar' => Notice::get_hellobar_config(),
 			'license' => Xpo::get_lc_key(),
 			'is_expired' => Xpo::is_lc_expired(),

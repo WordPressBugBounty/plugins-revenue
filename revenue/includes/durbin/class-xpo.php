@@ -207,6 +207,22 @@ class Xpo {
 
 	public static function generate_utm_link( $params = array() ) {
 		$default_config = array(
+			'plugin_meta'           => array(
+				'source'   => 'db-revenue-plugin-meta',
+				'medium'   => 'upgrade-pro',
+				'campaign' => 'revenue-dashboard',
+			),
+			'submenu'       => array(
+				'source'   => 'db-revenue-sub_menu',
+				'medium'   => 'upgrade-pro',
+				'campaign' => 'revenue-dashboard',
+			),
+			// chnage from below do not touch anything above.
+			'plugin_meta_summer_db' => array(
+				'source'   => 'db-revenue-plugin-meta',
+				'medium'   => 'summer-sale',
+				'campaign' => 'revenue-dashboard',
+			),
 			'summer_db'       => array(
 				'source'   => 'db-revenue-notice',
 				'medium'   => 'summer-sale',
