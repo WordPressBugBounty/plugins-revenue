@@ -3032,6 +3032,47 @@ class Revenue_Template_Utils {
 			$variation_attributes = $parent->get_variation_attributes();
 		}
 
+		// Map every way an attribute can reach this function to the data we
+		// actually need: the canonical key WooCommerce expects to be posted,
+		// the real taxonomy name and the human readable label.
+		//
+		// The taxonomy name cannot be rebuilt from the posted key: WooCommerce
+		// keeps taxonomy names in raw UTF-8 (wc_sanitize_taxonomy_name() url
+		// decodes), while variation meta keys are sanitize_title()'d. For a
+		// Hebrew attribute the taxonomy is "pa_צבע" but the posted key is
+		// "attribute_pa_%d7%a6%d7%91%d7%a2", so taxonomy_exists() on anything
+		// derived from the key always fails. Ask the product instead.
+		$attribute_info = array();
+		if ( $parent && $parent->is_type( 'variable' ) ) {
+			foreach ( $parent->get_attributes() as $attribute ) {
+				if ( ! $attribute->get_variation() ) {
+					continue;
+				}
+
+				$attribute_taxonomy = $attribute->get_name();
+				$sanitized_name     = sanitize_title( $attribute_taxonomy );
+
+				$info = array(
+					'key'      => 'attribute_' . $sanitized_name,
+					'taxonomy' => $attribute->is_taxonomy() ? $attribute_taxonomy : '',
+					'label'    => wc_attribute_label( $attribute_taxonomy, $parent ),
+				);
+
+				// Every alias the option list can be keyed by upstream.
+				$aliases = array(
+					'attribute_' . $sanitized_name,
+					$sanitized_name,
+					$attribute_taxonomy,
+					str_replace( 'pa_', '', $sanitized_name ),
+				);
+				foreach ( $aliases as $alias ) {
+					if ( '' !== $alias && ! isset( $attribute_info[ $alias ] ) ) {
+						$attribute_info[ $alias ] = $info;
+					}
+				}
+			}
+		}
+
 		// For Any Options Support.
 		foreach ( $variation_attributes as $key => $value ) {
 			// Normalize the key to lowercase.
@@ -3061,7 +3102,12 @@ class Revenue_Template_Utils {
 				$matched = false;
 
 				// Candidate taxonomy names to try (e.g. 'pa_color', 'color').
+				// The real taxonomy from the product comes first so non latin
+				// attribute names resolve; the guesses stay as a fallback.
 				$candidates = array();
+				if ( isset( $attribute_info[ $attr_key ]['taxonomy'] ) && '' !== $attribute_info[ $attr_key ]['taxonomy'] ) {
+					$candidates[] = $attribute_info[ $attr_key ]['taxonomy'];
+				}
 				if ( 0 === strpos( $raw, 'attribute_' ) ) {
 					$candidates[] = substr( $raw, 10 ); // strip 'attribute_'.
 				} else {
@@ -3072,11 +3118,13 @@ class Revenue_Template_Utils {
 
 				foreach ( $candidates as $tax ) {
 					if ( taxonomy_exists( $tax ) ) {
-						$terms = wc_get_product_terms( $product_id, $tax, array( 'fields' => 'names' ) );
+						$terms = wc_get_product_terms( $product_id, $tax, array( 'fields' => 'all' ) );
 						if ( ! empty( $terms ) ) {
-							foreach ( $terms as $tname ) {
+							foreach ( $terms as $term ) {
 								foreach ( $opts as $opt ) {
-									if ( 0 === strcasecmp( $opt, $tname ) ) {
+									// The option can be either the slug or the
+									// name depending on where it came from.
+									if ( 0 === strcasecmp( $opt, $term->slug ) || 0 === strcasecmp( $opt, $term->name ) ) {
 										$ordered[] = $opt;
 										break;
 									}
@@ -3129,17 +3177,44 @@ class Revenue_Template_Utils {
 		if ( $product && $product->is_type( 'variable' ) ) {
 			$default_attributes = $product->get_default_attributes();
 		}
+		// The same attribute can reach this point under two key shapes at once
+		// (the variation meta key and the bare slug the templates build), which
+		// would render the same dropdown twice. Collapse them onto the key
+		// WooCommerce expects, keeping the first non empty option list.
+		$normalized_attributes = array();
+		foreach ( $attributes as $attr => $options ) {
+			$canonical = isset( $attribute_info[ $attr ] ) ? $attribute_info[ $attr ]['key'] : $attr;
+
+			if ( empty( $normalized_attributes[ $canonical ] ) ) {
+				$normalized_attributes[ $canonical ] = $options;
+			}
+		}
+		$attributes = $normalized_attributes;
+
 		foreach ( $attributes as $attr => $options ) :
-			$attribute_name = strtolower( $attr );
-			$attr_key       = str_replace( 'attribute_', '', $attr );
+			$info = isset( $attribute_info[ $attr ] ) ? $attribute_info[ $attr ] : null;
+
+			// Always post the key WooCommerce expects. Option lists do not all
+			// arrive with the same key shape (some come from the variation meta,
+			// some are built by the templates), and anything that does not start
+			// with "attribute_" is skipped by the front-end script.
+			$attribute_name = $info ? $info['key'] : strtolower( $attr );
+			$attr_key       = str_replace( 'attribute_', '', $attribute_name );
+			$attr_taxonomy  = $info ? $info['taxonomy'] : '';
+
+			$default_option = null;
 			if ( isset( $default_attributes ) && isset( $default_attributes[ $attr_key ] ) ) {
 				$default_option = $default_attributes[ $attr_key ];
 			}
 
-			// remove any kind of prefixes before the actual attribute name. Add more if any case found.
-			$prefixes = array( 'attribute_', 'pa_' );
-			// use label either with default option name or seperate label tag. Convert to lower for consistency. Can be capitalized.
-			$label = str_replace( $prefixes, '', strtolower( $attr ) );
+			if ( $info && '' !== $info['label'] ) {
+				$label = $info['label'];
+			} else {
+				// remove any kind of prefixes before the actual attribute name. Add more if any case found.
+				$prefixes = array( 'attribute_', 'pa_' );
+				// use label either with default option name or seperate label tag. Convert to lower for consistency. Can be capitalized.
+				$label = str_replace( $prefixes, '', strtolower( $attr ) );
+			}
 			?>
 				<div class="<?php echo esc_attr( self::get_element_class( $template_data, 'productAttributeField' ) ); ?> revx-relative revx-w-<?php echo esc_attr( 'grid' === $layout ? 'full' : 'fit' ); ?> revx-d-flex revx-item-center">
 					<select class="revx-product-Attr-wrapper <?php echo esc_attr( $layout ); ?> <?php echo esc_attr( $is_enable_tag ? 'revx-tag-border revx-tag-bg revx-tag-text-color' : '' ); ?>" id="productAttributeSelect_<?php echo esc_attr( $product_id . '_' . $attr ); ?>"
@@ -3153,13 +3228,15 @@ class Revenue_Template_Utils {
 							$option_value = $option;
 							$option_label = $option;
 
-							// Try to map option to a taxonomy term so we can
-							// use the term slug as the value and the term name
-							// as the visible label. Check common candidates
-							// (pa_{attribute} and the raw attribute name).
-							$tax_candidates = array( 'pa_' . $attr_key, $attr_key );
+							// Map the option to a taxonomy term so the value is the
+							// term slug (what WooCommerce validates against) and
+							// the visible label is the term name. The taxonomy
+							// comes from the product itself, because it cannot be
+							// rebuilt from the sanitized attribute key when the
+							// attribute name is not latin.
+							$tax_candidates = array( $attr_taxonomy, 'pa_' . $attr_key, $attr_key );
 							foreach ( $tax_candidates as $tax ) {
-								if ( taxonomy_exists( $tax ) ) {
+								if ( '' !== $tax && taxonomy_exists( $tax ) ) {
 									// Try by slug first (option might already be a slug).
 									$term = get_term_by( 'slug', sanitize_title( $option ), $tax );
 									if ( ! $term ) {
@@ -3177,7 +3254,7 @@ class Revenue_Template_Utils {
 							// Ensure the selected check compares against the
 							// actual option value that will be submitted.
 							$is_selected = '';
-							if ( isset( $default_option ) && ( $default_option == $option_value || $default_option == $option_label ) ) {
+							if ( null !== $default_option && ( $default_option == $option_value || $default_option == $option_label ) ) {
 								$is_selected = 'selected';
 							}
 						?>

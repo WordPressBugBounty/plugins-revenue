@@ -27,6 +27,17 @@ use DateTime;
 	 */
 class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 
+	/**
+	 * Hard ceiling on how many days of chart data a single campaign may produce.
+	 *
+	 * The chart skeleton is built one array entry per day between the campaign's
+	 * creation date and today. A corrupt `date_created` (the column defaults to
+	 * '0000-00-00 00:00:00') would otherwise spin for ~740,000 iterations.
+	 *
+	 * @var int
+	 */
+	const MAX_CHART_DAYS = 1825;
+
 		/**
 		 * Endpoint namespace
 		 *
@@ -1047,7 +1058,10 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			$order_by = sanitize_text_field( $request['order_by'] );
 			$is_asc   = isset( $request['order'] ) ? 'asc' === sanitize_text_field( $request['order'] ) : false;
 
-			$order_by_query = $is_asc ? $wpdb->prepare( "order by {$order_by} asc" ) : $wpdb->prepare( "order by {$order_by} desc" );  //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// $order_by is whitelisted above; prepare() has no placeholder to fill
+			// here and calling it triggers a _doing_it_wrong() notice that can
+			// corrupt the JSON response body.
+			$order_by_query = "order by {$order_by} " . ( $is_asc ? 'asc' : 'desc' );
 		}
 
 		$data_keys     = isset( $request['data_keys'] ) ? $request['data_keys'] : array();
@@ -1121,19 +1135,7 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		}
 
 		if ( $has_order_stats_data ) {
-			$order_meta_select = revenue()->is_custom_orders_table_usages_enabled() ? "SELECT order_id, meta_value AS campaign_id FROM {$wpdb->prefix}wc_orders_meta " : "select  post_id as order_id, meta_value as campaign_id from {$wpdb->prefix}postmeta ";
-
-			$join_clause .= " LEFT JOIN (
-                            select count(DISTINCT orders.order_id) as order_count,SUM(COALESCE(order_stats.total_sales, 0)) as total_sales, orders.campaign_id as campaign_id from {$wpdb->prefix}wc_order_stats as order_stats
-                            inner join (
-                            $order_meta_select where meta_key = '_revx_campaign_id' and meta_value IS NOT NULL
-                            )
-                            orders ON (order_stats.order_id = orders.order_id OR order_stats.parent_id = orders.order_id)
-                            group by orders .campaign_id
-                            )
-                            stats ON campaigns.id = stats.campaign_id
-
-							";
+			$join_clause .= ' LEFT JOIN (' . $this->get_order_stats_sql( 'campaign' ) . ') AS stats ON campaigns.id = stats.campaign_id ';
 		}
 
 		$select_clause = rtrim( $select_clause, ', ' );
@@ -1165,9 +1167,16 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 			$results = $wpdb->get_results( $sql );  //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
+		// Resolve stats for every campaign on this page in one pass. Doing this
+		// per campaign inside the loop was an N+1 that dominated the response time.
+		$stats_by_campaign = $this->get_campaigns_stats( wp_list_pluck( $results, 'id' ), $data_keys );
+
 		foreach ( $results as $key => $value ) {
 					$id                  = $value->id;
-			$results[ $key ]->stats_data = $this->get_campaign_stats( $id, $data_keys );
+			$results[ $key ]->stats_data = isset( $stats_by_campaign[ $id ] ) ? $stats_by_campaign[ $id ] : array(
+				'data'   => array(),
+				'growth' => array(),
+			);
 
 			$_campaign = revenue()->get_campaign_data( $id );
 			$_campaign = revenue()->set_product_image_trigger_item_response( $_campaign );
@@ -1216,81 +1225,246 @@ class Revenue_Campaign_REST_Controller extends WP_REST_Controller {
 		 * @return array.
 		 */
 	public function get_campaign_stats( $campaign_id, $data_keys ) {
+		$stats = $this->get_campaigns_stats( array( $campaign_id ), $data_keys );
+
+		return isset( $stats[ (int) $campaign_id ] ) ? $stats[ (int) $campaign_id ] : array(
+			'data'   => array(),
+			'growth' => array(),
+		);
+	}
+
+	/**
+	 * Build the SQL that aggregates WooCommerce order stats per campaign.
+	 *
+	 * Replaces the previous single derived table, which joined
+	 * `wc_order_stats` with `ON (order_stats.order_id = orders.order_id OR
+	 * order_stats.parent_id = orders.order_id)`. MySQL cannot use an index for
+	 * an OR across two columns, so every candidate row triggered a full scan.
+	 *
+	 * Here the OR is split into two separately indexed branches combined with
+	 * UNION ALL: the order itself (PRIMARY KEY on wc_order_stats.order_id) and
+	 * its refunds (rows whose parent_id points back at that order). The
+	 * attribution meta value is also CAST to UNSIGNED - it lives in a longtext
+	 * column, and comparing it to an integer campaign id forced an implicit
+	 * conversion that disabled index use on the join.
+	 *
+	 * @param  string $group_by     'campaign' for lifetime totals, 'campaign_date' for a daily series.
+	 * @param  array  $campaign_ids Restrict to these campaign ids. Empty means all campaigns.
+	 * @return string SQL for use as a derived table.
+	 */
+	protected function get_order_stats_sql( $group_by = 'campaign', $campaign_ids = array() ) {
 		global $wpdb;
 
-			// Get campaign start date.
-		$campaign_start_date = $wpdb->get_var( //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				"SELECT DATE(date_created) FROM {$wpdb->prefix}revenue_campaigns WHERE id = %d",
-				$campaign_id
-			)
-		);
+		$hpos       = revenue()->is_custom_orders_table_usages_enabled();
+		$meta_table = $hpos ? "{$wpdb->prefix}wc_orders_meta" : $wpdb->postmeta;
+		$order_col  = $hpos ? 'order_id' : 'post_id';
 
-		$order_meta_select = revenue()->is_custom_orders_table_usages_enabled() ? "SELECT order_id, meta_value AS campaign_id FROM {$wpdb->prefix}wc_orders_meta " : "select  post_id as order_id, meta_value as campaign_id from {$wpdb->prefix}postmeta ";
+		$excluded_statuses = "'wc-auto-draft', 'wc-trash', 'wc-pending', 'wc-failed', 'wc-cancelled', 'wc-checkout-draft'";
 
-		$query = "
-            SELECT
-                DATE(analytics.date) AS date,
-                COALESCE(SUM(order_stats.total_sales), 0) AS total_sales,
-                COALESCE(SUM(CASE WHEN order_stats.parent_id = 0 THEN 1 ELSE 0 END), 0) AS orders_count,
-                ROUND(
-					CASE
-						WHEN COALESCE(SUM(analytics.impression_count), 0) > 0 THEN
-							(COALESCE(SUM(CASE WHEN order_stats.parent_id = 0 THEN 1 ELSE 0 END), 0) / SUM(analytics.impression_count)) * 100
-						ELSE 0
-					END,
-					2
-				) AS conversion_rate,
-                COALESCE(SUM(analytics.impression_count), 0) AS impression_count,
-                COALESCE(SUM(analytics.add_to_cart_count), 0) AS add_to_cart,
-                COALESCE(SUM(analytics.rejection_count), 0) AS rejection_count,
-                COALESCE(SUM(analytics.checkout_count), 0) AS checkout_count
-            FROM
-                {$wpdb->prefix}revenue_campaign_analytics AS analytics
-            LEFT JOIN (
-                $order_meta_select
-                WHERE
-                    meta_key = '_revx_campaign_id'
-                    AND meta_value IS NOT NULL
-            ) AS orders ON analytics.campaign_id = orders.campaign_id
-            LEFT JOIN {$wpdb->prefix}wc_order_stats order_stats ON (order_stats.order_id = orders.order_id OR order_stats.parent_id = orders.order_id) AND orders.order_id IS NOT NULL
-            AND order_stats.status NOT IN ('wc-auto-draft', 'wc-trash', 'wc-pending', 'wc-failed', 'wc-cancelled', 'wc-checkout-draft')
-            WHERE
-                analytics.campaign_id = %d
-            GROUP BY
-                DATE(analytics.date)
-        ";
-
-		$prepared_query = $wpdb->prepare( $query, $campaign_id );  //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$results        = $wpdb->get_results( $prepared_query );   //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-
-		$start_date = new DateTime( $campaign_start_date );
-		$end_date   = new DateTime( 'now' );
-
-		$campaign_stats_chart_data = revenue()->generate_campaigns_stats_chart_data( $start_date->format( 'Y-m-d' ), $end_date->format( 'Y-m-d' ), array(), $data_keys );
-
-		foreach ( $results as $campaign ) {
-			if ( is_array( $campaign_stats_chart_data[ $campaign->date ] ) ) {
-				$campaign_stats_chart_data[ $campaign->date ] = array_merge( $campaign_stats_chart_data[ $campaign->date ], (array) $campaign );
-			}
+		$id_filter = '';
+		if ( ! empty( $campaign_ids ) ) {
+			// Quoted so the (meta_key, meta_value) index still applies - meta_value
+			// is a text column, and an unquoted integer would force a conversion.
+			$id_filter = " AND meta.meta_value IN ('" . implode( "','", array_map( 'absint', (array) $campaign_ids ) ) . "') ";
 		}
 
-		$today     = gmdate( 'Y-m-d' );
-		$yesterday = gmdate( 'Y-m-d', strtotime( '-1 day' ) );
+		// Orders carrying a campaign attribution. DISTINCT guards against an
+		// order picking up the same meta key twice.
+		$attributed = "
+			SELECT DISTINCT
+				meta.{$order_col} AS order_id,
+				CAST(meta.meta_value AS UNSIGNED) AS campaign_id
+			FROM {$meta_table} AS meta
+			WHERE meta.meta_key = '_revx_campaign_id'
+				AND meta.meta_value IS NOT NULL
+				AND meta.meta_value <> ''
+				{$id_filter}
+		";
 
-		if ( ! isset( $campaign_stats_chart_data[ $today ], $campaign_stats_chart_data[ $yesterday ] ) ) {
-			return array(
-				'data'   => $campaign_stats_chart_data,
-				'growth' => array(),
+		// Branch 1: the attributed order itself (PK lookup).
+		// Branch 2: its refunds, so their negative total_sales nets off.
+		$rows = "
+			SELECT
+				att.campaign_id AS campaign_id,
+				DATE(stats.date_created) AS stat_date,
+				stats.total_sales AS total_sales,
+				CASE WHEN stats.parent_id = 0 THEN 1 ELSE 0 END AS is_order
+			FROM ({$attributed}) AS att
+			INNER JOIN {$wpdb->prefix}wc_order_stats AS stats
+				ON stats.order_id = att.order_id
+			WHERE stats.status NOT IN ({$excluded_statuses})
+
+			UNION ALL
+
+			SELECT
+				att.campaign_id AS campaign_id,
+				DATE(stats.date_created) AS stat_date,
+				stats.total_sales AS total_sales,
+				0 AS is_order
+			FROM ({$attributed}) AS att
+			INNER JOIN {$wpdb->prefix}wc_order_stats AS stats
+				ON stats.parent_id = att.order_id
+			WHERE stats.parent_id <> 0
+				AND stats.status NOT IN ({$excluded_statuses})
+		";
+
+		if ( 'campaign_date' === $group_by ) {
+			return "
+				SELECT
+					revx_rows.campaign_id AS campaign_id,
+					revx_rows.stat_date AS stat_date,
+					COALESCE(SUM(revx_rows.total_sales), 0) AS total_sales,
+					COALESCE(SUM(revx_rows.is_order), 0) AS orders_count
+				FROM ({$rows}) AS revx_rows
+				GROUP BY revx_rows.campaign_id, revx_rows.stat_date
+			";
+		}
+
+		return "
+			SELECT
+				revx_rows.campaign_id AS campaign_id,
+				COALESCE(SUM(revx_rows.total_sales), 0) AS total_sales,
+				COALESCE(SUM(revx_rows.is_order), 0) AS order_count
+			FROM ({$rows}) AS revx_rows
+			GROUP BY revx_rows.campaign_id
+		";
+	}
+
+	/**
+	 * Get daily chart stats for several campaigns at once.
+	 *
+	 * Runs a fixed three queries regardless of how many campaigns are passed.
+	 * The previous per-campaign implementation joined the analytics table
+	 * (one row per campaign per day) against every order the campaign had ever
+	 * received, producing `days x orders` intermediate rows before
+	 * `wc_order_stats` was even touched. That was both the performance problem
+	 * and a correctness one: because orders were grouped by the analytics date
+	 * rather than the order date, every day in the series reported the
+	 * campaign's lifetime totals instead of that day's.
+	 *
+	 * @param  array $campaign_ids Campaign ids.
+	 * @param  array $data_keys    Requested data keys.
+	 * @return array Keyed by campaign id, each entry having 'data' and 'growth'.
+	 */
+	public function get_campaigns_stats( $campaign_ids, $data_keys ) {
+		global $wpdb;
+
+		$campaign_ids = array_values( array_filter( array_unique( array_map( 'absint', (array) $campaign_ids ) ) ) );
+
+		if ( empty( $campaign_ids ) ) {
+			return array();
+		}
+
+		$data_keys = is_array( $data_keys ) ? $data_keys : array();
+		$ids_in    = implode( ',', $campaign_ids );
+
+		// 1. Campaign creation dates, which bound each chart series.
+		$start_dates = $wpdb->get_results( //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			"SELECT id, DATE(date_created) AS start_date FROM {$wpdb->prefix}revenue_campaigns WHERE id IN ({$ids_in})", //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			OBJECT_K
+		);
+
+		// 2. Per-day impression / cart / checkout / rejection counters.
+		$analytics_rows = $wpdb->get_results( //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			"SELECT
+				campaign_id,
+				DATE(date) AS stat_date,
+				COALESCE(SUM(impression_count), 0) AS impression_count,
+				COALESCE(SUM(add_to_cart_count), 0) AS add_to_cart,
+				COALESCE(SUM(rejection_count), 0) AS rejection_count,
+				COALESCE(SUM(checkout_count), 0) AS checkout_count
+			FROM {$wpdb->prefix}revenue_campaign_analytics
+			WHERE campaign_id IN ({$ids_in})
+			GROUP BY campaign_id, DATE(date)" //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		);
+
+		// 3. Per-day order counts and sales, attributed to the order's own date.
+		$order_rows = $wpdb->get_results( $this->get_order_stats_sql( 'campaign_date', $campaign_ids ) ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+		// Index both result sets by campaign then date.
+		$by_campaign = array();
+
+		foreach ( (array) $analytics_rows as $row ) {
+			$by_campaign[ (int) $row->campaign_id ][ $row->stat_date ] = array(
+				'impression_count' => (int) $row->impression_count,
+				'add_to_cart'      => (int) $row->add_to_cart,
+				'rejection_count'  => (int) $row->rejection_count,
+				'checkout_count'   => (int) $row->checkout_count,
 			);
 		}
 
-		$growth = revenue()->calculate_growth( $campaign_stats_chart_data[ $today ], $campaign_stats_chart_data[ $yesterday ], $data_keys );
+		foreach ( (array) $order_rows as $row ) {
+			$cid  = (int) $row->campaign_id;
+			$date = $row->stat_date;
 
-		return array(
-			'data'   => $campaign_stats_chart_data,
-			'growth' => $growth,
-		);
+			if ( ! isset( $by_campaign[ $cid ][ $date ] ) ) {
+				$by_campaign[ $cid ][ $date ] = array();
+			}
+
+			$by_campaign[ $cid ][ $date ]['total_sales']  = (float) $row->total_sales;
+			$by_campaign[ $cid ][ $date ]['orders_count'] = (int) $row->orders_count;
+		}
+
+		// Use site-local dates throughout: analytics rows are written with
+		// current_time(), so comparing against gmdate() skipped the current day
+		// on any site whose timezone is ahead of UTC.
+		$today     = current_time( 'Y-m-d' );
+		$yesterday = gmdate( 'Y-m-d', strtotime( $today . ' -1 day' ) );
+
+		$stats = array();
+
+		foreach ( $campaign_ids as $campaign_id ) {
+			$start = isset( $start_dates[ $campaign_id ]->start_date ) ? $start_dates[ $campaign_id ]->start_date : '';
+			$start = $this->clamp_chart_start_date( $start, $today );
+
+			$chart = revenue()->generate_campaigns_stats_chart_data( $start, $today, array(), $data_keys );
+
+			foreach ( (array) $chart as $date => $seed ) {
+				if ( empty( $by_campaign[ $campaign_id ][ $date ] ) ) {
+					continue;
+				}
+
+				$day = array_merge( $seed, $by_campaign[ $campaign_id ][ $date ] );
+
+				$impressions = isset( $day['impression_count'] ) ? (int) $day['impression_count'] : 0;
+				$orders      = isset( $day['orders_count'] ) ? (int) $day['orders_count'] : 0;
+
+				$day['conversion_rate'] = $impressions > 0 ? round( ( $orders / $impressions ) * 100, 2 ) : 0;
+
+				$chart[ $date ] = $day;
+			}
+
+			$growth = ( isset( $chart[ $today ], $chart[ $yesterday ] ) )
+				? revenue()->calculate_growth( $chart[ $today ], $chart[ $yesterday ], $data_keys )
+				: array();
+
+			$stats[ $campaign_id ] = array(
+				'data'   => $chart,
+				'growth' => $growth,
+			);
+		}
+
+		return $stats;
+	}
+
+	/**
+	 * Resolve a safe start date for a campaign's chart series.
+	 *
+	 * @param  string $start Raw DATE(date_created) value, possibly empty or zeroed.
+	 * @param  string $today Site-local Y-m-d.
+	 * @return string Y-m-d.
+	 */
+	protected function clamp_chart_start_date( $start, $today ) {
+		$start_ts = $start ? strtotime( $start ) : false;
+		$today_ts = strtotime( $today );
+
+		if ( ! $start_ts || $start_ts > $today_ts ) {
+			return $today;
+		}
+
+		$floor_ts = $today_ts - ( self::MAX_CHART_DAYS * DAY_IN_SECONDS );
+
+		return gmdate( 'Y-m-d', max( $start_ts, $floor_ts ) );
 	}
 
 

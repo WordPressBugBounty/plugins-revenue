@@ -4,7 +4,7 @@ Tags: product bundles, bogo, bulk discount, bought together, upsells
 Requires at least: 6.8
 Tested up to: 7.0.2
 Requires PHP: 7.4
-Stable tag: 2.2.11
+Stable tag: 2.2.12
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -233,7 +233,13 @@ Yes, we have a dedicated team for WowRevenue to provide on-demand support and as
 
 == Changelog ==
 
-= 2.2.11 – 28 July 2026 = 
+= 2.2.12 – 24 August 2026 =
+* Fix: Resolved slow campaign rendering by optimizing database queries.
+* Fix: Fixed add-to-cart failing for variable products with non-Latin attribute values.
+* Fix: Fixed variation attribute options not resolving correctly for non-Latin attribute names.
+* Fix: Corrected generated URLs missing a slash before the hash fragment.
+
+= 2.2.11 – 28 July 2026 =
 * Improvement: Refactored code for better maintainability.
 * Fix: Prevent frontend script load when file is missing.
 

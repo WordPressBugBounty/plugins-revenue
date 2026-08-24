@@ -5125,11 +5125,34 @@ class Revenue_Functions {
 		}
 
 		// Sanitize each key and value.
+		//
+		// Do NOT use sanitize_text_field()/wc_clean() here: it strips percent
+		// encoded octets, and WooCommerce stores attribute term slugs for any
+		// non latin language (Hebrew, Arabic, Russian, ...) percent encoded,
+		// e.g. "1 ליטר" is saved as "1-%d7%9c%d7%99%d7%98%d7%a8". Stripping the
+		// octets leaves "1-", which WC_Cart::add_to_cart() then rejects with
+		// "Invalid value posted for <attribute>". See the same warning in
+		// WooCommerce: includes/class-wc-cart.php ("Don't use wc_clean as it
+		// destroys sanitized characters.").
+		//
+		// The values are handed straight to WC_Cart::add_to_cart(), which
+		// sanitizes each one against its own attribute (sanitize_title() for
+		// taxonomy attributes, wc_clean() for custom ones) and rejects anything
+		// that is not a valid value, so keeping them intact here is safe.
 		$sanitized = array();
 		foreach ( $data as $key => $value ) {
-			$key               = sanitize_text_field( $key );
-			$value             = sanitize_text_field( $value );
-			$sanitized[ $key ] = $value;
+			if ( is_array( $value ) ) {
+				continue;
+			}
+
+			// sanitize_title() keeps percent encoded octets intact.
+			$key = sanitize_title( (string) $key );
+
+			if ( '' === $key ) {
+				continue;
+			}
+
+			$sanitized[ $key ] = trim( wp_strip_all_tags( (string) $value ) );
 		}
 
 		return $sanitized;

@@ -276,7 +276,7 @@ class Xpo {
 		}
 
 		if ( $hash ) {
-			$final_url .= '#' . $hash;
+			$final_url .= '/#' . $hash;
 		}
 
 		return $final_url;
