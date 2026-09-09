@@ -86,6 +86,15 @@ final class Revenue {
 		add_action( 'wp_head', array( $this, 'inline_critical_css' ), 0 );
 
 		$this->include_promotions();
+
+		add_filter(
+			'body_class',
+			function ( $classes ) {
+				$classes[] = 'revenue-front-page'; // [ revenue-front-page, wopb-front-page, optn-front-page]
+
+				return $classes;
+			}
+		);
 	}
 
 	/**
