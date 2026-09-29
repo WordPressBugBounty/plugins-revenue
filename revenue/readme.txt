@@ -1,10 +1,10 @@
-=== WowRevenue ===
+=== WowRevenue - Product Bundles & Bulk Discounts ===
 Contributors: wpxpo, anik4e, jakirhasan
 Tags: product bundles, bogo, bulk discount, bought together, upsells  
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -193,6 +193,10 @@ This free plugin does not contact any licensing or update server. License activa
 9. Cross-selling on Cart Page 
 
 == Changelog ==
+
+= 2.3.2 – 29 September 2026 =
+* Improvement: Renamed the plugin to "WowRevenue - Product Bundles & Bulk Discounts" for clarity in the plugin directory and admin list.
+* Improvement: Removed the Upgrade to Pro section and related UI components from the Overview page.
 
 = 2.3.1 – 27 September 2026 =
 * Security: Added AJAX nonce verification to the add-to-cart and coupon save actions.
